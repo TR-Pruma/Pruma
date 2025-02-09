@@ -1,11 +1,9 @@
 package com.br.pruma.modelos;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
+
+
 @Entity
 public class ClienteTipo {
 
@@ -14,7 +12,7 @@ public class ClienteTipo {
     private Integer idClienteTipo;
 
     @ManyToOne
-    @JoinColumn(name = "tipoUsuario", referencedColumnName = "id")
+    @JoinColumn(name = "tipoUsuario", referencedColumnName = "tipoUsuario")
     private UsuarioTipo tipoUsuario;
 
     private String descricaoCliente;
