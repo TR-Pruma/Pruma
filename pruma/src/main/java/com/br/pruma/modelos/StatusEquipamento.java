@@ -1,19 +1,18 @@
 package com.br.pruma.modelos;
 
-
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
-@Table(name = "tipo_documento")
+@Table(name = "status_equipamento")
 @Data
-public class TipoDocumento {
+public class StatusEquipamento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "tipo_id")
+    @Column(name = "status_id")
     private Integer id;
 
-    @Column(name = "descricao", length = 100, nullable = false)
+    @Column(name = "descricao")
     private String descricao;
 }

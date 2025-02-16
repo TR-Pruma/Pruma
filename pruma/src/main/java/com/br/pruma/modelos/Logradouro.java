@@ -1,17 +1,18 @@
 package com.br.pruma.modelos;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
+import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
+@Table(name = "logradouro")
+@Data
 public class Logradouro {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idLogradouro;
+    @Column(name = "id_logradouro")
+    private Integer id;
 
+    @Column(name = "tipo", length = 255)
     private String tipo;
 }
