@@ -1,17 +1,18 @@
 package com.br.pruma.modelos;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
+import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
+@Table(name = "status_solicitacao")
+@Data
 public class StatusSolicitacao {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idStatusSolicitacao;
+    @Column(name = "status_solicitacao_id")
+    private Integer id;
 
+    @Column(name = "descricao_solicitacao")
     private String descricaoSolicitacao;
-
 }

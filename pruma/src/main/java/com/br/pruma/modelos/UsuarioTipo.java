@@ -1,17 +1,23 @@
 package com.br.pruma.modelos;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
+import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
+@Table(name = "usuario_tipo")
+@Data
 public class UsuarioTipo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer tipoUsuario;
+    @Column(name = "usuario_tipo_id")
+    private Integer id;
 
-    private String descricaoUsuario;
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", referencedColumnName = "usuario_id")
+    private Usuario usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "tipo_usuario_id", referencedColumnName = "tipo_usuario_id")
+    private TipoUsuario tipoUsuario;
 }

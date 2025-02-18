@@ -1,19 +1,22 @@
 package com.br.pruma.modelos;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 
-
+@Data
 @Entity
+@Table(name = "cliente_tipo")
 public class ClienteTipo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idClienteTipo;
+    @Column(name = "id_cliente_tipo")
+    private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "tipoUsuario", referencedColumnName = "tipoUsuario")
-    private UsuarioTipo tipoUsuario;
+    @JoinColumn(name = "tipo_usuario", referencedColumnName = "tipo_usuario")
+    private TipoUsuario tipoUsuario;
 
+    @Column(name = "descricao_cliente", length = 255)
     private String descricaoCliente;
 }

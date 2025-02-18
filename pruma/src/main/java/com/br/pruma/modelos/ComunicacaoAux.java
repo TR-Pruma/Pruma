@@ -1,0 +1,19 @@
+package com.br.pruma.modelos;
+
+
+import jakarta.persistence.*;
+import lombok.Data;
+
+@Data
+@Entity
+@Table(name = "comunicacao_aux")
+public class ComunicacaoAux {
+
+    @Id
+    @OneToOne
+    @JoinColumn(name = "comunicacao_id", referencedColumnName = "comunicacao_id")
+    private Comunicacao comunicacao;
+
+    @Column(name = "tipo_mensagem", length = 15)
+    private String tipoMensagem;
+}
