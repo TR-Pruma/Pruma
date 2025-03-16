@@ -17,15 +17,15 @@ public class LogAlteracao {
 
     @ManyToOne
     @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Projeto projeto;
+    private Integer projeto;
 
     @ManyToOne
     @JoinColumn(name = "cliente_cpf", referencedColumnName = "cliente_cpf")
-    private Cliente cliente;
+    private Long cliente;
 
     @ManyToOne
     @JoinColumn(name = "tipo_usuario", referencedColumnName = "tipo_usuario")
-    private TipoUsuario tipoUsuario;
+    private Long tipoUsuario;
 
     @Column(name = "descricao", length = 255)
     private String descricao;

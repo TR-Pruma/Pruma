@@ -15,7 +15,7 @@ public class ItemChecklist {
 
     @ManyToOne
     @JoinColumn(name = "checklist_id", referencedColumnName = "checklist_id")
-    private Checklist checklist;
+    private Integer checklist;
 
     @Column(name = "descricao", length = 255)
     private String descricao;

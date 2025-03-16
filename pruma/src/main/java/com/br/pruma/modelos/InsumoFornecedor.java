@@ -20,7 +20,7 @@ public class InsumoFornecedor {
 
     @ManyToOne
     @JoinColumn(name = "fornecedor_id", referencedColumnName = "fornecedor_id")
-    private Fornecedor fornecedor;
+    private Integer fornecedor;
 
     @Column(name = "preco", precision = 10, scale = 2)
     private BigDecimal preco;

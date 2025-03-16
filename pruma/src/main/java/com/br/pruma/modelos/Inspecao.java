@@ -16,11 +16,11 @@ public class Inspecao {
 
     @ManyToOne
     @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Projeto projeto;
+    private Integer projeto;
 
     @ManyToOne
     @JoinColumn(name = "tecnico_id", referencedColumnName = "profissional_cpf")
-    private ProfissionalDeBase tecnico;
+    private Long tecnico;
 
     @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;

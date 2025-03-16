@@ -15,7 +15,7 @@ public class Endereco {
 
     @ManyToOne
     @JoinColumn(name = "id_lougradouro", referencedColumnName = "id_lougradouro")
-    private Logradouro logradouro;
+    private Integer logradouro;
 
     @Column(name = "rua", length = 50)
     private String rua;

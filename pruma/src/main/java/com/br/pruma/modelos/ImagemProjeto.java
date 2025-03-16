@@ -17,7 +17,7 @@ public class ImagemProjeto {
 
     @ManyToOne
     @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Projeto projeto;
+    private Integer projeto;
 
     @Column(name = "caminho_arquivo", length = 255)
     private String caminhoArquivo;

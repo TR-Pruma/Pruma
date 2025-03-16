@@ -21,7 +21,7 @@ public class Lembrete {
 
     @ManyToOne
     @JoinColumn(name = "tipo_usuario", referencedColumnName = "tipo_usuario")
-    private TipoUsuario tipoUsuario;
+    private Integer tipoUsuario;
 
     @Column(name = "mensagem", columnDefinition = "TEXT")
     private String mensagem;

@@ -15,7 +15,7 @@ public class InsumoFornecedorAux {
 
     @ManyToOne
     @JoinColumn(name = "fornecedor_id", referencedColumnName = "fornecedor_id")
-    private Fornecedor fornecedor;
+    private Integer fornecedor;
 
     @Column(name = "preco")
     private Float preco;

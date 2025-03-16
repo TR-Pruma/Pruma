@@ -17,7 +17,7 @@ public class FaseCronograma {
 
     @ManyToOne
     @JoinColumn(name = "cronograma_id", referencedColumnName = "cronograma_id")
-    private Cronograma cronograma;
+    private Integer cronograma;
 
     @Column(name = "nome", length = 255)
     private String nome;

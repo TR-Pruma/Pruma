@@ -17,7 +17,7 @@ public class Pagamento {
 
     @ManyToOne
     @JoinColumn(name = "orcamento_id", referencedColumnName = "orcamento_id")
-    private Orcamento orcamento;
+    private Integer orcamento;
 
     @Column(name = "valor", precision = 18, scale = 2)
     private BigDecimal valor;

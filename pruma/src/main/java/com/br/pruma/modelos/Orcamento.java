@@ -17,11 +17,11 @@ public class Orcamento {
 
     @ManyToOne
     @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Projeto projeto;
+    private Integer projeto;
 
     @ManyToOne
     @JoinColumn(name = "empresa_cnpj", referencedColumnName = "empresa_cnpj")
-    private Empresa empresa;
+    private Long empresa;
 
     @Column(name = "valor", precision = 18, scale = 2)
     private BigDecimal valor;

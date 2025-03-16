@@ -15,7 +15,7 @@ public class Cronograma {
 
     @ManyToOne
     @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Projeto projeto;
+    private Integer projeto;
 
     @Column(name = "data_inicio")
     private LocalDate dataInicio;

@@ -14,11 +14,11 @@ public class MaterialUtilizado {
 
     @ManyToOne
     @JoinColumn(name = "material_id", referencedColumnName = "material_id")
-    private Material material;
+    private Integer material;
 
     @ManyToOne
     @JoinColumn(name = "atividade_id", referencedColumnName = "atividade_id")
-    private Atividade atividade;
+    private Integer atividade;
 
     @Column(name = "quantidade_utilizada")
     private Integer quantidadeUtilizada;

@@ -15,11 +15,11 @@ public class EquipamentoProjeto {
 
     @ManyToOne
     @JoinColumn(name = "equipamento_id", referencedColumnName = "equipamento_id")
-    private Equipamento equipamento;
+    private Integer equipamento;
 
     @ManyToOne
     @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Projeto projeto;
+    private Integer projeto;
 
     @Column(name = "data_alocacao")
     private LocalDate dataAlocacao;

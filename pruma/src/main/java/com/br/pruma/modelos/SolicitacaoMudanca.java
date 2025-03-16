@@ -17,14 +17,14 @@ public class SolicitacaoMudanca {
 
     @ManyToOne
     @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Projeto projeto;
+    private Integer projeto;
 
     @Column(name = "descricao")
     private String descricao;
 
     @ManyToOne
     @JoinColumn(name = "status_solicitacao_id", referencedColumnName = "status_solicitacao_id")
-    private StatusSolicitacao statusSolicitacao;
+    private Integer statusSolicitacao;
 
     @Column(name = "data_solicitacao")
     @Temporal(TemporalType.DATE)

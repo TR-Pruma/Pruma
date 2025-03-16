@@ -21,5 +21,5 @@ public class Equipamento {
 
     @ManyToOne
     @JoinColumn(name = "status_id", referencedColumnName = "status_id")
-    private StatusEquipamento status;
+    private Integer status;
 }

@@ -16,11 +16,11 @@ public class Notificacao {
 
     @ManyToOne
     @JoinColumn(name = "cliente_cpf", referencedColumnName = "cliente_cpf")
-    private Cliente cliente;
+    private Long cliente;
 
     @ManyToOne
     @JoinColumn(name = "tipo_usuario", referencedColumnName = "tipo_usuario")
-    private TipoUsuario tipoUsuario;
+    private Integer tipoUsuario;
 
     @Column(name = "mensagem", length = 255)
     private String mensagem;

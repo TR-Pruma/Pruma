@@ -16,7 +16,7 @@ public class TermoGarantia {
 
     @ManyToOne
     @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Projeto projeto;
+    private Integer projeto;
 
     @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;

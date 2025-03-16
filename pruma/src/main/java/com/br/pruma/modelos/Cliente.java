@@ -25,7 +25,7 @@ public class Cliente {
 
     @ManyToOne
     @JoinColumn(name = "Id_endereco", referencedColumnName = "id_endereco")
-    private Endereco endereco;
+    private Integer endereco;
 
     @Column(name = "Senha", length = 15)
     private String senha;

@@ -17,7 +17,7 @@ public class Relatorio {
 
     @ManyToOne
     @JoinColumn(name = "obra_id", referencedColumnName = "obra_id")
-    private Obra obra;
+    private Integer obra;
 
     @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;

@@ -16,11 +16,11 @@ public class MensagemInstantanea {
 
     @ManyToOne
     @JoinColumn(name = "cliente_cpf", referencedColumnName = "cliente_cpf")
-    private Cliente cliente;
+    private Long cliente;
 
     @ManyToOne
     @JoinColumn(name = "tipo_usuario", referencedColumnName = "tipo_usuario")
-    private TipoUsuario tipoUsuario;
+    private Integer tipoUsuario;
 
     @Column(name = "destinatario_id", columnDefinition = "TEXT")
     private String destinatarioId;

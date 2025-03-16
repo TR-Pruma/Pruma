@@ -17,11 +17,11 @@ public class Documento {
 
     @ManyToOne
     @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Projeto projeto;
+    private Integer projeto;
 
     @ManyToOne
     @JoinColumn(name = "id_tipo_documento", referencedColumnName = "id_tipo_documento")
-    private TipoDocumento tipoDocumento;
+    private Integer tipoDocumento;
 
     @Column(name = "caminho_arquivo", length = 50)
     private String caminhoArquivo;

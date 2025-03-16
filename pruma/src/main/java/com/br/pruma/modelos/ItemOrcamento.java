@@ -16,7 +16,7 @@ public class ItemOrcamento {
 
     @ManyToOne
     @JoinColumn(name = "orcamento_id", referencedColumnName = "orcamento_id")
-    private Orcamento orcamento;
+    private Integer orcamento;
 
     @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;

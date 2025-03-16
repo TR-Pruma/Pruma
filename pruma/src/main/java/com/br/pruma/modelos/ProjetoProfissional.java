@@ -14,9 +14,9 @@ public class ProjetoProfissional {
 
     @ManyToOne
     @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Projeto projeto;
+    private Integer projeto;
 
     @ManyToOne
     @JoinColumn(name = "profissional_id", referencedColumnName = "profissional_id")
-    private ProfissionalDeBase profissional;
+    private Integer profissional;
 }

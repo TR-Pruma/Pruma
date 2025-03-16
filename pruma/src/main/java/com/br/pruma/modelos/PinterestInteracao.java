@@ -16,7 +16,7 @@ public class PinterestInteracao {
 
     @ManyToOne
     @JoinColumn(name = "cliente_cpf", referencedColumnName = "cliente_cpf")
-    private Cliente cliente;
+    private Long cliente;
 
     @Column(name = "tipo_interacao", length = 50)
     private String tipoInteracao;

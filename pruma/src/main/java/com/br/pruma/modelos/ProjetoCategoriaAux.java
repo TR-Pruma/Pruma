@@ -15,9 +15,9 @@ public class ProjetoCategoriaAux {
 
     @ManyToOne
     @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Projeto projeto;
+    private Integer projeto;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id", referencedColumnName = "categoria_id")
-    private ProjetoCategoria categoria;
+    private Integer categoria;
 }

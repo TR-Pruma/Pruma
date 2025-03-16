@@ -16,11 +16,11 @@ public class HistoricoLocalizacao {
 
     @ManyToOne
     @JoinColumn(name = "profissional_cpf", referencedColumnName = "profissional_cpf")
-    private ProfissionalDeBase profissional;
+    private Long profissional;
 
     @ManyToOne
     @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Projeto projeto;
+    private Integer projeto;
 
     @Column(name = "localizacao", length = 50)
     private String localizacao;

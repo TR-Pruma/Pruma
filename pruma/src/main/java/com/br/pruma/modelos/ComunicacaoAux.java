@@ -12,7 +12,7 @@ public class ComunicacaoAux {
     @Id
     @OneToOne
     @JoinColumn(name = "comunicacao_id", referencedColumnName = "comunicacao_id")
-    private Comunicacao comunicacao;
+    private Integer comunicacao;
 
     @Column(name = "tipo_mensagem", length = 15)
     private String tipoMensagem;

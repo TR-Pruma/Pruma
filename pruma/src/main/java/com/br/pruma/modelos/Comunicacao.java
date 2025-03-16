@@ -16,11 +16,11 @@ public class Comunicacao {
 
     @ManyToOne
     @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Projeto projeto;
+    private Integer projeto;
 
     @ManyToOne
     @JoinColumn(name = "id_cliente", referencedColumnName = "cliente_cpf")
-    private Cliente cliente;
+    private Long cliente;
 
     @Column(name = "tipo_remetente", length = 15)
     private String tipoRemetente;

@@ -15,7 +15,7 @@ public class UsuarioTipo {
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", referencedColumnName = "usuario_id")
-    private Usuario usuario;
+    private Integer usuario;
 
     @ManyToOne
     @JoinColumn(name = "tipo_usuario_id", referencedColumnName = "tipo_usuario_id")

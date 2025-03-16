@@ -15,7 +15,7 @@ public class ClienteTipo {
 
     @ManyToOne
     @JoinColumn(name = "tipo_usuario", referencedColumnName = "tipo_usuario")
-    private TipoUsuario tipoUsuario;
+    private Integer tipoUsuario;
 
     @Column(name = "descricao_cliente", length = 255)
     private String descricaoCliente;
