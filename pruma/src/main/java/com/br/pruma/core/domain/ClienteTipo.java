@@ -1,0 +1,22 @@
+package com.br.pruma.core.domain;
+
+import jakarta.persistence.*;
+import lombok.Data;
+
+
+@Data
+@Entity
+@Table(name = "cliente_tipo")
+public class ClienteTipo {
+
+    @Id
+    @Column(name = "id_cliente_tipo")
+    private Integer id;
+
+    @ManyToOne
+    @JoinColumn(name = "tipo_usuario", referencedColumnName = "tipo_usuario")
+    private Integer tipoUsuario;
+
+    @Column(name = "descricao_cliente", length = 255)
+    private String descricaoCliente;
+}

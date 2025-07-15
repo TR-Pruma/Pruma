@@ -1,0 +1,22 @@
+package com.br.pruma.core.domain;
+
+
+import jakarta.persistence.*;
+import lombok.Data;
+
+@Entity
+@Table(name = "insumo_fornecedor_aux")
+@Data
+public class InsumoFornecedorAux {
+
+    @Id
+    @Column(name = "insumo_id")
+    private Integer insumoId;
+
+    @ManyToOne
+    @JoinColumn(name = "fornecedor_id", referencedColumnName = "fornecedor_id")
+    private Integer fornecedor;
+
+    @Column(name = "preco")
+    private Float preco;
+}
