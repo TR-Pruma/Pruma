@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/usuario")
-@Api(tags = "Endpoint do Usuario", description = "Endpoint usado para o usuario")
+@Api(tags = "Endpoint do Usuario")
 public class UsuarioController {
 }

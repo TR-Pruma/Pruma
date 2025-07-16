@@ -10,4 +10,5 @@ public class AuditoriaRequestDTO {
     private String acao;
     private String usuario;
     private LocalDateTime dataHora;
+
 }
