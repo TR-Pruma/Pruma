@@ -1,4 +1,4 @@
-package com.br.pruma.servicos;
+package com.br.pruma.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
