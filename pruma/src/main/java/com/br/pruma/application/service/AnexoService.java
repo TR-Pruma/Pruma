@@ -1,33 +1,51 @@
 package com.br.pruma.application.service;
 
 
+import com.br.pruma.application.dto.request.AnexoRequestDTO;
+import com.br.pruma.application.dto.response.AnexoResponseDTO;
+import com.br.pruma.application.mapper.AnexoMapper;
+import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.Anexo;
-import com.br.pruma.core.repository.AnexoRepository;
+import com.br.pruma.infra.repository.AnexoRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class AnexoService {
-    private final AnexoRepository anexoRepository;
 
-    public AnexoService(AnexoRepository anexoRepository) {
-        this.anexoRepository = anexoRepository;
+    private final AnexoRepository repository;
+    private final AnexoMapper mapper;
+
+    public AnexoService(AnexoRepository repository, AnexoMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
     }
 
-    public List<Anexo> listarTodos() {
-        return anexoRepository.findAll();
+    public List<AnexoResponseDTO> listarTodos() {
+        return repository.findAll()
+                .stream()
+                .map(mapper::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
-    public Optional<Anexo> buscarPorId(Long id) {
-        return anexoRepository.findById(id);
+    public AnexoResponseDTO buscarPorId(Long id) {
+        Anexo anexo = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Anexo com ID " + id + " não encontrado."));
+        return mapper.toResponseDTO(anexo);
     }
 
-    public Anexo salvar(Anexo anexo) {
-        return anexoRepository.save(anexo);
+    public AnexoResponseDTO salvar(AnexoRequestDTO dto) {
+        Anexo anexo = mapper.toEntity(dto);
+        Anexo salvo = repository.save(anexo);
+        return mapper.toResponseDTO(salvo);
     }
 
     public void deletar(Long id) {
-        anexoRepository.deleteById(id);
+        if (!repository.existsById(id)) {
+            throw new RecursoNaoEncontradoException("Não é possível deletar. Anexo com ID " + id + " não existe.");
+        }
+        repository.deleteById(id);
     }
 }
+

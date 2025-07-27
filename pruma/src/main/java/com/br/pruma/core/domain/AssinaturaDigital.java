@@ -5,7 +5,6 @@ import lombok.Data;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.time.LocalDateTime;
-
 @ApiModel(description = "Representa uma assinatura digital vinculada a um cliente e um documento")
 @Data
 @Entity
@@ -21,19 +20,20 @@ public class AssinaturaDigital {
     @ManyToOne
     @JoinColumn(name = "cliente_cpf", referencedColumnName = "cliente_cpf")
     @ApiModelProperty(value = "CPF do cliente que realizou a assinatura", example = "12345678900")
-    private Long cliente;
+    private Cliente cliente;  // É um objeto, não Long!
 
     @ManyToOne
     @JoinColumn(name = "tipo_usuario", referencedColumnName = "tipo_usuario")
     @ApiModelProperty(value = "Tipo de usuário que realizou a assinatura", example = "2")
-    private Integer tipoUsuario;
+    private TipoUsuario tipoUsuario; // Também objeto
 
     @ManyToOne
     @JoinColumn(name = "documento_id", referencedColumnName = "documento_id")
     @ApiModelProperty(value = "Identificador do documento assinado", example = "10")
-    private Integer documento;
+    private Documento documento; // Outro objeto
 
     @Column(name = "data_hora")
     @ApiModelProperty(value = "Data e hora da assinatura", example = "2024-03-16T14:30:00")
     private LocalDateTime dataHora;
 }
+
