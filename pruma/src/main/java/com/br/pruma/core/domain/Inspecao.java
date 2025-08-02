@@ -2,6 +2,7 @@ package com.br.pruma.core.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.util.Date;
 
 @Entity

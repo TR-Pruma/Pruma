@@ -9,7 +9,8 @@ import java.time.LocalDate;
 @Table(name = "tarefa")
 @Data
 public class Tarefa {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int tarefaId;
 
     @ManyToOne

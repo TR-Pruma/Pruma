@@ -1,12 +1,18 @@
 package com.br.pruma.core.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import java.util.Date;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "subcontrato")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class SubContrato {
 
     @Id
@@ -14,25 +20,33 @@ public class SubContrato {
     @Column(name = "subcontrato_id")
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "cliente_cpf", referencedColumnName = "cliente_cpf")
-    private Long cliente;
+    // CORREÇÃO: Mapeamento para a entidade Cliente.
+    // Assumindo que a entidade Cliente existe e tem um campo `cliente_cpf`.
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_cpf", referencedColumnName = "cliente_cpf", nullable = false)
+    private Cliente cliente;
 
-    @ManyToOne
-    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Integer projeto;
+    // CORREÇÃO: Mapeamento para a entidade Projeto.
+    // Assumindo que a entidade Projeto existe.
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id", nullable = false)
+    private Projeto projeto;
 
     @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;
 
-    @Column(name = "valor")
+    @NotNull(message = "O valor é obrigatório.")
+    @Column(name = "valor", nullable = false)
     private Float valor;
 
-    @Column(name = "data_inicio")
-    @Temporal(TemporalType.DATE)
-    private Date dataInicio;
+    // CORREÇÃO: Uso de java.time.LocalDate
+    @NotNull(message = "A data de início é obrigatória.")
+    @Column(name = "data_inicio", nullable = false)
+    private LocalDate dataInicio;
 
+    // CORREÇÃO: Uso de java.time.LocalDate
     @Column(name = "data_fim")
-    @Temporal(TemporalType.DATE)
-    private Date dataFim;
+    private LocalDate dataFim;
 }

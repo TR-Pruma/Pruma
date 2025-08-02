@@ -7,7 +7,10 @@ import java.util.Optional;
 
 public interface AuditoriaRepository {
     List<Auditoria> findAll();
+
     Optional<Auditoria> findById(Integer id);
+
     Auditoria save(Auditoria auditoria);
+
     void deleteById(Integer id);
 }
