@@ -19,7 +19,6 @@ public class ItemChecklistResponseDTO {
 
     @ApiModelProperty(value = "Descrição do item", example = "Verificar documentação técnica")
     private String descricao;
-
     @ApiModelProperty(value = "Ordem do item no checklist", example = "1")
     private Integer ordem;
 
@@ -29,3 +28,4 @@ public class ItemChecklistResponseDTO {
     @ApiModelProperty(value = "Indica se o item está concluído", example = "true")
     private boolean concluido;
 }
+

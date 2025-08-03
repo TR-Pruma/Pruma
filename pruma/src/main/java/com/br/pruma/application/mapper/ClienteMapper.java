@@ -4,38 +4,66 @@ import com.br.pruma.application.dto.request.ClienteRequestDTO;
 import com.br.pruma.application.dto.response.ClienteResponseDTO;
 import com.br.pruma.core.domain.Cliente;
 import com.br.pruma.core.domain.Endereco;
-import org.mapstruct.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring", uses = {EnderecoMapper.class})
-public abstract class ClienteMapper {
+@Component
+public class ClienteMapper {
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    protected PasswordEncoder passwordEncoder;
-
-    @Mapping(target = "endereco", source = "enderecoId", qualifiedByName = "idToEndereco")
-    @Mapping(target = "senha", expression = "java(passwordEncoder.encode(dto.getSenha()))")
-    @Mapping(target = "ativo", constant = "true")
-    public abstract Cliente toEntity(ClienteRequestDTO dto);
-
-    @Mapping(target = "endereco", source = "endereco")
-    public abstract ClienteResponseDTO toResponseDTO(Cliente cliente);
-
-    @Named("idToEndereco")
-    protected Endereco idToEndereco(Integer id) {
-        if (id == null) {
-            return null;
-        }
-        Endereco endereco = new Endereco();
-        endereco.setId(id);
-        return endereco;
+    public ClienteMapper(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
     }
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "cpf", ignore = true)
-    @Mapping(target = "ativo", ignore = true)
-    @Mapping(target = "endereco", source = "enderecoId", qualifiedByName = "idToEndereco")
-    @Mapping(target = "senha", expression = "java(dto.getSenha() != null ? passwordEncoder.encode(dto.getSenha()) : entity.getSenha())")
-    public abstract void updateEntity(@MappingTarget Cliente entity, ClienteRequestDTO dto);
+    public Cliente toEntity(ClienteRequestDTO dto, Endereco endereco) {
+        return Cliente.builder()
+                .cpf(dto.getCpf())
+                .nome(dto.getNome())
+                .email(dto.getEmail())
+                .telefone(dto.getTelefone())
+                .endereco(endereco)
+                .senha(passwordEncoder.encode(dto.getSenha()))
+                .ativo(true)
+                .build();
+    }
+
+    public ClienteResponseDTO toDTO(Cliente entity) {
+        String enderecoCompleto = "";
+        if (entity.getEndereco() != null) {
+            Endereco endereco = entity.getEndereco();
+            enderecoCompleto = String.format("%s, %s%s - %s, %s/%s, CEP: %s",
+                    endereco.getLogradouro(),
+                    endereco.getNumero(),
+                    endereco.getComplemento() != null && !endereco.getComplemento().isEmpty() ?
+                        ", " + endereco.getComplemento() : "",
+                    endereco.getBairro(),
+                    endereco.getCidade(),
+                    endereco.getUf(),
+                    endereco.getCep());
+        }
+
+        return ClienteResponseDTO.builder()
+                .id(entity.getId())
+                .cpf(entity.getCpf())
+                .nome(entity.getNome())
+                .email(entity.getEmail())
+                .telefone(entity.getTelefone())
+                .enderecoCompleto(enderecoCompleto)
+                .dataCriacao(entity.getDataCriacao())
+                .dataAtualizacao(entity.getDataAtualizacao())
+                .versao(entity.getVersao())
+                .ativo(entity.getAtivo())
+                .build();
+    }
+
+    public void updateEntity(Cliente entity, ClienteRequestDTO dto, Endereco endereco) {
+        entity.setCpf(dto.getCpf());
+        entity.setNome(dto.getNome());
+        entity.setEmail(dto.getEmail());
+        entity.setTelefone(dto.getTelefone());
+        entity.setEndereco(endereco);
+        if (dto.getSenha() != null && !dto.getSenha().isEmpty()) {
+            entity.setSenha(passwordEncoder.encode(dto.getSenha()));
+        }
+    }
 }

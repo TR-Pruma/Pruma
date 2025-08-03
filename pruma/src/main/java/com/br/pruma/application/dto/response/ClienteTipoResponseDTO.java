@@ -11,13 +11,10 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClienteResponseDTO {
+public class ClienteTipoResponseDTO {
     private Integer id;
-    private String cpf;
-    private String nome;
-    private String email;
-    private String telefone;
-    private String enderecoCompleto;
+    private Integer tipoUsuarioId;
+    private String descricaoCliente;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataAtualizacao;
     private Long versao;

@@ -120,7 +120,7 @@ public class Checklist implements Serializable {
         if (novaOrdem == ordemAtual) {
             return;
         }
-
+        
         itens.stream()
             .filter(i -> i != item)
             .forEach(i -> {
@@ -143,9 +143,9 @@ public class Checklist implements Serializable {
     }
 
     public boolean isCompleto() {
-        return !itens.isEmpty() &&
+        return !itens.isEmpty() && 
                itens.stream()
-                    .allMatch(item -> StatusItem.CONCLUIDO.equals(item.getStatus()) ||
+                    .allMatch(item -> StatusItem.CONCLUIDO.equals(item.getStatus()) || 
                                     StatusItem.CANCELADO.equals(item.getStatus()));
     }
 

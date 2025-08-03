@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -26,3 +25,4 @@ public class ChecklistRequestDTO {
     @ApiModelProperty(value = "ID do projeto ao qual o checklist pertence", required = true, example = "1")
     private Integer projetoId;
 }
+

@@ -1,40 +1,59 @@
 package com.br.pruma.core.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-@Data
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "endereco")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Endereco {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_endereco")
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "id_lougradouro", referencedColumnName = "id_lougradouro")
-    private Integer logradouro;
+    @Column(nullable = false)
+    private String logradouro;
 
-    @Column(name = "rua", length = 50)
-    private String rua;
+    @Column(nullable = false)
+    private String numero;
 
-    @Column(name = "numero")
-    private Integer numero;
-
-    @Column(name = "complemento", length = 15)
     private String complemento;
 
-    @Column(name = "bairro", length = 30)
+    @Column(nullable = false)
     private String bairro;
 
-    @Column(name = "cidade", length = 30)
+    @Column(nullable = false)
     private String cidade;
 
-    @Column(name = "estado", length = 50)
-    private String estado;
+    @Column(nullable = false, length = 2)
+    private String uf;
 
-    @Column(name = "pais", length = 15)
-    private String pais;
+    @Column(nullable = false, length = 8)
+    private String cep;
+
+    @CreationTimestamp
+    @Column(name = "data_criacao", nullable = false, updatable = false)
+    private LocalDateTime dataCriacao;
+
+    @UpdateTimestamp
+    @Column(name = "data_atualizacao")
+    private LocalDateTime dataAtualizacao;
+
+    @Version
+    @Column(name = "versao")
+    private Long versao;
+
+    @Column(nullable = false)
+    private Boolean ativo = true;
 }
