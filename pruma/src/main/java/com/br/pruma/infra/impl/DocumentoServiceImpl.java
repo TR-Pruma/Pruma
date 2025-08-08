@@ -3,7 +3,7 @@ package com.br.pruma.infra.impl;
 import com.br.pruma.application.dto.request.DocumentoRequestDTO;
 import com.br.pruma.application.dto.response.DocumentoResponseDTO;
 import com.br.pruma.application.mapper.DocumentoMapper;
-import com.br.pruma.application.service.DocumentoService;
+import com.br.pruma.infra.repository.DocumentoService;
 import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.Documento;
 import com.br.pruma.core.domain.Projeto;

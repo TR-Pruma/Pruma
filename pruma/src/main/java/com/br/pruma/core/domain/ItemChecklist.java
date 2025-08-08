@@ -14,6 +14,9 @@ import org.hibernate.annotations.SQLDelete;
 
 import java.io.Serializable;
 
+@FilterDef(name = "ativoFilter", parameters = @ParamDef(name = "ativo", type = boolean.class))
+@Filter(name = "ativoFilter", condition = "ativo = :ativo")
+
 @Entity
 @Getter
 @Setter
@@ -24,8 +27,7 @@ import java.io.Serializable;
     indexes = @Index(name = "idx_item_checklist_ordem", columnList = "ordem")
 )
 @SQLDelete(sql = "UPDATE item_checklist SET ativo = false WHERE item_id = ?")
-@FilterDef(name = "ativoFilter", parameters = @ParamDef(name = "ativo", type = boolean.class))
-@Filter(name = "ativoFilter", condition = "ativo = :ativo")
+@org.hibernate.annotations.Where(clause = "ativo = true")
 @ApiModel(description = "Representa um item do checklist")
 public class ItemChecklist implements Serializable {
 
@@ -74,3 +76,5 @@ public class ItemChecklist implements Serializable {
         this.ativo = true;
     }
 }
+
+

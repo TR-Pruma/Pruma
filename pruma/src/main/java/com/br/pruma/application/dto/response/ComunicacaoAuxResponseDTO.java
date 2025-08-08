@@ -1,5 +1,4 @@
 package com.br.pruma.application.dto.response;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,3 +32,4 @@ public class ComunicacaoAuxResponseDTO {
     private Integer clienteId;
     private String clienteNome;
 }
+

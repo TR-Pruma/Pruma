@@ -19,7 +19,6 @@ public class CronogramaRequestDTO {
     @NotNull(message = "O ID do projeto é obrigatório")
     @Schema(description = "ID do projeto", example = "1")
     private Integer projetoId;
-
     @NotNull(message = "A data de início é obrigatória")
     @Schema(description = "Data de início do cronograma", example = "2025-08-01")
     private LocalDate dataInicio;
@@ -31,3 +30,4 @@ public class CronogramaRequestDTO {
     @Schema(description = "Descrição do cronograma", example = "Cronograma de implementação do sistema")
     private String descricao;
 }
+

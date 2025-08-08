@@ -14,11 +14,17 @@ import java.util.Optional;
 public interface ChecklistRepository extends JpaRepository<Checklist, Integer> {
 
     @Query("SELECT c FROM Checklist c WHERE c.projeto.id = :projetoId")
-    List<Checklist> findByProjetoIdAndAtivo(@Param("projetoId") Integer projetoId);
 
     @Query("SELECT c FROM Checklist c LEFT JOIN FETCH c.itens i LEFT JOIN FETCH c.projeto WHERE c.id = :id")
-    Optional<Checklist> findByIdWithItens(@Param("id") Integer id);
 
+
+
+
+    @Query("SELECT c FROM Checklist c LEFT JOIN FETCH c.itens WHERE c.projeto.id = :projetoId ORDER BY c.dataCriacao DESC")
+    List<Checklist> findByProjetoIdWithItens(@Param("projetoId") Integer projetoId);
+
+    @Query("SELECT COUNT(c) > 0 FROM Checklist c WHERE c.nome = :nome AND c.projeto.id = :projetoId AND c.id <> :checklistId")
+    boolean existsByNomeAndProjetoIdAndIdNot(@Param("nome") String nome, @Param("projetoId") Integer projetoId, @Param("checklistId") Integer checklistId);
     boolean existsByNomeAndProjetoIdAndAtivoTrue(String nome, Integer projetoId);
 
     @Modifying
@@ -26,10 +32,4 @@ public interface ChecklistRepository extends JpaRepository<Checklist, Integer> {
     void softDelete(@Param("id") Integer id);
 
     List<Checklist> findByNomeContainingIgnoreCaseAndAtivoTrue(String nome);
-
-    @Query("SELECT c FROM Checklist c LEFT JOIN FETCH c.itens WHERE c.projeto.id = :projetoId ORDER BY c.dataCriacao DESC")
-    List<Checklist> findByProjetoIdWithItens(@Param("projetoId") Integer projetoId);
-
-    @Query("SELECT COUNT(c) > 0 FROM Checklist c WHERE c.nome = :nome AND c.projeto.id = :projetoId AND c.id <> :checklistId")
-    boolean existsByNomeAndProjetoIdAndIdNot(@Param("nome") String nome, @Param("projetoId") Integer projetoId, @Param("checklistId") Integer checklistId);
 }

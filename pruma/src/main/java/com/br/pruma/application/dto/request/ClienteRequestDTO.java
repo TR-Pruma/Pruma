@@ -17,7 +17,6 @@ public class ClienteRequestDTO {
     @Pattern(regexp = "^\\d{11}$", message = "CPF deve ter 11 dígitos")
     @ApiModelProperty(value = "CPF do cliente", example = "12345678900")
     private String cpf;
-
     @NotBlank(message = "Nome é obrigatório")
     @Size(min = 3, max = 100, message = "Nome deve ter entre 3 e 100 caracteres")
     @ApiModelProperty(value = "Nome do cliente", example = "João da Silva")
@@ -42,3 +41,4 @@ public class ClienteRequestDTO {
     @ApiModelProperty(value = "Senha do cliente")
     private String senha;
 }
+

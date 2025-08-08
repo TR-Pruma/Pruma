@@ -2,7 +2,7 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.CronogramaRequestDTO;
 import com.br.pruma.application.dto.response.CronogramaResponseDTO;
-import com.br.pruma.application.service.CronogramaService;
+import com.br.pruma.infra.repository.CronogramaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,7 +28,6 @@ import java.util.List;
 public class CronogramaController {
 
     private final CronogramaService cronogramaService;
-
     @PostMapping
     @Operation(summary = "Criar novo cronograma")
     @ApiResponses(value = {
@@ -129,3 +128,4 @@ public class CronogramaController {
         cronogramaService.deletar(id);
     }
 }
+

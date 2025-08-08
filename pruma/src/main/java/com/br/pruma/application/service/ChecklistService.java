@@ -6,7 +6,6 @@ import com.br.pruma.application.mapper.ChecklistMapper;
 import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.Checklist;
 import com.br.pruma.core.repository.ChecklistRepository;
-import com.br.pruma.core.repository.ProjetoRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;

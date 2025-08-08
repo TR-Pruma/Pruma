@@ -27,7 +27,6 @@ public class DocumentoResponseDTO {
 
     @Schema(description = "ID do tipo de documento", example = "1")
     private Integer tipoDocumentoId;
-
     @Schema(description = "Nome do tipo de documento", example = "Contrato")
     private String tipoDocumentoNome;
 
@@ -57,3 +56,4 @@ public class DocumentoResponseDTO {
     @Schema(description = "Indica se o documento está ativo", example = "true")
     private Boolean ativo;
 }
+

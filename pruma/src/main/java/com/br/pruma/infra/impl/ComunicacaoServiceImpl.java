@@ -1,6 +1,6 @@
 package com.br.pruma.infra.impl;
 
-import com.br.pruma.core.repository.ComunicacaoService;
+import com.br.pruma.infra.repository.ComunicacaoService;
 import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.Comunicacao;
 import com.br.pruma.core.repository.ComunicacaoRepository;
@@ -35,37 +35,26 @@ public class ComunicacaoServiceImpl implements ComunicacaoService {
     @Override
     @Transactional(readOnly = true)
     public Page<Comunicacao> listarPorProjeto(Integer projetoId, Pageable pageable) {
-        return comunicacaoRepository.findByProjetoIdAndAtivoTrueOrderByDataHoraDesc(projetoId, pageable);
+        return comunicacaoRepository.findByProjetoIdAndAtivoTrueOrderByDataCriacaoDesc(projetoId, pageable);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Comunicacao> listarPorCliente(Integer clienteId) {
-        return comunicacaoRepository.findByClienteIdAndAtivoTrueOrderByDataHoraDesc(clienteId);
+        return comunicacaoRepository.findByClienteIdAndAtivoTrueOrderByDataCriacaoDesc(clienteId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<Comunicacao> listarPorProjetoECliente(Integer projetoId, Integer clienteId, Pageable pageable) {
-        return comunicacaoRepository.findByProjetoIdAndClienteIdAndAtivoTrueOrderByDataHoraDesc(projetoId, clienteId, pageable);
-    }
-
-    @Override
-    @Transactional
-    public Comunicacao atualizar(Integer id, Comunicacao comunicacao) {
-        Comunicacao comunicacaoExistente = buscarPorId(id);
-
-        comunicacaoExistente.setMensagem(comunicacao.getMensagem());
-        comunicacaoExistente.setTipoRemetente(comunicacao.getTipoRemetente());
-
-        return comunicacaoRepository.save(comunicacaoExistente);
+        return comunicacaoRepository.findByProjetoIdAndClienteIdAndAtivoTrueOrderByDataCriacaoDesc(
+            projetoId, clienteId, pageable);
     }
 
     @Override
     @Transactional
     public void deletar(Integer id) {
         Comunicacao comunicacao = buscarPorId(id);
-        comunicacao.setAtivo(false);
-        comunicacaoRepository.save(comunicacao);
+        comunicacaoRepository.delete(comunicacao);
     }
 }

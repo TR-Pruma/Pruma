@@ -3,7 +3,7 @@ package com.br.pruma.infra.impl;
 import com.br.pruma.application.dto.request.CronogramaRequestDTO;
 import com.br.pruma.application.dto.response.CronogramaResponseDTO;
 import com.br.pruma.application.mapper.CronogramaMapper;
-import com.br.pruma.application.service.CronogramaService;
+import com.br.pruma.infra.repository.CronogramaService;
 import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.Cronograma;
 import com.br.pruma.core.domain.Projeto;

@@ -1,21 +1,20 @@
 package com.br.pruma.core.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-@Entity
-@Table(name = "endereco")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "endereco")
 public class Endereco {
 
     @Id
@@ -56,4 +55,21 @@ public class Endereco {
 
     @Column(nullable = false)
     private Boolean ativo = true;
+
+    @ManyToOne
+    @JoinColumn(name = "empresa_cnpj", nullable = false)
+    private Empresa empresa;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Endereco)) return false;
+        Endereco endereco = (Endereco) o;
+        return Objects.equals(id, endereco.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

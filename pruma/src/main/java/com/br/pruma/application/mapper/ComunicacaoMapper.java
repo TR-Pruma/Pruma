@@ -5,44 +5,26 @@ import com.br.pruma.application.dto.response.ComunicacaoResponseDTO;
 import com.br.pruma.core.domain.Cliente;
 import com.br.pruma.core.domain.Comunicacao;
 import com.br.pruma.core.domain.Projeto;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
 
-import java.time.LocalDateTime;
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface ComunicacaoMapper {
 
-@Component
-public class ComunicacaoMapper {
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "projeto", source = "projeto")
+    @Mapping(target = "cliente", source = "cliente")
+    @Mapping(target = "ativo", constant = "true")
+    @Mapping(target = "dataCriacao", ignore = true)
+    @Mapping(target = "dataAtualizacao", ignore = true)
+    @Mapping(target = "versao", ignore = true)
+    Comunicacao toEntity(ComunicacaoRequestDTO dto, Projeto projeto, Cliente cliente);
 
-    public Comunicacao toEntity(ComunicacaoRequestDTO dto, Cliente cliente, Projeto projeto) {
-        return Comunicacao.builder()
-                .cliente(cliente)
-                .projeto(projeto)
-                .mensagem(dto.getMensagem())
-                .tipoRemetente(dto.getTipoRemetente())
-                .dataHora(LocalDateTime.now())
-                .ativo(true)
-                .build();
-    }
+    @Mapping(target = "projetoId", source = "projeto.id")
+    @Mapping(target = "projetoNome", source = "projeto.nome")
+    @Mapping(target = "clienteId", source = "cliente.id")
+    @Mapping(target = "clienteNome", source = "cliente.nome")
+    ComunicacaoResponseDTO toDTO(Comunicacao entity);
 
-    public ComunicacaoResponseDTO toResponse(Comunicacao entity) {
-        return ComunicacaoResponseDTO.builder()
-                .id(entity.getId())
-                .mensagem(entity.getMensagem())
-                .tipoRemetente(entity.getTipoRemetente())
-                .projetoId(entity.getProjeto().getId())
-                .projetoNome(entity.getProjeto().getNome())
-                .clienteId(entity.getCliente().getId())
-                .clienteNome(entity.getCliente().getNome())
-                .dataHora(entity.getDataHora())
-                .dataAtualizacao(entity.getDataAtualizacao())
-                .versao(entity.getVersao())
-                .ativo(entity.getAtivo())
-                .build();
-    }
-
-    public void updateEntity(Comunicacao entity, ComunicacaoRequestDTO dto, Cliente cliente, Projeto projeto) {
-        entity.setCliente(cliente);
-        entity.setProjeto(projeto);
-        entity.setMensagem(dto.getMensagem());
-        entity.setTipoRemetente(dto.getTipoRemetente());
-    }
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateEntity(@MappingTarget Comunicacao entity, ComunicacaoRequestDTO dto);
 }

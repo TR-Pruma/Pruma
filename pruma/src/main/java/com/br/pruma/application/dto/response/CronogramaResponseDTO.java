@@ -40,7 +40,6 @@ public class CronogramaResponseDTO {
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     @Schema(description = "Data de criação do registro", example = "01/08/2025 10:30:00")
     private LocalDateTime dataCriacao;
-
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     @Schema(description = "Data da última atualização", example = "01/08/2025 10:30:00")
     private LocalDateTime dataAtualizacao;
@@ -51,3 +50,4 @@ public class CronogramaResponseDTO {
     @Schema(description = "Indica se o cronograma está ativo", example = "true")
     private Boolean ativo;
 }
+

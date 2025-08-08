@@ -18,7 +18,6 @@ public class CronogramaMapper {
                 .ativo(true)
                 .build();
     }
-
     public CronogramaResponseDTO toResponse(Cronograma entity) {
         return CronogramaResponseDTO.builder()
                 .id(entity.getId())
@@ -41,3 +40,4 @@ public class CronogramaMapper {
         entity.setDescricao(dto.getDescricao());
     }
 }
+

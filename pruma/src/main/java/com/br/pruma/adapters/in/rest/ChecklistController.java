@@ -2,13 +2,11 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.ChecklistRequestDTO;
 import com.br.pruma.application.dto.response.ChecklistResponseDTO;
-import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.br.pruma.application.mapper.ChecklistMapper;
 import com.br.pruma.application.service.ChecklistService;
 import com.br.pruma.core.domain.Checklist;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

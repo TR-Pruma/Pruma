@@ -1,12 +1,9 @@
 package com.br.pruma.application.dto.response;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -23,3 +20,5 @@ public class ClienteResponseDTO {
     private Long versao;
     private Boolean ativo;
 }
+
+

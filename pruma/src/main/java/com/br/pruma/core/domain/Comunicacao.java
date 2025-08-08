@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +18,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "comunicacao")
+@SQLDelete(sql = "UPDATE comunicacao SET ativo = false WHERE comunicacao_id = ?")
+@Where(clause = "ativo = true")
 public class Comunicacao {
 
     @Id
@@ -38,8 +42,8 @@ public class Comunicacao {
     private String mensagem;
 
     @CreationTimestamp
-    @Column(name = "data_hora", nullable = false, updatable = false)
-    private LocalDateTime dataHora;
+    @Column(name = "data_criacao", nullable = false, updatable = false)
+    private LocalDateTime dataCriacao;
 
     @UpdateTimestamp
     @Column(name = "data_atualizacao")
@@ -49,6 +53,6 @@ public class Comunicacao {
     @Column(name = "versao")
     private Long versao;
 
-    @Column(nullable = false)
+    @Column(name = "ativo", nullable = false)
     private Boolean ativo = true;
 }

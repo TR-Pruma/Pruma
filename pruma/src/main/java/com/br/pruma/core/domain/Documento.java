@@ -7,22 +7,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.LocalDateTime;
 
-
-@Data
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "documento")
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Documento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "documento_id")
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projeto_id", nullable = false)
@@ -55,7 +52,4 @@ public class Documento {
     @Version
     @Column(name = "versao")
     private Long versao;
-
-    @Column(nullable = false)
-    private Boolean ativo = true;
 }

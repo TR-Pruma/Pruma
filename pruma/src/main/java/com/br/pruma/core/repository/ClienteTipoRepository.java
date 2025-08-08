@@ -9,7 +9,8 @@ import java.util.Optional;
 
 @Repository
 public interface ClienteTipoRepository extends JpaRepository<ClienteTipo, Integer> {
-    boolean existsByDescricaoClienteAndAtivoTrue(String descricaoCliente);
     List<ClienteTipo> findByAtivoTrue();
     Optional<ClienteTipo> findByIdAndAtivoTrue(Integer id);
+    boolean existsByDescricaoClienteAndAtivoTrue(String descricaoCliente);
 }
+

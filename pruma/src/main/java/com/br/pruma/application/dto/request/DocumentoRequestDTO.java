@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -33,3 +32,4 @@ public class DocumentoRequestDTO {
     @Schema(description = "Descrição opcional do documento", example = "Contrato assinado do projeto")
     private String descricao;
 }
+

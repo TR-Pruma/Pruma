@@ -11,18 +11,25 @@ import java.util.Optional;
 
 @Repository
 public interface ComunicacaoRepository extends JpaRepository<Comunicacao, Integer> {
-
     Optional<Comunicacao> findByIdAndAtivoTrue(Integer id);
 
-    Page<Comunicacao> findByProjetoIdAndAtivoTrueOrderByDataHoraDesc(Integer projetoId, Pageable pageable);
-
-    List<Comunicacao> findByClienteIdAndAtivoTrueOrderByDataHoraDesc(Integer clienteId);
-
-    Page<Comunicacao> findByProjetoIdAndClienteIdAndAtivoTrueOrderByDataHoraDesc(
-            Integer projetoId,
-            Integer clienteId,
-            Pageable pageable
+    Page<Comunicacao> findByProjetoIdAndAtivoTrueOrderByDataCriacaoDesc(
+        Integer projetoId,
+        Pageable pageable
     );
 
-    boolean existsByProjetoIdAndClienteIdAndAtivoTrue(Integer projetoId, Integer clienteId);
+    List<Comunicacao> findByClienteIdAndAtivoTrueOrderByDataCriacaoDesc(
+        Integer clienteId
+    );
+
+    Page<Comunicacao> findByProjetoIdAndClienteIdAndAtivoTrueOrderByDataCriacaoDesc(
+        Integer projetoId,
+        Integer clienteId,
+        Pageable pageable
+    );
+
+    boolean existsByProjetoIdAndClienteIdAndAtivoTrue(
+        Integer projetoId,
+        Integer clienteId
+    );
 }

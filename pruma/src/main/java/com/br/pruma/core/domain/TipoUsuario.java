@@ -34,7 +34,6 @@ public class TipoUsuario implements Serializable {
     @Size(max = 255, message = "A descrição deve ter no máximo 255 caracteres")
     @Column(name = "descricao", length = 255, nullable = false)
     private String descricao;
-
     @CreationTimestamp
     @Column(name = "data_criacao", updatable = false)
     private LocalDateTime dataCriacao;
@@ -57,3 +56,4 @@ public class TipoUsuario implements Serializable {
         }
     }
 }
+

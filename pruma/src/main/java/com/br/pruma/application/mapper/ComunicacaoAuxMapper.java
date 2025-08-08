@@ -4,35 +4,27 @@ import com.br.pruma.application.dto.request.ComunicacaoAuxRequestDTO;
 import com.br.pruma.application.dto.response.ComunicacaoAuxResponseDTO;
 import com.br.pruma.core.domain.Comunicacao;
 import com.br.pruma.core.domain.ComunicacaoAux;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
 
-@Component
-public class ComunicacaoAuxMapper {
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface ComunicacaoAuxMapper {
 
-    public ComunicacaoAux toEntity(ComunicacaoAuxRequestDTO dto, Comunicacao comunicacao) {
-        return ComunicacaoAux.builder()
-                .comunicacao(comunicacao)
-                .tipoMensagem(dto.getTipoMensagem())
-                .ativo(true)
-                .build();
-    }
+    @Mapping(target = "comunicacao", source = "comunicacao")
+    @Mapping(target = "ativo", constant = "true")
+    @Mapping(target = "dataCriacao", ignore = true)
+    @Mapping(target = "dataAtualizacao", ignore = true)
+    @Mapping(target = "versao", ignore = true)
+    ComunicacaoAux toEntity(ComunicacaoAuxRequestDTO dto, Comunicacao comunicacao);
 
-    public ComunicacaoAuxResponseDTO toDTO(ComunicacaoAux entity) {
-        Comunicacao comunicacao = entity.getComunicacao();
+    @Mapping(target = "comunicacaoId", source = "comunicacao.id")
+    @Mapping(target = "mensagem", source = "comunicacao.mensagem")
+    @Mapping(target = "tipoRemetente", source = "comunicacao.tipoRemetente")
+    @Mapping(target = "projetoId", source = "comunicacao.projeto.id")
+    @Mapping(target = "projetoNome", source = "comunicacao.projeto.nome")
+    @Mapping(target = "clienteId", source = "comunicacao.cliente.id")
+    @Mapping(target = "clienteNome", source = "comunicacao.cliente.nome")
+    ComunicacaoAuxResponseDTO toDTO(ComunicacaoAux entity);
 
-        return ComunicacaoAuxResponseDTO.builder()
-                .comunicacaoId(comunicacao.getId())
-                .tipoMensagem(entity.getTipoMensagem())
-                .dataCriacao(entity.getDataCriacao())
-                .dataAtualizacao(entity.getDataAtualizacao())
-                .versao(entity.getVersao())
-                .ativo(entity.getAtivo())
-                .mensagem(comunicacao.getMensagem())
-                .tipoRemetente(comunicacao.getTipoRemetente())
-                .projetoId(comunicacao.getProjeto().getId())
-                .projetoNome(comunicacao.getProjeto().getNome())
-                .clienteId(comunicacao.getCliente().getId())
-                .clienteNome(comunicacao.getCliente().getNome())
-                .build();
-    }
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateEntity(@MappingTarget ComunicacaoAux entity, ComunicacaoAuxRequestDTO dto);
 }

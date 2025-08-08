@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -21,3 +20,4 @@ public class ComunicacaoAuxRequestDTO {
     @Size(max = 15, message = "O tipo da mensagem deve ter no máximo 15 caracteres")
     private String tipoMensagem;
 }
+

@@ -40,11 +40,9 @@ public class Cliente {
 
     @Column(nullable = false)
     private String senha;
-
     @CreationTimestamp
     @Column(name = "data_criacao", nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
-
     @UpdateTimestamp
     @Column(name = "data_atualizacao")
     private LocalDateTime dataAtualizacao;
@@ -56,3 +54,4 @@ public class Cliente {
     @Column(nullable = false)
     private Boolean ativo = true;
 }
+

@@ -9,10 +9,24 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ClienteMapper {
-    private final PasswordEncoder passwordEncoder;
-
     public ClienteMapper(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
+        String enderecoCompleto = "";
+        if (entity.getEndereco() != null) {
+            Endereco endereco = entity.getEndereco();
+            enderecoCompleto = String.format("%s, %s%s - %s, %s/%s, CEP: %s",
+                    endereco.getLogradouro(),
+                    endereco.getNumero(),
+                    endereco.getComplemento() != null && !endereco.getComplemento().isEmpty() ?
+                        ", " + endereco.getComplemento() : "",
+                    endereco.getBairro(),
+                    endereco.getCidade(),
+                    endereco.getUf(),
+                    endereco.getCep());
+        }
+
+                .enderecoCompleto(enderecoCompleto)
+                .ativo(entity.getAtivo());
+        this.enderecoMapper = enderecoMapper;
     }
 
     public Cliente toEntity(ClienteRequestDTO dto, Endereco endereco) {
@@ -28,31 +42,17 @@ public class ClienteMapper {
     }
 
     public ClienteResponseDTO toDTO(Cliente entity) {
-        String enderecoCompleto = "";
-        if (entity.getEndereco() != null) {
-            Endereco endereco = entity.getEndereco();
-            enderecoCompleto = String.format("%s, %s%s - %s, %s/%s, CEP: %s",
-                    endereco.getLogradouro(),
-                    endereco.getNumero(),
-                    endereco.getComplemento() != null && !endereco.getComplemento().isEmpty() ?
-                        ", " + endereco.getComplemento() : "",
-                    endereco.getBairro(),
-                    endereco.getCidade(),
-                    endereco.getUf(),
-                    endereco.getCep());
-        }
-
         return ClienteResponseDTO.builder()
                 .id(entity.getId())
                 .cpf(entity.getCpf())
                 .nome(entity.getNome())
                 .email(entity.getEmail())
                 .telefone(entity.getTelefone())
-                .enderecoCompleto(enderecoCompleto)
+                .endereco(enderecoMapper.toDTO(entity.getEndereco()))
                 .dataCriacao(entity.getDataCriacao())
                 .dataAtualizacao(entity.getDataAtualizacao())
                 .versao(entity.getVersao())
-                .ativo(entity.getAtivo())
+                .ativo(entity.isAtivo())
                 .build();
     }
 
