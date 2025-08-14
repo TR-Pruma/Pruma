@@ -3,12 +3,12 @@ package com.br.pruma.infra.impl;
 import com.br.pruma.application.dto.request.CronogramaRequestDTO;
 import com.br.pruma.application.dto.response.CronogramaResponseDTO;
 import com.br.pruma.application.mapper.CronogramaMapper;
-import com.br.pruma.infra.repository.CronogramaService;
+import com.br.pruma.application.service.CronogramaService;
 import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.Cronograma;
 import com.br.pruma.core.domain.Projeto;
 import com.br.pruma.core.repository.CronogramaRepository;
-import com.br.pruma.core.repository.ProjetoRepository;
+import com.br.pruma.infra.repository.ProjetoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +35,7 @@ public class CronogramaServiceImpl implements CronogramaService {
         Projeto projeto = projetoRepository.findByIdAndAtivoTrue(request.getProjetoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Projeto não encontrado"));
 
+        // Se preferir, troque por checagem de sobreposição de períodos
         if (cronogramaRepository.existsByProjetoIdAndDataInicioAndDataFimAndAtivoTrue(
                 request.getProjetoId(), request.getDataInicio(), request.getDataFim())) {
             throw new IllegalArgumentException("Já existe um cronograma para este período no projeto");
@@ -43,14 +44,14 @@ public class CronogramaServiceImpl implements CronogramaService {
         Cronograma cronograma = cronogramaMapper.toEntity(request, projeto);
         cronograma = cronogramaRepository.save(cronograma);
 
-        return cronogramaMapper.toResponse(cronograma);
+        return cronogramaMapper.toResponseDTO(cronograma);
     }
 
     @Override
     @Transactional(readOnly = true)
     public CronogramaResponseDTO buscarPorId(Integer id) {
         Cronograma cronograma = buscarCronogramaAtivo(id);
-        return cronogramaMapper.toResponse(cronograma);
+        return cronogramaMapper.toResponseDTO(cronograma);
     }
 
     @Override
@@ -61,7 +62,7 @@ public class CronogramaServiceImpl implements CronogramaService {
         }
 
         return cronogramaRepository.findByProjetoIdAndAtivoTrueOrderByDataInicioDesc(projetoId, pageable)
-                .map(cronogramaMapper::toResponse);
+                .map(cronogramaMapper::toResponseDTO);
     }
 
     @Override
@@ -72,7 +73,7 @@ public class CronogramaServiceImpl implements CronogramaService {
         return cronogramaRepository
                 .findByDataInicioGreaterThanEqualAndDataFimLessThanEqualAndAtivoTrue(inicio, fim)
                 .stream()
-                .map(cronogramaMapper::toResponse)
+                .map(cronogramaMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
 
@@ -85,7 +86,7 @@ public class CronogramaServiceImpl implements CronogramaService {
 
         return cronogramaRepository.findByProjetoIdAndAtivoTrueOrderByDataInicioAsc(projetoId)
                 .stream()
-                .map(cronogramaMapper::toResponse)
+                .map(cronogramaMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
 
@@ -98,10 +99,12 @@ public class CronogramaServiceImpl implements CronogramaService {
         Projeto projeto = projetoRepository.findByIdAndAtivoTrue(request.getProjetoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Projeto não encontrado"));
 
+        // Sugerido: checar sobreposição (excluindo o próprio id) se necessário
+
         cronogramaMapper.updateEntity(cronograma, request, projeto);
         cronograma = cronogramaRepository.save(cronograma);
 
-        return cronogramaMapper.toResponse(cronograma);
+        return cronogramaMapper.toResponseDTO(cronograma);
     }
 
     @Override
@@ -118,8 +121,11 @@ public class CronogramaServiceImpl implements CronogramaService {
     }
 
     private void validarDatas(LocalDate inicio, LocalDate fim) {
+        if (inicio == null || fim == null) {
+            throw new IllegalArgumentException("Datas de início e fim são obrigatórias");
+        }
         if (inicio.isAfter(fim)) {
-            throw new IllegalArgumentException("A data de início deve ser anterior à data de fim");
+            throw new IllegalArgumentException("A data de início deve ser anterior ou igual à data de fim");
         }
     }
 }
