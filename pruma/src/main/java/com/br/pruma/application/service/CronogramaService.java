@@ -10,9 +10,16 @@ import java.util.List;
 
 public interface CronogramaService {
     CronogramaResponseDTO criar(CronogramaRequestDTO request);
+
     CronogramaResponseDTO buscarPorId(Integer id);
+
     Page<CronogramaResponseDTO> listarPorProjeto(Integer projetoId, Pageable pageable);
+
     List<CronogramaResponseDTO> listarPorPeriodo(LocalDate inicio, LocalDate fim);
+
     List<CronogramaResponseDTO> listarPorProjetoOrdenado(Integer projetoId);
+
     CronogramaResponseDTO atualizar(Integer id, CronogramaRequestDTO request);
+
     void deletar(Integer id);
+}

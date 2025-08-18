@@ -1,13 +1,21 @@
 package com.br.pruma.core.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
 @Table(name = "historico_localizacao")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(of = "id")
+@ToString(exclude = {"profissional", "projeto"})
+
 public class HistoricoLocalizacao {
 
     @Id
@@ -15,18 +23,18 @@ public class HistoricoLocalizacao {
     @Column(name = "historico_id")
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "profissional_cpf", referencedColumnName = "profissional_cpf")
-    private Long profissional;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "profissional_cpf", referencedColumnName = "profissional_cpf", nullable = false)
+    private Profissional profissional;
 
-    @ManyToOne
-    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Integer projeto;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id", nullable = false)
+    private Projeto projeto;
 
-    @Column(name = "localizacao", length = 50)
+    @Column(name = "localizacao", length = 50, nullable = false)
     private String localizacao;
 
-    @Column(name = "data_hora")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date dataHora;
+    @Column(name = "data_hora", nullable = false)
+    private LocalDateTime dataHora;
+
 }

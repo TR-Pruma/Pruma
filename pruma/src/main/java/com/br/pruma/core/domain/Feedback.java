@@ -2,36 +2,50 @@ package com.br.pruma.core.domain;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
 @Table(name = "feedback")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"projeto", "cliente", "tipoUsuario"})
 public class Feedback {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "feedback_id")
+    @EqualsAndHashCode.Include
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Integer projeto;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id", nullable = false)
+    private Projeto projeto;
 
-    @ManyToOne
-    @JoinColumn(name = "cliente_cpf", referencedColumnName = "cliente_cpf")
-    private Long cliente;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "cliente_cpf", referencedColumnName = "cliente_cpf", nullable = false)
+    private Cliente cliente;
 
-    @ManyToOne
-    @JoinColumn(name = "tipo_usuario", referencedColumnName = "tipo_usuario")
-    private Integer tipoUsuario;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "tipo_usuario", referencedColumnName = "tipo_usuario", nullable = false)
+    private TipoUsuario tipoUsuario;
 
-    @Column(name = "mensagem", columnDefinition = "TEXT")
+    @Column(name = "mensagem", columnDefinition = "TEXT", nullable = false)
     private String mensagem;
 
-    @Column(name = "data_hora")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date dataHora;
+    @CreationTimestamp
+    @Column(name = "data_hora", nullable = false, updatable = false)
+    private LocalDateTime dataHora;
 }
+
