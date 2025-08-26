@@ -7,33 +7,14 @@ import com.br.pruma.core.domain.Projeto;
 import org.mapstruct.*;
 
 import java.util.List;
-
-@Mapper(
-        componentModel = "spring",
-        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
-)
+@Mapper(componentModel = "spring")
 public interface CronogramaMapper {
 
-    // Criação: recebe DTO + Projeto carregado
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "projeto", source = "projeto")
-    Cronograma toEntity(CronogramaRequestDTO dto, Projeto projeto);
+    Cronograma toEntity(CronogramaRequestDTO dto);
 
-    // Update parcial: ignora nulos do DTO, recebe Projeto carregado
+    CronogramaResponseDTO toResponse(Cronograma entity);
+
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "projeto", source = "projeto")
-    void updateEntity(@MappingTarget Cronograma entity, CronogramaRequestDTO dto, Projeto projeto);
+    void updateEntityFromDto(CronogramaRequestDTO dto, @MappingTarget Cronograma entity);
 
-    // Response: projeta campos do Projeto
-    @Mapping(target = "projetoId", source = "projeto.id")
-    @Mapping(target = "projetoNome", source = "projeto", qualifiedByName = "nomeDoProjeto")
-    CronogramaResponseDTO toResponseDTO(Cronograma entity);
-
-    List<CronogramaResponseDTO> toResponseDTO(List<Cronograma> entities);
-
-    @Named("nomeDoProjeto")
-    default String nomeDoProjeto(Projeto projeto) {
-        return projeto == null ? null : projeto.getNome();
-    }
 }

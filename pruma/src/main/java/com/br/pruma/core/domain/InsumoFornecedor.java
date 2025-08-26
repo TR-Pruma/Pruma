@@ -1,28 +1,51 @@
 package com.br.pruma.core.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "insumo_fornecedor")
-@Data
+@Table(
+        name = "insumo_fornecedor",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_insumo_fornecedor",
+                columnNames = {"insumo_id", "fornecedor_id"}
+        )
+)
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 public class InsumoFornecedor {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+    @EmbeddedId
+    @EqualsAndHashCode.Include
+    @ToString.Include
+    private InsumoFornecedorAux id;
 
-    @ManyToOne
-    @JoinColumn(name = "insumo_id", referencedColumnName = "insumo_id")
+    @MapsId("insumoId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "insumo_id", nullable = false)
+    @ToString.Include(name = "insumo")
     private Insumo insumo;
 
-    @ManyToOne
-    @JoinColumn(name = "fornecedor_id", referencedColumnName = "fornecedor_id")
-    private Integer fornecedor;
+    @MapsId("fornecedorId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "fornecedor_id", nullable = false)
+    @ToString.Include(name = "fornecedor")
+    private Fornecedor fornecedor;
 
-    @Column(name = "preco", precision = 10, scale = 2)
+    @NotNull
+    @DecimalMin("0.0")
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal preco;
+
+    @Version
+    private Long version;
 }

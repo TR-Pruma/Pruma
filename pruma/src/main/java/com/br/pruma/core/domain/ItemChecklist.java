@@ -1,80 +1,97 @@
 package com.br.pruma.core.domain;
 
 import com.br.pruma.core.enums.StatusItem;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import jakarta.persistence.*;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
-import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @FilterDef(name = "ativoFilter", parameters = @ParamDef(name = "ativo", type = boolean.class))
 @Filter(name = "ativoFilter", condition = "ativo = :ativo")
 
 @Entity
-@Getter
-@Setter
-@ToString(exclude = "checklist")
-@EqualsAndHashCode(of = "id")
-@NoArgsConstructor
-@Table(name = "item_checklist",
-    indexes = @Index(name = "idx_item_checklist_ordem", columnList = "ordem")
+@Table(
+        name = "item_checklist",
+        indexes = @Index(name = "idx_item_checklist_ordem", columnList = "checklist_id, ordem"),
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_item_checklist_ordem",
+                columnNames = {"checklist_id", "ordem"}
+        )
 )
 @SQLDelete(sql = "UPDATE item_checklist SET ativo = false WHERE item_id = ?")
-@org.hibernate.annotations.Where(clause = "ativo = true")
-@ApiModel(description = "Representa um item do checklist")
+@Where(clause = "ativo = true")
+@EntityListeners(org.springframework.data.jpa.domain.support.AuditingEntityListener.class)
+@Getter
+@ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 public class ItemChecklist implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_id")
-    @ApiModelProperty(value = "Identificador único do item", example = "1")
+    @EqualsAndHashCode.Include
+    @Column(name = "item_id", updatable = false)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "checklist_id", nullable = false)
     @NotNull(message = "O checklist é obrigatório")
-    @ApiModelProperty(value = "Checklist ao qual o item pertence")
+    @EqualsAndHashCode.Include
+    @ToString.Include(name = "checklistId")
     private Checklist checklist;
 
     @NotBlank(message = "A descrição é obrigatória")
-    @Column(name = "descricao", nullable = false)
-    @ApiModelProperty(value = "Descrição do item", example = "Verificar documentação")
+    @Size(max = 500, message = "A descrição deve ter no máximo 500 caracteres")
+    @Column(name = "descricao", nullable = false, length = 500)
     private String descricao;
 
+    @NotNull(message = "A ordem é obrigatória")
+    @Min(value = 1, message = "A ordem deve ser maior ou igual a 1")
     @Column(name = "ordem", nullable = false)
-    @ApiModelProperty(value = "Ordem do item no checklist", example = "1")
     private Integer ordem;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", length = 20, nullable = false)
     @NotNull(message = "O status é obrigatório")
-    @ApiModelProperty(value = "Status do item", example = "PENDENTE")
-    private StatusItem status = StatusItem.PENDENTE;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private StatusItem status;
 
-    @Column(name = "observacao")
-    @ApiModelProperty(value = "Observações sobre o item", example = "Necessita revisão adicional")
+    @Size(max = 1000, message = "A observação deve ter no máximo 1000 caracteres")
+    @Column(name = "observacao", length = 1000)
     private String observacao;
 
     @Column(name = "ativo", nullable = false)
-    @ApiModelProperty(value = "Indica se o item está ativo", example = "true")
-    private boolean ativo = true;
+    private boolean ativo;
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    /**
+     * Garante valores default e invariantes antes do primeiro persist.
+     */
     @PrePersist
-    public void prePersist() {
-        if (this.status == null) {
-            this.status = StatusItem.PENDENTE;
-        }
-        this.ativo = true;
+    private void prePersist() {
+        this.status = (this.status == null ? StatusItem.PENDENTE : this.status);
+        this.ativo  = true;
     }
 }
-
-

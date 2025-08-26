@@ -35,7 +35,7 @@ public interface ChecklistMapper {
         if (projetoId == null) {
             return null;
         }
-        Projeto projeto = new Projeto();
+        Projeto projeto = new Projeto(dto.projetoId());
         projeto.setId(projetoId);
         return projeto;
     }

@@ -2,21 +2,49 @@ package com.br.pruma.core.domain;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "insumo_fornecedor_aux")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class InsumoFornecedorAux {
 
-    @Id
-    @Column(name = "insumo_id")
-    private Integer insumoId;
+    @EmbeddedId
+    @EqualsAndHashCode.Include
+    private InsumoFornecedorAuxId id;
 
-    @ManyToOne
-    @JoinColumn(name = "fornecedor_id", referencedColumnName = "fornecedor_id")
-    private Integer fornecedor;
+    /**
+     * Usa o record Insumo como entidade JPA.
+     * É necessário Hibernate 6.2+ ou outro provedor que suporte JPA 3.1+.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @MapsId("insumoId")
+    @JoinColumn(name = "insumo_id", nullable = false)
+    @ToString.Include(name = "insumoId")
+    private Insumo insumo;
 
-    @Column(name = "preco")
-    private Float preco;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @MapsId("fornecedorId")
+    @JoinColumn(name = "fornecedor_id", nullable = false)
+    @ToString.Include(name = "fornecedorId")
+    private Fornecedor fornecedor;
+
+    @Column(name = "preco", nullable = false, precision = 13, scale = 2)
+    private BigDecimal preco;
+
+    /**
+     * Construtor de conveniência para relacionar instâncias existentes.
+     */
+    public InsumoFornecedorAux(Insumo insumo, Fornecedor fornecedor) {
+        this.id = new InsumoFornecedorAuxId(insumo.id(), fornecedor.getId());
+        this.insumo = insumo;
+        this.fornecedor = fornecedor;
+    }
+
 }

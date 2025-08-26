@@ -2,81 +2,93 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.ClienteRequestDTO;
 import com.br.pruma.application.dto.response.ClienteResponseDTO;
-import com.br.pruma.core.repository.ClienteService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import com.br.pruma.infra.repository.ClienteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.util.List;
+
+
 @RestController
-@RequestMapping("/api/clientes")
+@RequestMapping("/pruma/v1/clientes")
+@Validated
 @RequiredArgsConstructor
-@Api(tags = "Clientes", description = "Operações relacionadas a clientes")
+
 public class ClienteController {
 
     private final ClienteService clienteService;
 
+    @Operation(summary = "Cria um novo cliente")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Cliente criado",
+                    content = @Content(schema = @Schema(implementation = ClienteResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    })
     @PostMapping
-    @ApiOperation("Criar um novo cliente")
-    public ResponseEntity<ClienteResponseDTO> criar(
-            @ApiParam(value = "Dados do cliente", required = true)
+    public ResponseEntity<ClienteResponseDTO> create(
             @Valid @RequestBody ClienteRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(clienteService.criar(request));
+
+        ClienteResponseDTO created = clienteService.create(request);
+        URI location = URI.create("/pruma/v1/clientes/" + created.id());
+        return ResponseEntity.created(location).body(created);
     }
 
-    @GetMapping
-    @ApiOperation("Listar todos os clientes ativos")
-    public ResponseEntity<Page<ClienteResponseDTO>> listarTodos(Pageable pageable) {
-        return ResponseEntity.ok(clienteService.listarTodos(pageable));
-    }
-
-    @GetMapping("/{id}")
-    @ApiOperation("Buscar um cliente pelo ID")
-    public ResponseEntity<ClienteResponseDTO> buscarPorId(
-            @ApiParam(value = "ID do cliente", required = true)
-            @PathVariable Integer id) {
-        return ResponseEntity.ok(clienteService.buscarPorId(id));
-    }
-
+    @Operation(summary = "Atualiza um cliente existente")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Cliente atualizado",
+                    content = @Content(schema = @Schema(implementation = ClienteResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    })
     @PutMapping("/{id}")
-    @ApiOperation("Atualizar um cliente existente")
-    public ResponseEntity<ClienteResponseDTO> atualizar(
-            @ApiParam(value = "ID do cliente", required = true)
-            @PathVariable Integer id,
-            @ApiParam(value = "Novos dados do cliente", required = true)
+    public ResponseEntity<ClienteResponseDTO> update(
+            @Parameter(description = "ID do cliente") @PathVariable Integer id,
             @Valid @RequestBody ClienteRequestDTO request) {
-        return ResponseEntity.ok(clienteService.atualizar(id, request));
+        ClienteResponseDTO updated = clienteService.update(id, request);
+        return ResponseEntity.ok(updated);
     }
 
+    @Operation(summary = "Lista todos os clientes")
+    @ApiResponse(responseCode = "200", description = "Lista de clientes",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClienteResponseDTO.class))))
+    @GetMapping
+    public ResponseEntity<List<ClienteResponseDTO>> findAll() {
+        return ResponseEntity.ok(clienteService.findAll());
+    }
+
+    @Operation(summary = "Busca cliente por ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Cliente encontrado",
+                    content = @Content(schema = @Schema(implementation = ClienteResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<ClienteResponseDTO> findById(
+            @Parameter(description = "ID do cliente") @PathVariable Integer id) {
+        return ResponseEntity.ok(clienteService.findById(id));
+    }
+
+    @Operation(summary = "Remove um cliente")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Cliente excluído"),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+    })
     @DeleteMapping("/{id}")
-    @ApiOperation("Desativar um cliente")
-    public ResponseEntity<Void> deletar(
-            @ApiParam(value = "ID do cliente", required = true)
-            @PathVariable Integer id) {
-        clienteService.deletar(id);
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "ID do cliente") @PathVariable Integer id) {
+        clienteService.delete(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/cpf/{cpf}")
-    @ApiOperation("Buscar um cliente pelo CPF")
-    public ResponseEntity<ClienteResponseDTO> buscarPorCpf(
-            @ApiParam(value = "CPF do cliente", required = true)
-            @PathVariable String cpf) {
-        return ResponseEntity.ok(clienteService.buscarPorCpf(cpf));
-    }
-
-    @GetMapping("/email/{email}")
-    @ApiOperation("Buscar um cliente pelo email")
-    public ResponseEntity<ClienteResponseDTO> buscarPorEmail(
-            @ApiParam(value = "Email do cliente", required = true)
-            @PathVariable String email) {
-        return ResponseEntity.ok(clienteService.buscarPorEmail(email));
     }
 }
