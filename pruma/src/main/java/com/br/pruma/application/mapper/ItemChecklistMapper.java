@@ -1,29 +1,26 @@
 package com.br.pruma.application.mapper;
 
+import com.br.pruma.application.dto.request.ItemChecklistRequestDTO;
+import com.br.pruma.application.dto.request.ItemChecklistUpdateDTO;
 import com.br.pruma.application.dto.response.ItemChecklistResponseDTO;
 import com.br.pruma.core.domain.ItemChecklist;
 import com.br.pruma.core.enums.StatusItem;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface ItemChecklistMapper {
 
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "descricao", source = "descricao")
-    @Mapping(target = "ordem", source = "ordem")
-    @Mapping(target = "observacao", source = "observacao")
-    @Mapping(target = "concluido", expression = "java(StatusItem.CONCLUIDO.equals(item.getStatus()))")
-    ItemChecklistResponseDTO toResponseDTO(ItemChecklist item);
+    // Converte RequestDTO em entidade (não mapeia checklist)
+    @Mapping(target = "checklist", ignore = true)
+    ItemChecklist toEntity(ItemChecklistRequestDTO dto);
 
-    @Named("itemToId")
-    default Integer itemToId(ItemChecklist item) {
-        return item != null ? item.getId() : null;
-    }
+    // Atualiza apenas propriedades não-nulas de UpdateDTO na entidade
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "checklist", ignore = true)
+    void updateEntityFromDto(ItemChecklistUpdateDTO dto, @MappingTarget ItemChecklist entity);
 
-    @Named("itemToDescricao")
-    default String itemToDescricao(ItemChecklist item) {
-        return item != null ? item.getDescricao() : null;
-    }
+    // Converte entidade em ResponseDTO, mapeando checklist.id para checklistId
+    @Mapping(target = "checklistId", source = "checklist.id")
+    ItemChecklistResponseDTO toResponse(ItemChecklist entity);
 }
+

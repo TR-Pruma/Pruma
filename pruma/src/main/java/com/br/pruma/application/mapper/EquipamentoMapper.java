@@ -1,10 +1,10 @@
 package com.br.pruma.application.mapper;
 
 import com.br.pruma.application.dto.request.EquipamentoRequestDTO;
-import com.br.pruma.application.dto.response.EquipamentoAtivoUpdateDTO;
+import com.br.pruma.application.dto.update.EquipamentoAtivoUpdateDTO;
 import com.br.pruma.application.dto.response.EquipamentoListDTO;
 import com.br.pruma.application.dto.response.EquipamentoResponseDTO;
-import com.br.pruma.application.dto.response.EquipamentoStatusUpdateDTO;
+import com.br.pruma.application.dto.update.EquipamentoStatusUpdateDTO;
 import com.br.pruma.core.domain.Equipamento;
 import org.mapstruct.*;
 

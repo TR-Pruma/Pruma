@@ -1,33 +1,75 @@
 package com.br.pruma.core.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "item_orcamento")
-@Data
-public class ItemOrcamento {
+@Table(name = "item_orcamento",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_item_orcamento_orcamento_descricao",
+                columnNames = {"orcamento_id","descricao"}
+        ),
+        indexes = @Index(
+                name = "idx_item_orcamento_ordem",
+                columnList = "orcamento_id,ordem"
+        )
+)
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
+public class ItemOrcamento implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_id")
+    @EqualsAndHashCode.Include
+    @Column(name = "item_id", updatable = false)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "orcamento_id", referencedColumnName = "orcamento_id")
-    private Integer orcamento;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "orcamento_id", nullable = false)
+    @ToString.Include(name = "orcamentoId")
+    private Orcamento orcamento;
 
-    @Column(name = "descricao", columnDefinition = "TEXT")
+    @NotBlank
+    @Size(max = 1000)
+    @Column(name = "descricao", columnDefinition = "TEXT", nullable = false)
     private String descricao;
 
-    @Column(name = "quantidade")
+    @NotNull @Positive
+    @Column(name = "quantidade", nullable = false)
     private Integer quantidade;
 
-    @Column(name = "valor_unitario")
-    private Float valorUnitario;
+    @NotNull @DecimalMin("0.00")
+    @Column(name = "valor_unitario", nullable = false, precision = 18, scale = 2)
+    private BigDecimal valorUnitario;
 
-    @Column(name = "valor_total")
-    private Float valorTotal;
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Transient
+    public BigDecimal getValorTotal() {
+        return valorUnitario.multiply(BigDecimal.valueOf(quantidade));
+    }
 }
+

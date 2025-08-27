@@ -1,4 +1,4 @@
-package com.br.pruma.application.dto.response;
+package com.br.pruma.application.dto.update;
 
 import lombok.Builder;
 import lombok.Data;

@@ -2,7 +2,7 @@ package com.br.pruma.application.service;
 
 import org.springframework.transaction.annotation.Transactional;
 import com.br.pruma.application.dto.request.EquipamentoProjetoRequestDTO;
-import com.br.pruma.application.dto.response.EquipamentoProjetoResponseDTO;
+import com.br.pruma.application.dto.update.EquipamentoProjetoResponseDTO;
 import com.br.pruma.application.mapper.EquipamentoProjetoMapper;
 import com.br.pruma.core.domain.EquipamentoProjeto;
 import com.br.pruma.infra.repository.EquipamentoProjetoRepository;

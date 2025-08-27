@@ -2,10 +2,10 @@ package com.br.pruma.adapters.in.rest;
 
 
 import com.br.pruma.application.dto.request.EquipamentoRequestDTO;
-import com.br.pruma.application.dto.response.EquipamentoAtivoUpdateDTO;
+import com.br.pruma.application.dto.update.EquipamentoAtivoUpdateDTO;
 import com.br.pruma.application.dto.response.EquipamentoListDTO;
 import com.br.pruma.application.dto.response.EquipamentoResponseDTO;
-import com.br.pruma.application.dto.response.EquipamentoStatusUpdateDTO;
+import com.br.pruma.application.dto.update.EquipamentoStatusUpdateDTO;
 import com.br.pruma.application.service.EquipamentoService;
 import com.br.pruma.core.enums.StatusEquipamento;
 import jakarta.validation.Valid;

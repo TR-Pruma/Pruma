@@ -1,7 +1,7 @@
 package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.EquipamentoProjetoRequestDTO;
-import com.br.pruma.application.dto.response.EquipamentoProjetoResponseDTO;
+import com.br.pruma.application.dto.update.EquipamentoProjetoResponseDTO;
 import com.br.pruma.application.service.EquipamentoProjetoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

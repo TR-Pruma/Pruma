@@ -1,12 +1,12 @@
 package com.br.pruma.adapters.in.rest;
 
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/usuario")
-@Api(tags = "Endpoint do Usuario")
+@Schema()
 public class UsuarioController {
 }
