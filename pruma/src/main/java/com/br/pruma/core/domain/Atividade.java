@@ -1,52 +1,92 @@
 package com.br.pruma.core.domain;
 
 import com.br.pruma.core.enums.StatusAtividade;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-@ApiModel(description = "Representa uma atividade dentro de um projeto")
-@Getter
-@Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = "projeto")
 @Entity
 @Table(name = "atividade")
+@EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 public class Atividade implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "atividade_id")
-    @ApiModelProperty(value = "Identificador único da atividade", example = "1")
+    @Column(name = "atividade_id", updatable = false, nullable = false)
     @EqualsAndHashCode.Include
+    @ToString.Include
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    @ApiModelProperty(value = "Projeto ao qual a atividade pertence")
+    @NotNull(message = "Projeto é obrigatório")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id", nullable = false)
     private Projeto projeto;
 
-    @Column(name = "descricao", columnDefinition = "TEXT")
-    @ApiModelProperty(value = "Descrição detalhada da atividade", example = "Desenvolvimento do módulo de autenticação")
+    @NotBlank(message = "Descrição da atividade é obrigatória")
+    @Size(max = 4000, message = "Descrição deve ter no máximo 4000 caracteres")
+    @Column(name = "descricao", columnDefinition = "TEXT", nullable = false)
+    @ToString.Include
     private String descricao;
 
+    @NotNull(message = "Status da atividade é obrigatório")
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", length = 15)
-    @ApiModelProperty(value = "Status atual da atividade", example = "EM_ANDAMENTO")
+    @Column(name = "status", length = 15, nullable = false)
     private StatusAtividade status;
 
-    @Column(name = "data_inicio")
-    @ApiModelProperty(value = "Data de início da atividade", example = "2024-03-01")
+    @NotNull(message = "Data de início é obrigatória")
+    @Column(name = "data_inicio", nullable = false)
     private LocalDate dataInicio;
 
     @Column(name = "data_fim")
-    @ApiModelProperty(value = "Data prevista ou real de conclusão da atividade", example = "2024-04-01")
     private LocalDate dataFim;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    /**
+     * Lista de materiais utilizados nesta atividade.
+     * Mapeamento bidirecional para permitir consultas e remoções em cascata.
+     */
+    @OneToMany(
+            mappedBy        = "atividade",
+            cascade         = CascadeType.ALL,
+            orphanRemoval   = true,
+            fetch           = FetchType.LAZY
+    )
+    @ToString.Include(name = "materiaisCount")
+    @EqualsAndHashCode.Exclude
+    private List<MaterialUtilizado> materiaisUtilizados = new ArrayList<>();
 }
+
