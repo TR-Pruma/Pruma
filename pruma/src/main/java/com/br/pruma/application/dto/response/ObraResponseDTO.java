@@ -1,10 +1,8 @@
 package com.br.pruma.application.dto.response;
 
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -14,83 +12,72 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Schema(
-        name              = "OrcamentoResponseDTO",
-        description       = "Dados retornados de um orçamento",
+        name              = "ObraResponseDTO",
+        description       = "Dados retornados de uma obra",
         requiredProperties = {
                 "id",
                 "projetoId",
-                "empresaCnpj",
-                "valor",
-                "dataEnvio",
-                "status",
+                "descricao",
+                "dataInicio",
                 "version",
                 "createdAt",
                 "updatedAt"
         }
 )
-public class OrcamentoResponseDTO {
+public class ObraResponseDTO {
 
     @Schema(
-            description = "Identificador único do orçamento",
-            example     = "12",
+            description = "Identificador único da obra",
+            example     = "10",
             required    = true
     )
     private Integer id;
 
     @Schema(
             description = "Identificador do projeto associado",
-            example     = "3",
+            example     = "5",
             required    = true
     )
     private Integer projetoId;
 
     @Schema(
-            description = "CNPJ da empresa responsável pelo orçamento",
-            example     = "12345678000199",
+            description = "Descrição da obra",
+            example     = "Construção de alvenaria",
             required    = true
     )
-    private String empresaCnpj;
+    private String descricao;
 
     @Schema(
-            description = "Valor total do orçamento",
-            example     = "15000.50",
+            description = "Data de início da obra (YYYY-MM-DD)",
+            example     = "2025-09-01",
             required    = true
     )
-    private BigDecimal valor;
+    private LocalDate dataInicio;
 
     @Schema(
-            description = "Data de envio do orçamento (YYYY-MM-DD)",
-            example     = "2025-09-15",
-            required    = true
+            description = "Data de término da obra (YYYY-MM-DD)",
+            example     = "2025-12-31"
     )
-    private LocalDate dataEnvio;
-
-    @Schema(
-            description = "Status do orçamento",
-            example     = "PENDENTE",
-            required    = true
-    )
-    private String status;
+    private LocalDate dataFim;
 
     @Schema(
             description = "Versão para controle otimista",
-            example     = "2",
+            example     = "1",
             required    = true
     )
     private Long version;
 
     @Schema(
             description = "Timestamp de criação do registro (ISO 8601)",
-            example     = "2025-08-20T09:30:00",
+            example     = "2025-08-27T10:15:30",
             required    = true
     )
     private LocalDateTime createdAt;
 
     @Schema(
             description = "Timestamp da última atualização do registro (ISO 8601)",
-            example     = "2025-09-01T14:45:00",
+            example     = "2025-08-28T14:05:00",
             required    = true
     )
     private LocalDateTime updatedAt;
 }
-

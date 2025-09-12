@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/pruma/v1/orcamentos")
-@Tag(name = "Orcamento", description = "Gerencia orçamentos")
+@Tag(name = "Orcamento", description = "Gerencia orçamentos de projetos")
 @RequiredArgsConstructor
 public class OrcamentoController {
 
@@ -29,44 +29,61 @@ public class OrcamentoController {
             @Valid @RequestBody OrcamentoRequestDTO request
     ) {
         OrcamentoResponseDTO response = service.create(request);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(response.getId())
                 .toUri();
         return ResponseEntity.created(location).body(response);
     }
-    @Operation(summary = "Lista orçamentos (opcionalmente filtra por projeto)")
+
+    @Operation(summary = "Lista todos os orçamentos")
     @GetMapping
-    public ResponseEntity<List<OrcamentoResponseDTO>> list(
-            @RequestParam(value = "projetoId", required = false) Integer projetoId
-    ) {
-        List<OrcamentoResponseDTO> list = (projetoId == null)
-                ? service.listAll()
-                : service.listByProjeto(projetoId);
-        return ResponseEntity.ok(list);
+    public ResponseEntity<List<OrcamentoResponseDTO>> listAll() {
+        return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Busca um orçamento por ID")
+    @Operation(summary = "Busca orçamento por ID")
     @GetMapping("/{id}")
     public ResponseEntity<OrcamentoResponseDTO> getById(
             @PathVariable Integer id
     ) {
-        OrcamentoResponseDTO response = service.getById(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(service.getById(id));
     }
 
-    @Operation(summary = "Atualiza um orçamento existente")
+    @Operation(summary = "Lista orçamentos por projeto")
+    @GetMapping("/projeto/{projetoId}")
+    public ResponseEntity<List<OrcamentoResponseDTO>> listByProjeto(
+            @PathVariable Integer projetoId
+    ) {
+        return ResponseEntity.ok(service.listByProjeto(projetoId));
+    }
+
+    @Operation(summary = "Lista orçamentos por empresa (CNPJ)")
+    @GetMapping("/empresa/{empresaCnpj}")
+    public ResponseEntity<List<OrcamentoResponseDTO>> listByEmpresa(
+            @PathVariable String empresaCnpj
+    ) {
+        return ResponseEntity.ok(service.listByEmpresa(empresaCnpj));
+    }
+
+    @Operation(summary = "Lista orçamentos por status")
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<OrcamentoResponseDTO>> listByStatus(
+            @PathVariable String status
+    ) {
+        return ResponseEntity.ok(service.listByStatus(status));
+    }
+
+    @Operation(summary = "Atualiza parcialmente um orçamento existente")
     @PutMapping("/{id}")
     public ResponseEntity<OrcamentoResponseDTO> update(
             @PathVariable Integer id,
             @Valid @RequestBody OrcamentoUpdateDTO request
     ) {
-        OrcamentoResponseDTO response = service.update(id, request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(service.update(id, request));
     }
 
-    @Operation(summary = "Remove um orçamento")
+    @Operation(summary = "Exclui logicamente um orçamento")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable Integer id
@@ -74,6 +91,4 @@ public class OrcamentoController {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
-
-
 }

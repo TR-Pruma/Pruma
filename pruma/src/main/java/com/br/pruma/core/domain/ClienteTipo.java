@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
@@ -23,6 +24,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @EqualsAndHashCode(of = "id")
 public class ClienteTipo implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

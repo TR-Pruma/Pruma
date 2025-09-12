@@ -10,56 +10,65 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@FilterDef(name = "ativoFilter", parameters = @ParamDef(name = "ativo", type = boolean.class))
-@Filter(name = "ativoFilter", condition = "ativo = :ativo")
-
 @Entity
 @Table(
-        name = "item_checklist",
-        indexes = @Index(name = "idx_item_checklist_ordem", columnList = "checklist_id, ordem"),
-        uniqueConstraints = @UniqueConstraint(
-                name = "uk_item_checklist_ordem",
+        name               = "item_checklist",
+        indexes            = @Index(
+                name       = "idx_item_checklist_ordem",
+                columnList = "checklist_id, ordem"
+        ),
+        uniqueConstraints  = @UniqueConstraint(
+                name        = "uk_item_checklist_ordem",
                 columnNames = {"checklist_id", "ordem"}
         )
 )
 @SQLDelete(sql = "UPDATE item_checklist SET ativo = false WHERE item_id = ?")
-@Where(clause = "ativo = true")
-@EntityListeners(org.springframework.data.jpa.domain.support.AuditingEntityListener.class)
+@FilterDef(
+        name       = "ativoFilter",
+        parameters = @ParamDef(name = "ativo", type = boolean.class)
+)
+@Filter(name = "ativoFilter", condition = "ativo = :ativo")
+@EntityListeners(AuditingEntityListener.class)
 @Getter
-@ToString(onlyExplicitlyIncluded = true)
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 public class ItemChecklist implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "item_id", updatable = false, nullable = false)
     @EqualsAndHashCode.Include
-    @Column(name = "item_id", updatable = false)
+    @ToString.Include
     private Integer id;
 
+    @NotNull(message = "O checklist é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "checklist_id", nullable = false)
-    @NotNull(message = "O checklist é obrigatório")
-    @EqualsAndHashCode.Include
-    @ToString.Include(name = "checklistId")
     private Checklist checklist;
 
     @NotBlank(message = "A descrição é obrigatória")
     @Size(max = 500, message = "A descrição deve ter no máximo 500 caracteres")
     @Column(name = "descricao", nullable = false, length = 500)
+    @ToString.Include
     private String descricao;
 
     @NotNull(message = "A ordem é obrigatória")
     @Min(value = 1, message = "A ordem deve ser maior ou igual a 1")
     @Column(name = "ordem", nullable = false)
+    @ToString.Include
     private Integer ordem;
 
     @NotNull(message = "O status é obrigatório")
@@ -72,26 +81,23 @@ public class ItemChecklist implements Serializable {
     private String observacao;
 
     @Column(name = "ativo", nullable = false)
-    private boolean ativo;
+    private boolean ativo = true;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 
     @Version
     @Column(name = "version", nullable = false)
     private Long version;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    /**
-     * Garante valores default e invariantes antes do primeiro persist.
-     */
     @PrePersist
-    private void prePersist() {
-        this.status = (this.status == null ? StatusItem.PENDENTE : this.status);
+    protected void prePersist() {
         this.ativo  = true;
+        this.status = (this.status == null ? StatusItem.PENDENTE : this.status);
     }
 }

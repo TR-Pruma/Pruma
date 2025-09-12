@@ -1,8 +1,6 @@
 package com.br.pruma.application.dto.update;
 
-import com.br.pruma.core.enums.StatusOrcamento;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.DecimalMin;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,16 +10,40 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@Schema(name = "OrcamentoUpdateDTO", description = "Dados para atualização parcial de um orçamento")
+@Schema(
+        name        = "OrcamentoUpdateDTO",
+        description = "Dados para atualização parcial de um orçamento"
+)
 public class OrcamentoUpdateDTO {
-    @DecimalMin(value = "0.00", inclusive = false, message = "valor deve ser maior que 0.00")
-    @Schema(description = "Novo valor do orçamento", example = "15500.00")
+
+    @Schema(
+            description = "Identificador do projeto associado",
+            example     = "3"
+    )
+    private Integer projetoId;
+
+    @Schema(
+            description = "CNPJ da empresa responsável pelo orçamento",
+            example     = "12345678000199"
+    )
+    private String empresaCnpj;
+
+    @Schema(
+            description = "Valor total do orçamento",
+            example     = "16000.00"
+    )
     private BigDecimal valor;
 
-    @Schema(description = "Nova data de envio do orçamento", example = "2025-08-27")
+    @Schema(
+            description = "Data de envio do orçamento (YYYY-MM-DD)",
+            example     = "2025-10-01"
+    )
     private LocalDate dataEnvio;
 
-    @Schema(description = "Novo status do orçamento", example = "APROVADO")
-    private StatusOrcamento status;
-
+    @Schema(
+            description = "Status do orçamento",
+            example     = "APROVADO"
+    )
+    private String status;
 }
+

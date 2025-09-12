@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -30,6 +31,7 @@ import java.util.UUID;
 )
 public class Auditoria implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

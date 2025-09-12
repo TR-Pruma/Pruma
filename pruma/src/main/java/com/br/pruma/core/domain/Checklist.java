@@ -1,108 +1,108 @@
 package com.br.pruma.core.domain;
 
 import com.br.pruma.core.enums.StatusItem;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Index;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
 
 @Entity
-@Getter
-@Setter
-@ToString(exclude = {"projeto", "itens"})
-@EqualsAndHashCode(of = "id")
-@NoArgsConstructor
-@Table(name = "checklist",
-    indexes = {
-        @Index(name = "idx_checklist_projeto", columnList = "projeto_id"),
-        @Index(name = "idx_checklist_nome", columnList = "nome")
-    }
+@Table(
+        name    = "checklist",
+        indexes = {
+                @Index(name = "idx_checklist_projeto", columnList = "projeto_id"),
+                @Index(name = "idx_checklist_nome",    columnList = "nome")
+        }
 )
 @SQLDelete(sql = "UPDATE checklist SET ativo = false WHERE checklist_id = ?")
-@FilterDef(name = "ativoFilter", parameters = @ParamDef(name = "ativo", type = boolean.class))
+@FilterDef(
+        name       = "ativoFilter",
+        parameters = @ParamDef(name = "ativo", type = boolean.class)
+)
 @Filter(name = "ativoFilter", condition = "ativo = :ativo")
-@ApiModel(description = "Representa um checklist de projeto")
+@EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 public class Checklist implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "checklist_id")
-    @ApiModelProperty(value = "Identificador único do checklist", example = "1")
+    @Column(name = "checklist_id", updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private Integer id;
 
     @NotBlank(message = "O nome do checklist é obrigatório")
     @Size(min = 3, max = 50, message = "O nome deve ter entre 3 e 50 caracteres")
     @Column(name = "nome", length = 50, nullable = false)
-    @ApiModelProperty(value = "Nome do checklist", example = "Checklist de Qualidade")
+    @ToString.Include
     private String nome;
 
     @NotNull(message = "O projeto é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "projeto_id", nullable = false)
-    @ApiModelProperty(value = "Projeto ao qual o checklist pertence")
     private Projeto projeto;
 
-    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy      = "checklist",
+            cascade       = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch         = FetchType.LAZY
+    )
     @OrderBy("ordem ASC")
-    @ApiModelProperty(value = "Itens do checklist")
     private List<ItemChecklist> itens = new ArrayList<>();
 
     @Column(name = "ativo", nullable = false)
-    @ApiModelProperty(value = "Indica se o checklist está ativo", example = "true")
     private boolean ativo = true;
 
     @CreationTimestamp
-    @Column(name = "data_criacao", nullable = false, updatable = false)
-    @ApiModelProperty(value = "Data de criação do checklist")
-    private LocalDateTime dataCriacao;
+    @Column(name = "data_criacao", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "data_atualizacao")
-    @ApiModelProperty(value = "Data da última atualização do checklist")
-    private LocalDateTime dataAtualizacao;
+    @Column(name = "data_atualizacao", nullable = false)
+    private LocalDateTime updatedAt;
 
     @Version
-    @Column(name = "version")
+    @Column(name = "version", nullable = false)
     private Long version;
 
     @PrePersist
-    public void prePersist() {
+    protected void prePersist() {
         this.ativo = true;
-        if (this.dataCriacao == null) {
-            this.dataCriacao = LocalDateTime.now();
-        }
     }
 
     public void addItem(ItemChecklist item) {
-        if (item == null) {
-            throw new IllegalArgumentException("Item não pode ser nulo");
-        }
+        Objects.requireNonNull(item, "Item não pode ser nulo");
         item.setChecklist(this);
         item.setStatus(StatusItem.PENDENTE);
-        item.setOrdem(this.itens.size() + 1);
+        item.setOrdem(itens.size() + 1);
         item.setAtivo(true);
-        this.itens.add(item);
+        itens.add(item);
     }
 
     public void removeItem(ItemChecklist item) {
-        if (item != null && this.itens.remove(item)) {
+        if (itens.remove(item)) {
             item.setChecklist(null);
             item.setAtivo(false);
             reordenarItens();
@@ -113,40 +113,42 @@ public class Checklist implements Serializable {
         if (!itens.contains(item)) {
             throw new IllegalArgumentException("Item não pertence a este checklist");
         }
-        if (novaOrdem < 1 || novaOrdem > itens.size()) {
+        int tamanho = itens.size();
+        if (novaOrdem < 1 || novaOrdem > tamanho) {
             throw new IllegalArgumentException("Ordem inválida");
         }
         int ordemAtual = item.getOrdem();
         if (novaOrdem == ordemAtual) {
             return;
         }
-        
-        itens.stream()
-            .filter(i -> i != item)
-            .forEach(i -> {
-                if (novaOrdem < ordemAtual && i.getOrdem() >= novaOrdem && i.getOrdem() < ordemAtual) {
-                    i.setOrdem(i.getOrdem() + 1);
-                } else if (novaOrdem > ordemAtual && i.getOrdem() <= novaOrdem && i.getOrdem() > ordemAtual) {
-                    i.setOrdem(i.getOrdem() - 1);
+
+        for (ItemChecklist i : itens) {
+            int o = i.getOrdem();
+            if (i != item) {
+                if (novaOrdem < ordemAtual && o >= novaOrdem && o < ordemAtual) {
+                    i.setOrdem(o + 1);
+                } else if (novaOrdem > ordemAtual && o <= novaOrdem && o > ordemAtual) {
+                    i.setOrdem(o - 1);
                 }
-            });
+            }
+        }
         item.setOrdem(novaOrdem);
     }
 
     private void reordenarItens() {
-        int ordem = 1;
-        for (ItemChecklist item : itens.stream()
+        List<ItemChecklist> ordenados = itens.stream()
                 .sorted(Comparator.comparing(ItemChecklist::getOrdem))
-                .toList()) {
-            item.setOrdem(ordem++);
+                .collect(Collectors.toList());
+        for (int idx = 0; idx < ordenados.size(); idx++) {
+            ordenados.get(idx).setOrdem(idx + 1);
         }
     }
 
     public boolean isCompleto() {
-        return !itens.isEmpty() && 
-               itens.stream()
-                    .allMatch(item -> StatusItem.CONCLUIDO.equals(item.getStatus()) || 
-                                    StatusItem.CANCELADO.equals(item.getStatus()));
+        return !itens.isEmpty() &&
+                itens.stream()
+                        .allMatch(it -> it.getStatus() == StatusItem.CONCLUIDO
+                                || it.getStatus() == StatusItem.CANCELADO);
     }
 
     public long getPercentualConcluido() {
@@ -154,7 +156,7 @@ public class Checklist implements Serializable {
             return 0L;
         }
         long concluidos = itens.stream()
-                .filter(item -> StatusItem.CONCLUIDO.equals(item.getStatus()))
+                .filter(it -> it.getStatus() == StatusItem.CONCLUIDO)
                 .count();
         return (concluidos * 100L) / itens.size();
     }

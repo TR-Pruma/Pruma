@@ -1,10 +1,9 @@
 package com.br.pruma.application.dto.request;
 
-import com.br.pruma.core.enums.StatusOrcamento;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -15,36 +14,51 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@Schema(name = "OrcamentoRequestDTO", description = "Dados para criação de um novo orçamento")
+@Schema(
+        name        = "OrcamentoRequestDTO",
+        description = "Dados para criação de um orçamento"
+)
 public class OrcamentoRequestDTO {
 
     @NotNull(message = "projetoId é obrigatório")
-    @Schema(description = "Identificador do projeto", example = "42", required = true)
+    @Schema(
+            description = "Identificador do projeto associado",
+            example     = "3",
+            required    = true
+    )
     private Integer projetoId;
 
-    @NotNull(message = "empresaCnpj é obrigatório")
-    @Pattern(
-            regexp = "\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}",
-            message = "empresaCnpj deve seguir o padrão 00.000.000/0000-00"
-    )
+    @NotBlank(message = "empresaCnpj é obrigatório")
     @Schema(
-            description = "CNPJ da empresa contratante",
-            example = "12.345.678/0001-90",
-            required = true
+            description = "CNPJ da empresa responsável pelo orçamento",
+            example     = "12345678000199",
+            required    = true
     )
     private String empresaCnpj;
 
     @NotNull(message = "valor é obrigatório")
-    @DecimalMin(value = "0.00", inclusive = false, message = "valor deve ser maior que 0.00")
-    @Schema(description = "Valor total do orçamento", example = "15000.75", required = true)
+    @DecimalMin(value = "0.00", message = "valor deve ser maior ou igual a zero")
+    @Schema(
+            description = "Valor total do orçamento",
+            example     = "15000.50",
+            required    = true
+    )
     private BigDecimal valor;
 
     @NotNull(message = "dataEnvio é obrigatória")
-    @Schema(description = "Data de envio do orçamento", example = "2025-08-26", required = true)
+    @Schema(
+            description = "Data de envio do orçamento (YYYY-MM-DD)",
+            example     = "2025-09-15",
+            required    = true
+    )
     private LocalDate dataEnvio;
 
     @NotNull(message = "status é obrigatório")
-    @Schema(description = "Status do orçamento", example = "PENDENTE", required = true)
-    private StatusOrcamento status;
-
+    @Schema(
+            description = "Status do orçamento",
+            example     = "PENDENTE",
+            required    = true
+    )
+    private String status;
 }
+
