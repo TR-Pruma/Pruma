@@ -12,12 +12,12 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
+
 @Entity
 @Table(
-        name    = "obra",
+        name = "obra",
         indexes = {
-                @Index(name = "idx_obra_projeto",     columnList = "projeto_id"),
+                @Index(name = "idx_obra_projeto", columnList = "projeto_id"),
                 @Index(name = "idx_obra_data_inicio", columnList = "data_inicio")
         }
 )
@@ -44,6 +44,7 @@ public class Obra implements Serializable {
     @NotNull(message = "Projeto é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "projeto_id", nullable = false)
+    @ToString.Exclude
     private Projeto projeto;
 
     @NotBlank(message = "Descrição é obrigatória")
@@ -57,6 +58,14 @@ public class Obra implements Serializable {
     @Column(name = "data_fim")
     private LocalDate dataFim;
 
+    /**
+     * Marca de soft delete opcional.
+     * Se quiser usar soft-delete, descomente o campo, adicione @Where(clause = "deleted = false")
+     * na entidade e adapte repository/queries.
+     */
+    // @Column(name = "deleted", nullable = false)
+    // private Boolean deleted = Boolean.FALSE;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
@@ -68,4 +77,23 @@ public class Obra implements Serializable {
     @Version
     @Column(name = "version", nullable = false)
     private Long version;
+
+    // ---------- Domain helpers ----------
+
+    /**
+     * Atualiza campos permitidos da entidade.
+     * Mantém referências consistentes e evita atribuições nulas indevidas.
+     */
+    public void updateFrom(Obra source) {
+        if (source == null) return;
+        if (source.getProjeto() != null) this.setProjeto(source.getProjeto());
+        if (source.getDescricao() != null && !source.getDescricao().isBlank()) this.setDescricao(source.getDescricao());
+        if (source.getDataInicio() != null) this.setDataInicio(source.getDataInicio());
+        this.setDataFim(source.getDataFim());
+    }
+
+    /**
+     * Convenience method to mark as deleted when soft-delete is enabled.
+     */
+    // public void markDeleted() { this.deleted = Boolean.TRUE; }
 }

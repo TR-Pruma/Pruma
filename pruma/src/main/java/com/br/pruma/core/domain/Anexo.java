@@ -1,4 +1,4 @@
-package com.br.pruma.core.domain;
+£98ygfrtr87repackage com.br.pruma.core.domain;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

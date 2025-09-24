@@ -1,8 +1,6 @@
 package com.br.pruma.application.dto.request;
-
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -12,39 +10,21 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@Schema(
-        name        = "ObraRequestDTO",
-        description = "Dados para criação de uma obra"
-)
+@Schema(name = "ObraRequestDTO", description = "Dados para criação de uma Obra")
 public class ObraRequestDTO {
 
     @NotNull(message = "projetoId é obrigatório")
-    @Schema(
-            description = "Identificador do projeto associado",
-            example     = "5",
-            required    = true
-    )
+    @Schema(description = "Identificador do projeto associado", example = "12", required = true)
     private Integer projetoId;
 
-    @NotBlank(message = "descrição é obrigatória")
-    @Schema(
-            description = "Descrição da obra",
-            example     = "Construção de alvenaria",
-            required    = true
-    )
+    @NotBlank(message = "descricao é obrigatória")
+    @Schema(description = "Descrição da obra", example = "Reforma de escola municipal", required = true)
     private String descricao;
 
     @NotNull(message = "dataInicio é obrigatória")
-    @Schema(
-            description = "Data de início da obra (YYYY-MM-DD)",
-            example     = "2025-09-01",
-            required    = true
-    )
+    @Schema(description = "Data de início da obra (YYYY-MM-DD)", example = "2025-06-01", required = true)
     private LocalDate dataInicio;
 
-    @Schema(
-            description = "Data de término da obra (YYYY-MM-DD)",
-            example     = "2025-12-31"
-    )
+    @Schema(description = "Data de fim prevista (YYYY-MM-DD)", example = "2025-12-15")
     private LocalDate dataFim;
 }
