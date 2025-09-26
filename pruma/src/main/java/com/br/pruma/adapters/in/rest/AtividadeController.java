@@ -2,72 +2,78 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.AtividadeRequestDTO;
 import com.br.pruma.application.dto.response.AtividadeResponseDTO;
-import com.br.pruma.application.mapper.AtividadeMapper;
 import com.br.pruma.application.service.AtividadeService;
-import com.br.pruma.core.domain.Atividade;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/pruma/v1/atividades")
-@Api(tags = "Atividades")
+@Tag(name = "Atividades", description = "Operações de gerenciamento de atividades")
+@RequiredArgsConstructor
 public class AtividadeController {
 
-    private final AtividadeService atividadeService;
-    private final AtividadeMapper atividadeMapper;
-
-    public AtividadeController(AtividadeService atividadeService, AtividadeMapper atividadeMapper) {
-        this.atividadeService = atividadeService;
-        this.atividadeMapper = atividadeMapper;
-    }
+    private final AtividadeService service;
 
     @GetMapping
-    @ApiOperation("Listar todas as atividades")
-    public ResponseEntity<List<AtividadeResponseDTO>> listarTodas() {
-        List<Atividade> atividades = atividadeService.listarTodos();
-        List<AtividadeResponseDTO> resposta = atividades.stream()
-                .map(atividadeMapper::toResponseDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(resposta);
+    @Operation(summary = "Listar todas as atividades")
+    public ResponseEntity<List<AtividadeResponseDTO>> findAll() {
+        List<AtividadeResponseDTO> dtos = service.findAll();
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/{id}")
-    @ApiOperation("Buscar atividade por ID")
-    public ResponseEntity<AtividadeResponseDTO> buscarPorId(@PathVariable Integer id) {
-        Optional<Atividade> atividade = atividadeService.buscarPorId(id);
-        return atividade.map(a -> ResponseEntity.ok(atividadeMapper.toResponseDTO(a)))
-                .orElse(ResponseEntity.notFound().build());
+    @Operation(summary = "Buscar atividade por ID")
+    public ResponseEntity<AtividadeResponseDTO> findById(
+            @PathVariable Integer id
+    ) {
+        AtividadeResponseDTO dto = service.findById(id);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping
-    @ApiOperation("Criar nova atividade")
-    public ResponseEntity<AtividadeResponseDTO> criar(@RequestBody AtividadeRequestDTO dto) {
-        Atividade nova = atividadeMapper.toEntity(dto);
-        Atividade salvo = atividadeService.salvar(nova);
-        return ResponseEntity.ok(atividadeMapper.toResponseDTO(salvo));
+    @Operation(summary = "Criar nova atividade")
+    public ResponseEntity<AtividadeResponseDTO> create(
+            @Valid @RequestBody AtividadeRequestDTO dto
+    ) {
+        AtividadeResponseDTO created = service.create(dto);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(created.getId())
+                .toUri();
+
+        return ResponseEntity
+                .created(location)
+                .body(created);
     }
 
     @PutMapping("/{id}")
-    @ApiOperation("Atualizar atividade existente")
-    public ResponseEntity<AtividadeResponseDTO> atualizar(@PathVariable Integer id, @RequestBody AtividadeRequestDTO dto) {
-        if (atividadeService.buscarPorId(id).isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        Atividade atividadeAtualizada = atividadeMapper.toEntity(dto);
-        atividadeAtualizada.setId(id);
-        Atividade salvo = atividadeService.salvar(atividadeAtualizada);
-        return ResponseEntity.ok(atividadeMapper.toResponseDTO(salvo));
+    @Operation(summary = "Atualizar atividade existente")
+    public ResponseEntity<AtividadeResponseDTO> update(
+            @PathVariable Integer id,
+            @Valid @RequestBody AtividadeRequestDTO dto
+    ) {
+        AtividadeResponseDTO updated = service.update(id, dto);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    @ApiOperation("Deletar atividade por ID")
-    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
-        atividadeService.deletar(id);
+    @Operation(summary = "Deletar atividade por ID")
+    public ResponseEntity<Void> delete(
+            @PathVariable Integer id
+    ) {
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
+

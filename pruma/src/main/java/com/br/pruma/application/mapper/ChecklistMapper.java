@@ -32,12 +32,8 @@ public interface ChecklistMapper {
 
     @Named("projetoIdToProjeto")
     default Projeto projetoIdToProjeto(Integer projetoId) {
-        if (projetoId == null) {
-            return null;
-        }
-        Projeto projeto = new Projeto(dto.projetoId());
-        projeto.setId(projetoId);
-        return projeto;
+        if (projetoId == null) return null;
+        return Projeto.builder().id(projetoId).build();
     }
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

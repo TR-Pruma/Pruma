@@ -35,5 +35,9 @@ public interface ProjetoRepository extends JpaRepository<Projeto, Integer> {
      * Lista projetos com data de criação igual à informada.
      */
     List<Projeto> findAllByDataCriacao(LocalDate date);
+
+    Optional<Object> findByIdAndAtivoTrue(Integer projetoId);
+
+    boolean existsByIdAndAtivoTrue(Integer projetoId);
 }
 

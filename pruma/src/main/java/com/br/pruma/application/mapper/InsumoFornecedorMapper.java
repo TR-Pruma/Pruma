@@ -2,31 +2,44 @@ package com.br.pruma.application.mapper;
 
 import com.br.pruma.application.dto.request.InsumoFornecedorRequestDTO;
 import com.br.pruma.application.dto.response.InsumoFornecedorResponseDTO;
-import com.br.pruma.core.domain.InsumoFornecedor;
-import com.br.pruma.core.domain.InsumoFornecedorAux;
+import com.br.pruma.core.domain.*;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring")
 public interface InsumoFornecedorMapper {
 
-    @Mapping(target = "id.insumoId",     source = "request.insumoId")
-    @Mapping(target = "id.fornecedorId", source = "request.fornecedorId")
-    @Mapping(target = "preco",           source = "request.preco")
-    InsumoFornecedor toEntity(InsumoFornecedorRequestDTO request);
+    // ====== DTO → Entidade (create) ======
+    @Mapping(target = "id", source = ".", qualifiedByName = "buildCompositeId")
+    @Mapping(target = "insumo", source = "insumoId", qualifiedByName = "mapInsumoById")
+    @Mapping(target = "fornecedor", source = "fornecedorId", qualifiedByName = "mapFornecedorById")
+    @Mapping(target = "version", ignore = true)
+    InsumoFornecedor toEntity(InsumoFornecedorRequestDTO dto);
 
-    @Mapping(target = "insumoId",     source = "entity.id.insumoId")
-    @Mapping(target = "fornecedorId", source = "entity.id.fornecedorId")
-    @Mapping(target = "preco",        source = "entity.preco")
-    @Mapping(target = "version",      source = "entity.version")
-    InsumoFornecedorResponseDTO toResponse(InsumoFornecedor entity);
+    // ====== Entidade → DTO (response) ======
+    @Mapping(target = "insumoId", source = "insumo.id")
+    @Mapping(target = "fornecedorId", source = "fornecedor.id")
+    @Mapping(target = "preco", source = "preco")
+    @Mapping(target = "version", source = "version")
+    InsumoFornecedorResponseDTO toResponseDTO(InsumoFornecedor entity);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id.insumoId",     ignore = true)
-    @Mapping(target = "id.fornecedorId", ignore = true)
-    @Mapping(target = "preco",           source = "request.preco")
-    void updateFromRequest(InsumoFornecedorRequestDTO request,
-                           @MappingTarget InsumoFornecedor entity);
+    // ====== Conversores auxiliares ======
+    @Named("mapInsumoById")
+    default Insumo mapInsumoById(Integer id) {
+        return id == null ? null : Insumo.builder().id(id).build();
+    }
 
+    @Named("mapFornecedorById")
+    default Fornecedor mapFornecedorById(Integer id) {
+        return id == null ? null : Fornecedor.builder().id(id).build();
+    }
 
-
+    @Named("buildCompositeId")
+    default InsumoFornecedorAux buildCompositeId(InsumoFornecedorRequestDTO dto) {
+        if (dto == null) return null;
+        Integer insumoId = dto.getInsumoId();
+        Integer fornecedorId = dto.getFornecedorId();
+        return (insumoId != null && fornecedorId != null)
+                ? new InsumoFornecedorAux(insumoId, fornecedorId)
+                : null;
+    }
 }

@@ -23,7 +23,7 @@ public class DocumentoMapper {
                 .caminhoArquivo(caminhoArquivo)
                 .tipoArquivo(arquivo.getContentType())
                 .tamanhoArquivo(arquivo.getSize())
-                .ativo(true)
+
                 .build();
     }
 
@@ -34,11 +34,10 @@ public class DocumentoMapper {
                 .toUriString();
 
         return DocumentoResponseDTO.builder()
-                .id(entity.getId())
                 .projetoId(entity.getProjeto().getId())
                 .projetoNome(entity.getProjeto().getNome())
                 .tipoDocumentoId(entity.getTipoDocumento().getId())
-                .tipoDocumentoNome(entity.getTipoDocumento().getNome())
+                .tipoDocumentoNome(entity.getTipoDocumento().getDescricao())
                 .nomeArquivo(entity.getNomeArquivo())
                 .tipoArquivo(entity.getTipoArquivo())
                 .tamanhoArquivo(entity.getTamanhoArquivo())
@@ -46,7 +45,6 @@ public class DocumentoMapper {
                 .dataUpload(entity.getDataUpload())
                 .dataAtualizacao(entity.getDataAtualizacao())
                 .versao(entity.getVersao())
-                .ativo(entity.getAtivo())
                 .build();
     }
 

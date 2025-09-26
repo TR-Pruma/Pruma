@@ -100,4 +100,13 @@ public class ChecklistService {
             }
         }
     }
+
+
+    @Transactional(readOnly = true)
+    public List<ChecklistResponseDTO> findAll() {
+        return checklistRepository.findAll().stream()
+                .map(checklistMapper::toResponseDTO)
+                .toList();
+    }
+
 }

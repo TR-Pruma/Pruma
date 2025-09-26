@@ -1,22 +1,18 @@
 package com.br.pruma.core.domain;
 
 import com.br.pruma.core.enums.StatusAtividade;
-
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "atividade")
@@ -35,28 +31,28 @@ public class Atividade implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "atividade_id", updatable = false, nullable = false)
+    @Column(name = "atividade_id", nullable = false, updatable = false)
     @EqualsAndHashCode.Include
     @ToString.Include
     private Integer id;
 
-    @NotNull(message = "Projeto é obrigatório")
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id", nullable = false)
+    @JoinColumn(name = "projeto_id", nullable = false)
     private Projeto projeto;
 
-    @NotBlank(message = "Descrição da atividade é obrigatória")
-    @Size(max = 4000, message = "Descrição deve ter no máximo 4000 caracteres")
+    @NotBlank
+    @Size(max = 4000)
     @Column(name = "descricao", columnDefinition = "TEXT", nullable = false)
     @ToString.Include
     private String descricao;
 
-    @NotNull(message = "Status da atividade é obrigatório")
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 15, nullable = false)
     private StatusAtividade status;
 
-    @NotNull(message = "Data de início é obrigatória")
+    @NotNull
     @Column(name = "data_inicio", nullable = false)
     private LocalDate dataInicio;
 
@@ -68,25 +64,20 @@ public class Atividade implements Serializable {
     private Long version;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false, nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    /**
-     * Lista de materiais utilizados nesta atividade.
-     * Mapeamento bidirecional para permitir consultas e remoções em cascata.
-     */
     @OneToMany(
-            mappedBy        = "atividade",
-            cascade         = CascadeType.ALL,
-            orphanRemoval   = true,
-            fetch           = FetchType.LAZY
+            mappedBy = "atividade",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
     )
     @ToString.Include(name = "materiaisCount")
     @EqualsAndHashCode.Exclude
     private List<MaterialUtilizado> materiaisUtilizados = new ArrayList<>();
 }
-

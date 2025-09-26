@@ -38,13 +38,9 @@ public class InsumoFornecedorAux {
     @Column(name = "preco", nullable = false, precision = 13, scale = 2)
     private BigDecimal preco;
 
-    /**
-     * Construtor de conveniência para relacionar instâncias existentes.
-     */
-    public InsumoFornecedorAux(Insumo insumo, Fornecedor fornecedor) {
-        this.id = new InsumoFornecedorAuxId(insumo.id(), fornecedor.getId());
-        this.insumo = insumo;
-        this.fornecedor = fornecedor;
-    }
 
+    public InsumoFornecedorAux(Integer insumoId, Integer fornecedorId) {
+        this.insumo.setId(insumoId);
+        this.fornecedor.setId(fornecedorId);
+    }
 }

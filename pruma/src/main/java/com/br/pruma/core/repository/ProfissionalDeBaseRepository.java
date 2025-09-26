@@ -34,4 +34,6 @@ public interface ProfissionalDeBaseRepository extends JpaRepository<Profissional
      * Verifica existência por nome exato.
      */
     boolean existsByNome(String nome);
+
+    Optional<Object> findByCpf(Long aLong);
 }

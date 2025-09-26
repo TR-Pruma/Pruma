@@ -3,6 +3,7 @@ package com.br.pruma.config;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,14 +20,17 @@ import java.time.LocalDateTime;
 public abstract class AuditableEntity implements Serializable {
 
     @CreationTimestamp
-    @Column(name = "data_criacao", nullable = false, updatable = false)
-    private LocalDateTime dataCriacao;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "data_atualizacao")
-    private LocalDateTime dataAtualizacao;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Column(name = "ativo", nullable = false)
     private Boolean ativo = true;
 
+    @Version
+    @Column(name = "version")
+    private Long version;
 }

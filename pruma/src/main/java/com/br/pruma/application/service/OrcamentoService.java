@@ -10,7 +10,8 @@ import com.br.pruma.core.domain.Projeto;
 import com.br.pruma.core.enums.StatusOrcamento;
 import com.br.pruma.core.repository.EmpresaRepository;
 import com.br.pruma.core.repository.OrcamentoRepository;
-import com.br.pruma.infra.repository.ProjetoRepository;
+
+import com.br.pruma.core.repository.ProjetoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -74,4 +74,5 @@ public class ProfissionalDeBase implements Serializable {
         if (patch.getEspecialidade() != null) this.setEspecialidade(patch.getEspecialidade());
         if (patch.getTelefone() != null) this.setTelefone(patch.getTelefone());
     }
+
 }

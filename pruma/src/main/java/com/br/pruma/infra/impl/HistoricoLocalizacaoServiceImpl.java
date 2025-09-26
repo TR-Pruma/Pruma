@@ -5,9 +5,12 @@ import com.br.pruma.application.dto.response.HistoricoLocalizacaoResponseDTO;
 import com.br.pruma.application.mapper.HistoricoLocalizacaoMapper;
 import com.br.pruma.application.service.HistoricoLocalizacaoService;
 import com.br.pruma.core.domain.HistoricoLocalizacao;
+import com.br.pruma.core.domain.ProfissionalDeBase;
 import com.br.pruma.core.domain.Projeto;
 import com.br.pruma.core.repository.HistoricoLocalizacaoRepository;
-import com.br.pruma.infra.repository.ProjetoRepository;
+
+import com.br.pruma.core.repository.ProfissionalDeBaseRepository;
+import com.br.pruma.core.repository.ProjetoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,14 +22,14 @@ import java.util.List;
 public class HistoricoLocalizacaoServiceImpl implements HistoricoLocalizacaoService {
 
     private final HistoricoLocalizacaoRepository repository;
-    private final ProfissionalRepository profissionalRepository;
+    private final ProfissionalDeBaseRepository profissionalRepository;
     private final ProjetoRepository projetoRepository;
     private final HistoricoLocalizacaoMapper mapper;
 
     @Override
     @Transactional
     public HistoricoLocalizacaoResponseDTO salvar(HistoricoLocalizacaoRequestDTO dto) {
-        Profissional profissional = profissionalRepository.findByCpf(dto.profissionalCpf())
+        ProfissionalDeBase profissional = (ProfissionalDeBase) profissionalRepository.findByCpf(dto.profissionalCpf())
                 .orElseThrow(() -> new RuntimeException("Profissional não encontrado"));
         Projeto projeto = projetoRepository.findById(dto.projetoId())
                 .orElseThrow(() -> new RuntimeException("Projeto não encontrado"));

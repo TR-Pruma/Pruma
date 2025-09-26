@@ -1,50 +1,47 @@
 package com.br.pruma.application.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@Builder
-@NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@ApiModel(description = "DTO para resposta de Checklist")
+@Builder
+@Schema(description = "DTO de resposta para Checklist")
 public class ChecklistResponseDTO {
 
-    @ApiModelProperty(value = "ID do checklist", example = "1")
+    @Schema(description = "ID do checklist", example = "1", required = true)
     private Integer id;
 
-    @ApiModelProperty(value = "Nome do checklist", example = "Checklist de Qualidade")
+    @Schema(description = "Nome do checklist", example = "Checklist de Qualidade", required = true)
     private String nome;
 
-    @ApiModelProperty(value = "ID do projeto", example = "1")
+    @Schema(description = "ID do projeto", example = "1", required = true)
     private Integer projetoId;
 
-    @ApiModelProperty(value = "Nome do projeto", example = "Projeto ABC")
+    @Schema(description = "Nome do projeto", example = "Projeto ABC", required = true)
     private String projetoNome;
 
-    @ApiModelProperty(value = "Lista de itens do checklist")
-    private List<ItemChecklistResponseDTO> itens = new ArrayList<>();
+    @Schema(description = "Itens do checklist")
+    @Builder.Default
+    private List<ItemChecklistResponseDTO> itens = List.of();
 
-    @ApiModelProperty(value = "Percentual de conclusão", example = "75")
+    @Schema(description = "Percentual de conclusão", example = "75")
     private Long percentualConcluido;
 
-    @ApiModelProperty(value = "Status de ativação do checklist", example = "true")
+    @Schema(description = "Flag de ativação do checklist", example = "true")
     private boolean ativo;
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
-    @ApiModelProperty(value = "Data de criação", example = "01/08/2025 14:30:00")
+    @Schema(description = "Data de criação", example = "01/08/2025 14:30:00", required = true)
     private LocalDateTime dataCriacao;
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
-    @ApiModelProperty(value = "Data da última atualização", example = "01/08/2025 14:30:00")
+    @Schema(description = "Data da última atualização", example = "01/08/2025 14:30:00", required = true)
     private LocalDateTime dataAtualizacao;
 }

@@ -70,6 +70,10 @@ public class Cronograma {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "nome", nullable = false)
+    private String nome;
+
+
     @PrePersist
     @PreUpdate
     private void validatePeriodo() {

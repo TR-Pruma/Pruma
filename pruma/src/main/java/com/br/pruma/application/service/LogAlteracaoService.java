@@ -9,8 +9,8 @@ import com.br.pruma.core.domain.Projeto;
 import com.br.pruma.core.domain.TipoUsuario;
 import com.br.pruma.core.repository.ClienteRepository;
 import com.br.pruma.core.repository.LogAlteracaoRepository;
+import com.br.pruma.core.repository.ProjetoRepository;
 import com.br.pruma.core.repository.TipoUsuarioRepository;
-import com.br.pruma.infra.repository.ProjetoRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;

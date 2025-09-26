@@ -1,14 +1,11 @@
 package com.br.pruma.application.mapper;
 
-import com.br.pruma.api.dto.*;
 import com.br.pruma.application.dto.request.PermissaoUsuarioRequestDTO;
 import com.br.pruma.application.dto.response.PermissaoUsuarioResponseDTO;
 import com.br.pruma.core.domain.PermissaoUsuario;
 import com.br.pruma.core.domain.Cliente;
 import com.br.pruma.core.domain.TipoUsuario;
 import org.mapstruct.*;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface PermissaoUsuarioMapper {
@@ -24,7 +21,7 @@ public interface PermissaoUsuarioMapper {
     /* =======================
        Converte Entidade -> ResponseDTO
        ======================= */
-    @Mapping(target = "clienteCpf", source = "cliente.clienteCpf")
+    @Mapping(target = "clienteCpf", source = "cliente.cpf")
     @Mapping(target = "clienteNome", source = "cliente.nome") // ajuste conforme atributo real
     @Mapping(target = "tipoUsuarioId", source = "tipoUsuario.id")
     @Mapping(target = "tipoUsuarioDescricao", source = "tipoUsuario.descricao") // ajuste conforme atributo real

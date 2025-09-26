@@ -28,7 +28,7 @@ public class Inspecao {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tecnico_id", referencedColumnName = "profissional_cpf")
-    private Profissional tecnico;
+    private ProfissionalDeBase tecnico;
 
     @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;

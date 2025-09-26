@@ -1,5 +1,4 @@
 package com.br.pruma.application.service;
-
 import com.br.pruma.application.dto.request.InsumoFornecedorRequestDTO;
 import com.br.pruma.application.dto.response.InsumoFornecedorResponseDTO;
 import com.br.pruma.application.mapper.InsumoFornecedorMapper;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,73 +22,56 @@ public class InsumoFornecedorService {
     @Transactional
     public InsumoFornecedorResponseDTO create(InsumoFornecedorRequestDTO request) {
         InsumoFornecedor entity = mapper.toEntity(request);
-        InsumoFornecedor saved  = repository.save(entity);
-        return mapper.toResponse(saved);
+        return mapper.toResponseDTO(repository.save(entity));
     }
 
     @Transactional(readOnly = true)
     public List<InsumoFornecedorResponseDTO> findAll() {
-        return repository.findAll()
-                .stream()
-                .map(mapper::toResponse)
-                .collect(Collectors.toList());
+        return repository.findAll().stream()
+                .map(mapper::toResponseDTO)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public InsumoFornecedorResponseDTO findById(Integer insumoId,
-                                                Integer fornecedorId) {
-        InsumoFornecedorAux key = new InsumoFornecedorAux(insumoId, fornecedorId);
-        InsumoFornecedor entity = repository.findById(key)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "InsumoFornecedor não encontrado para insumoId="
-                                        + insumoId + ", fornecedorId=" + fornecedorId
-                        )
-                );
-        return mapper.toResponse(entity);
+    public InsumoFornecedorResponseDTO findById(Integer insumoId, Integer fornecedorId) {
+        return mapper.toResponseDTO(findEntity(insumoId, fornecedorId));
     }
+
     @Transactional
     public InsumoFornecedorResponseDTO update(Integer insumoId,
                                               Integer fornecedorId,
                                               InsumoFornecedorRequestDTO request) {
-        InsumoFornecedorAux key = new InsumoFornecedorAux(insumoId, fornecedorId);
-        InsumoFornecedor entity = repository.findById(key)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "InsumoFornecedor não encontrado para atualização: insumoId="
-                                        + insumoId + ", fornecedorId=" + fornecedorId
-                        )
-                );
-        mapper.updateFromRequest(request, entity);
-        InsumoFornecedor updated = repository.save(entity);
-        return mapper.toResponse(updated);
+        InsumoFornecedor entity = findEntity(insumoId, fornecedorId);
+        entity.setPreco(request.getPreco());
+        return mapper.toResponseDTO(repository.save(entity));
     }
+
     @Transactional
-    public void delete(Integer insumoId,
-                       Integer fornecedorId) {
+    public void delete(Integer insumoId, Integer fornecedorId) {
         InsumoFornecedorAux key = new InsumoFornecedorAux(insumoId, fornecedorId);
         if (!repository.existsById(key)) {
             throw new ResourceNotFoundException(
-                    "InsumoFornecedor não encontrado para remoção: insumoId="
-                            + insumoId + ", fornecedorId=" + fornecedorId
+                    "InsumoFornecedor não encontrado para remoção: insumoId=%d, fornecedorId=%d"
+                            .formatted(insumoId, fornecedorId)
             );
         }
         repository.deleteById(key);
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public List<InsumoFornecedorResponseDTO> findAllByInsumo(Integer insumoId) {
         return repository.findByIdInsumoId(insumoId).stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
+                .map(mapper::toResponseDTO)
+                .toList();
     }
 
-    private InsumoFornecedorResponseDTO toResponseDTO(InsumoFornecedor entity) {
-        return InsumoFornecedorResponseDTO.builder()
-                .insumoId(entity.getId().getInsumo().id())
-                .fornecedorId(entity.getId().getFornecedor().getId())
-                .preco(entity.getPreco())
-                .build();
+    // ====== Utilitário interno ======
+    private InsumoFornecedor findEntity(Integer insumoId, Integer fornecedorId) {
+        InsumoFornecedorAux key = new InsumoFornecedorAux(insumoId, fornecedorId);
+        return repository.findById(key)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "InsumoFornecedor não encontrado: insumoId=%d, fornecedorId=%d"
+                                .formatted(insumoId, fornecedorId)
+                ));
     }
-
 }

@@ -1,5 +1,6 @@
 package com.br.pruma.core.domain;
 
+
 import com.br.pruma.config.UnidadeMedidaConverter;
 import com.br.pruma.core.enums.UnidadeMedida;
 import jakarta.persistence.*;
@@ -7,8 +8,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
@@ -18,83 +21,60 @@ import java.math.BigDecimal;
                 @Index(name = "idx_insumo_nome", columnList = "nome")
         }
 )
-public record Insumo(
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
+public class Insumo implements Serializable {
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "insumo_id", updatable = false)
-        Integer id,
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-        @NotBlank
-        @Size(max = 255)
-        @Column(name = "nome", nullable = false, length = 255)
-        String nome,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "insumo_id", updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
+    @ToString.Include
+    private Integer id;
 
-        @Size(max = 2000)
-        @Column(name = "descricao", columnDefinition = "TEXT")
-        String descricao,
+    @NotBlank
+    @Size(max = 255)
+    @Column(name = "nome", nullable = false, length = 255)
+    private String nome;
 
-        @NotNull
-        @Convert(converter = UnidadeMedidaConverter.class)
-        @Column(name = "unidade_medida", nullable = false, length = 15)
-        UnidadeMedida unidadeMedida,
+    @Size(max = 2000)
+    @Column(name = "descricao", columnDefinition = "TEXT")
+    private String descricao;
 
-        @NotNull
-        @Positive
-        @Column(name = "custo", nullable = false, precision = 10, scale = 2)
-        BigDecimal custo,
+    @NotNull
+    @Convert(converter = UnidadeMedidaConverter.class)
+    @Column(name = "unidade_medida", nullable = false, length = 15)
+    private UnidadeMedida unidadeMedida;
 
-        @Version
-        @Column(name = "version", nullable = false)
-        Long version
+    @NotNull
+    @Positive
+    @Column(name = "custo", nullable = false, precision = 10, scale = 2)
+    private BigDecimal custo;
 
-) {
-    // Construtor customizado para validar invariantes de domínio
-    public Insumo {
-        if (nome.isBlank()) {
-            throw new IllegalArgumentException("Nome do insumo não pode ser vazio");
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
+    // ====== Métodos de atualização ======
+    public void atualizarCusto(BigDecimal novoCusto) {
+        if (novoCusto == null || novoCusto.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Novo custo deve ser maior que zero");
         }
-        if (custo.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Custo deve ser maior que zero");
+        this.custo = novoCusto;
+    }
+
+    public void atualizarNome(String novoNome) {
+        if (novoNome == null || novoNome.isBlank()) {
+            throw new IllegalArgumentException("Novo nome não pode ser vazio");
         }
-    }
-
-    // Factory method para criação — omite 'id' e 'version'
-    public static Insumo of(String nome,
-                            String descricao,
-                            UnidadeMedida unidadeMedida,
-                            BigDecimal custo) {
-        return new Insumo(
-                null,
-                nome,
-                descricao,
-                unidadeMedida,
-                custo,
-                0L
-        );
-    }
-
-    // Exemplo de método de atualização que retorna uma nova instância
-    public Insumo withCusto(BigDecimal novoCusto) {
-        return new Insumo(
-                this.id,
-                this.nome,
-                this.descricao,
-                this.unidadeMedida,
-                novoCusto,
-                this.version
-        );
-    }
-
-    public Insumo withNome(String novoNome) {
-        return new Insumo(
-                this.id,
-                novoNome,
-                this.descricao,
-                this.unidadeMedida,
-                this.custo,
-                this.version
-        );
+        this.nome = novoNome;
     }
 }
-

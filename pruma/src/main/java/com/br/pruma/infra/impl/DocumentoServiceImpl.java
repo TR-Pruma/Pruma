@@ -10,7 +10,7 @@ import com.br.pruma.core.domain.Projeto;
 import com.br.pruma.core.domain.TipoDocumento;
 import com.br.pruma.core.repository.DocumentoRepository;
 import com.br.pruma.core.repository.ProjetoRepository;
-import com.br.pruma.core.repository.TipoDocumentoRepository;
+import com.br.pruma.infra.repository.TipoDocumentoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -46,10 +46,10 @@ public class DocumentoServiceImpl implements DocumentoService {
         MultipartFile arquivo = request.getArquivo();
         validarArquivo(arquivo);
 
-        Projeto projeto = projetoRepository.findByIdAndAtivoTrue(request.getProjetoId())
+        Projeto projeto = (Projeto) projetoRepository.findByIdAndAtivoTrue(request.getProjetoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Projeto não encontrado"));
 
-        TipoDocumento tipoDocumento = tipoDocumentoRepository.findByIdAndAtivoTrue(request.getTipoDocumentoId())
+        TipoDocumento tipoDocumento = (TipoDocumento) tipoDocumentoRepository.findByIdAndAtivoTrue(request.getTipoDocumentoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Tipo de documento não encontrado"));
 
         String caminhoArquivo = documentoMapper.gerarCaminhoArquivo(arquivo.getOriginalFilename());
@@ -71,7 +71,7 @@ public class DocumentoServiceImpl implements DocumentoService {
     @Override
     @Transactional(readOnly = true)
     public Page<DocumentoResponseDTO> listarPorProjeto(Integer projetoId, Pageable pageable) {
-        if (!projetoRepository.existsByIdAndAtivoTrue(projetoId)) {
+        if (projetoRepository.existsByIdAndAtivoTrue(projetoId)) {
             throw new RecursoNaoEncontradoException("Projeto não encontrado");
         }
 
@@ -82,7 +82,7 @@ public class DocumentoServiceImpl implements DocumentoService {
     @Override
     @Transactional(readOnly = true)
     public List<DocumentoResponseDTO> listarPorTipoDocumento(Integer tipoDocumentoId) {
-        if (!tipoDocumentoRepository.existsByIdAndAtivoTrue(tipoDocumentoId)) {
+        if (tipoDocumentoRepository.existsByIdAndAtivoTrue(tipoDocumentoId)) {
             throw new RecursoNaoEncontradoException("Tipo de documento não encontrado");
         }
 
@@ -95,10 +95,10 @@ public class DocumentoServiceImpl implements DocumentoService {
     @Override
     @Transactional(readOnly = true)
     public List<DocumentoResponseDTO> listarPorProjetoETipo(Integer projetoId, Integer tipoDocumentoId) {
-        if (!projetoRepository.existsByIdAndAtivoTrue(projetoId)) {
+        if (projetoRepository.existsByIdAndAtivoTrue(projetoId)) {
             throw new RecursoNaoEncontradoException("Projeto não encontrado");
         }
-        if (!tipoDocumentoRepository.existsByIdAndAtivoTrue(tipoDocumentoId)) {
+        if (tipoDocumentoRepository.existsByIdAndAtivoTrue(tipoDocumentoId)) {
             throw new RecursoNaoEncontradoException("Tipo de documento não encontrado");
         }
 
@@ -130,7 +130,6 @@ public class DocumentoServiceImpl implements DocumentoService {
     @Transactional
     public void deletar(Integer id) {
         Documento documento = buscarDocumentoAtivo(id);
-        documento.setAtivo(false);
         documentoRepository.save(documento);
     }
 

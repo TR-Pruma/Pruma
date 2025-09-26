@@ -7,7 +7,7 @@ import com.br.pruma.application.mapper.ObraMapper;
 import com.br.pruma.core.domain.Obra;
 import com.br.pruma.core.domain.Projeto;
 import com.br.pruma.core.repository.ObraRepository;
-import com.br.pruma.infra.repository.ProjetoRepository;
+import com.br.pruma.core.repository.ProjetoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
