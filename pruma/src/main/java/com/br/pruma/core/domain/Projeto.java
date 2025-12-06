@@ -14,14 +14,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Entidade Projeto refatorada para Java 21 e alinhada ao modelo do domínio.
- * - usa LocalDate/LocalDateTime em vez de java.util.Date;
- * - mantém relação com Obra (OneToMany) para navegação do agregado;
- * - validações básicas, índices e auditoria (createdAt/updatedAt);
- * - controle de concorrência otimista por @Version;
- * - helpers para operações de domínio (adicionar/remover obras, aplicar patch).
- */
 @Entity
 @Table(
         name = "projeto",
@@ -32,7 +24,7 @@ import java.util.List;
 )
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA requires a no-args constructor with at least protected visibility
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -49,9 +41,9 @@ public class Projeto implements Serializable {
     @ToString.Include
     private Integer id;
 
+    @Column(name = "nome", length = 100, nullable = false)
     @NotBlank(message = "Nome do projeto é obrigatório")
     @Size(max = 100)
-    @Column(name = "nome", length = 100, nullable = false)
     private String nome;
 
     @Column(name = "descricao", columnDefinition = "TEXT")
@@ -59,7 +51,6 @@ public class Projeto implements Serializable {
 
     /**
      * Data de criação do projeto no sentido de negócio (p.ex. quando foi iniciado).
-     * Mantemos stored value como LocalDate.
      */
     @Column(name = "data_criacao")
     private LocalDate dataCriacao;
@@ -114,5 +105,13 @@ public class Projeto implements Serializable {
         obras.remove(obra);
         obra.setProjeto(null);
     }
-}
 
+    /**
+     * Conveniência para mappers (MapStruct) quando for necessário criar uma referência
+     * apenas com o identificador (por exemplo @MapsId ou associações).
+     */
+    public static Projeto ofId(Integer id) {
+        if (id == null) return null;
+        return Projeto.builder().id(id).build();
+    }
+}

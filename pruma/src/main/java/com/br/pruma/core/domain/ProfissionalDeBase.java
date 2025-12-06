@@ -1,8 +1,6 @@
 package com.br.pruma.core.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -10,7 +8,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-
 
 @Entity
 @Table(
@@ -22,7 +19,7 @@ import java.time.LocalDateTime;
 )
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA requires a no-args constructor with at least protected visibility
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -39,17 +36,17 @@ public class ProfissionalDeBase implements Serializable {
     @ToString.Include
     private Integer id;
 
+    @Column(name = "nome", length = 100, nullable = false)
     @NotBlank(message = "Nome é obrigatório")
     @Size(max = 100)
-    @Column(name = "nome", length = 100, nullable = false)
     private String nome;
 
-    @Size(max = 50)
     @Column(name = "especialidade", length = 50)
+    @Size(max = 50)
     private String especialidade;
 
-    @Size(max = 20)
     @Column(name = "telefone", length = 20)
+    @Size(max = 20)
     @ToString.Exclude
     private String telefone;
 
@@ -75,4 +72,12 @@ public class ProfissionalDeBase implements Serializable {
         if (patch.getTelefone() != null) this.setTelefone(patch.getTelefone());
     }
 
+    /**
+     * Conveniência para mappers (MapStruct) quando for necessário criar uma referência
+     * apenas com o identificador (por exemplo @MapsId ou associações).
+     */
+    public static ProfissionalDeBase ofId(Integer id) {
+        if (id == null) return null;
+        return ProfissionalDeBase.builder().id(id).build();
+    }
 }
