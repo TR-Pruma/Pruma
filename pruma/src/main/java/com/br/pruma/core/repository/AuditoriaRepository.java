@@ -1,16 +1,7 @@
 package com.br.pruma.core.repository;
 
 import com.br.pruma.core.domain.Auditoria;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-import java.util.Optional;
-
-public interface AuditoriaRepository {
-    List<Auditoria> findAll();
-
-    Optional<Auditoria> findById(Integer id);
-
-    Auditoria save(Auditoria auditoria);
-
-    void deleteById(Integer id);
+public interface AuditoriaRepository extends JpaRepository<Auditoria, Integer> {
 }

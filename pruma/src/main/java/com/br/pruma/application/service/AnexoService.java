@@ -6,7 +6,7 @@ import com.br.pruma.application.dto.response.AnexoResponseDTO;
 import com.br.pruma.application.mapper.AnexoMapper;
 import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.Anexo;
-import com.br.pruma.infra.repository.AnexoRepository;
+import com.br.pruma.core.repository.AnexoRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -4,6 +4,7 @@ import com.br.pruma.application.dto.request.ImagemProjetoRequestDTO;
 import com.br.pruma.application.dto.response.ImagemProjetoResponseDTO;
 import com.br.pruma.application.mapper.ImagemProjetoMapper;
 import com.br.pruma.core.domain.ImagemProjeto;
+import com.br.pruma.core.domain.Projeto;
 import com.br.pruma.core.repository.ImagemProjetoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ public class ImagemProjetoService {
         ImagemProjeto existente = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("ImagemProjeto não encontrada"));
 
-        existente.setProjeto(new com.br.pruma.core.domain.Projeto());
+
         existente.setCaminhoArquivo(dto.caminhoArquivo());
         existente.setDescricao(dto.descricao());
         existente.setDataUpload(dto.dataUpload());

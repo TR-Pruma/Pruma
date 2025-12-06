@@ -122,14 +122,30 @@
             </exclusions>
         </dependency>
 
-        <!-- Optional: hibernate-types if you need JSON/array mappings -->
-        <!--
+        <!-- MapStruct processor (help IDE to recognize generated classes) -->
         <dependency>
-          <groupId>com.vladmihalcea</groupId>
-          <artifactId>hibernate-types-60</artifactId>
-          <version>2.21.1</version>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
+            <scope>provided</scope>
         </dependency>
-        -->
+
+        <!-- Lombok-MapStruct binding to avoid warnings in IDE -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok-mapstruct-binding</artifactId>
+            <version>${lombok-mapstruct-binding.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Devtools (opcional, útil em desenvolvimento local) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -232,6 +248,22 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <!-- Surefire para testes unitários -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <useSystemClassLoader>false</useSystemClassLoader>
+                </configuration>
+            </plugin>
+
+            <!-- Failsafe para testes de integração (se usar) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.1.2</version>
             </plugin>
 
         </plugins>

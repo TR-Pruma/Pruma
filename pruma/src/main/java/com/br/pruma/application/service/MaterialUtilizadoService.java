@@ -9,7 +9,7 @@ import com.br.pruma.core.domain.Material;
 import com.br.pruma.core.domain.MaterialUtilizado;
 import com.br.pruma.core.repository.MaterialRepository;
 import com.br.pruma.core.repository.MaterialUtilizadoRepository;
-import com.br.pruma.infra.repository.AtividadeRepository;
+import com.br.pruma.core.repository.AtividadeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
