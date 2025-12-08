@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
-
 @Entity
 @Table(name = "solicitacao_mudanca")
 @Data
@@ -16,22 +15,22 @@ public class SolicitacaoMudanca {
     @Column(name = "solicitacao_id")
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Integer projeto;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id", nullable = false)
+    private Projeto projeto;   // ✅ entidade
 
     @Column(name = "descricao")
     private String descricao;
 
-    @ManyToOne
-    @JoinColumn(name = "status_solicitacao_id", referencedColumnName = "status_solicitacao_id")
-    private Integer statusSolicitacao;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "status_solicitacao_id", referencedColumnName = "status_solicitacao_id", nullable = false)
+    private StatusSolicitacao statusSolicitacao;   // ✅ entidade
 
-    @Column(name = "data_solicitacao")
     @Temporal(TemporalType.DATE)
+    @Column(name = "data_solicitacao")
     private Date dataSolicitacao;
 
-    @Column(name = "data_resposta")
     @Temporal(TemporalType.DATE)
+    @Column(name = "data_resposta")
     private Date dataResposta;
 }

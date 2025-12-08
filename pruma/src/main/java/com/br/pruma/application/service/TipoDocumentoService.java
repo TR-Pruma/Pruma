@@ -4,7 +4,7 @@ import com.br.pruma.application.dto.request.TipoDocumentoRequestDTO;
 import com.br.pruma.application.dto.response.TipoDocumentoResponseDTO;
 import com.br.pruma.application.mapper.TipoDocumentoMapper;
 import com.br.pruma.core.domain.TipoDocumento;
-import com.br.pruma.infra.repository.TipoDocumentoRepository;
+import com.br.pruma.core.repository.TipoDocumentoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

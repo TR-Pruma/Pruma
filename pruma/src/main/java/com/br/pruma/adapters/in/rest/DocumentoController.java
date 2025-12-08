@@ -2,7 +2,7 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.DocumentoRequestDTO;
 import com.br.pruma.application.dto.response.DocumentoResponseDTO;
-import com.br.pruma.infra.repository.DocumentoService;
+import com.br.pruma.core.repository.DocumentoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

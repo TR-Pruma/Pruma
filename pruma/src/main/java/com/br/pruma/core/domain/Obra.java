@@ -91,9 +91,11 @@ public class Obra implements Serializable {
         if (source.getDataInicio() != null) this.setDataInicio(source.getDataInicio());
         this.setDataFim(source.getDataFim());
     }
+    public static Obra ofId(Integer id) {
+        if (id == null) return null;
+        Obra obra = new Obra();
+        obra.setId(id);
+        return obra;
+    }
 
-    /**
-     * Convenience method to mark as deleted when soft-delete is enabled.
-     */
-    // public void markDeleted() { this.deleted = Boolean.TRUE; }
 }

@@ -88,4 +88,12 @@ public class Checklist implements Serializable {
         this.ativo = true;
     }
 
+    @Transient
+    public Double getPercentualConcluido() {
+        if (itens == null || itens.isEmpty()) return 0.0;
+        long concluidos = itens.stream().filter(ItemChecklist::isConcluido).count();
+        return (concluidos * 100.0) / itens.size();
+    }
+
+
 }

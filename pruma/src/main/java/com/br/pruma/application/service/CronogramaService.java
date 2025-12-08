@@ -6,7 +6,7 @@ import com.br.pruma.application.dto.response.CronogramaResponseDTO;
 import com.br.pruma.application.mapper.CronogramaMapper;
 import com.br.pruma.config.ResourceNotFoundException;
 import com.br.pruma.core.domain.Cronograma;
-import com.br.pruma.infra.repository.CronogramaRepository;
+import com.br.pruma.core.repository.CronogramaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

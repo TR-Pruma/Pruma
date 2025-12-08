@@ -34,12 +34,11 @@ public interface InsumoFornecedorMapper {
     }
 
     @Named("buildCompositeId")
-    default InsumoFornecedorAux buildCompositeId(InsumoFornecedorRequestDTO dto) {
+    default InsumoFornecedorAuxId buildCompositeId(InsumoFornecedorRequestDTO dto) {
         if (dto == null) return null;
         Integer insumoId = dto.getInsumoId();
         Integer fornecedorId = dto.getFornecedorId();
-        return (insumoId != null && fornecedorId != null)
-                ? new InsumoFornecedorAux(insumoId, fornecedorId)
-                : null;
+        return (insumoId != null && fornecedorId != null) ? new InsumoFornecedorAuxId(insumoId, fornecedorId) : null;
     }
+
 }

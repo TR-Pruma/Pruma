@@ -5,7 +5,7 @@ import com.br.pruma.application.dto.request.EquipamentoProjetoRequestDTO;
 import com.br.pruma.application.dto.update.EquipamentoProjetoResponseDTO;
 import com.br.pruma.application.mapper.EquipamentoProjetoMapper;
 import com.br.pruma.core.domain.EquipamentoProjeto;
-import com.br.pruma.infra.repository.EquipamentoProjetoRepository;
+import com.br.pruma.core.repository.EquipamentoProjetoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

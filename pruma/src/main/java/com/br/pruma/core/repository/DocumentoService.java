@@ -1,4 +1,4 @@
-package com.br.pruma.infra.repository;
+package com.br.pruma.core.repository;
 
 import com.br.pruma.application.dto.request.DocumentoRequestDTO;
 import com.br.pruma.application.dto.response.DocumentoResponseDTO;

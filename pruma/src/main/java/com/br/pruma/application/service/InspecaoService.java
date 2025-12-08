@@ -43,7 +43,7 @@ public class InspecaoService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Inspeção não encontrada com id " + id
                 ));
-        mapper.updateEntity(existente, dto);
+        mapper.updateEntity(dto, existente);
         Inspecao atualizada = repository.save(existente);
         return mapper.toDTO(atualizada);
     }

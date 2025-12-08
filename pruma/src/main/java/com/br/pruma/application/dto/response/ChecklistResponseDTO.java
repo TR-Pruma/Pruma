@@ -32,7 +32,7 @@ public class ChecklistResponseDTO {
     private List<ItemChecklistResponseDTO> itens = List.of();
 
     @Schema(description = "Percentual de conclusão", example = "75")
-    private Long percentualConcluido;
+    private Double percentualConcluido;
 
     @Schema(description = "Flag de ativação do checklist", example = "true")
     private boolean ativo;

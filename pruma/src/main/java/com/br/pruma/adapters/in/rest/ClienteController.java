@@ -2,7 +2,7 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.ClienteRequestDTO;
 import com.br.pruma.application.dto.response.ClienteResponseDTO;
-import com.br.pruma.infra.repository.ClienteService;
+import com.br.pruma.core.repository.ClienteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

@@ -2,7 +2,7 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.ClienteTipoRequestDTO;
 import com.br.pruma.application.dto.response.ClienteTipoResponseDTO;
-import com.br.pruma.infra.repository.ClienteTipoService;
+import com.br.pruma.core.repository.ClienteTipoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

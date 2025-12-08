@@ -18,22 +18,18 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-        name               = "item_checklist",
-        indexes            = @Index(
-                name       = "idx_item_checklist_ordem",
+        name = "item_checklist",
+        indexes = @Index(
+                name = "idx_item_checklist_ordem",
                 columnList = "checklist_id, ordem"
         ),
-        uniqueConstraints  = @UniqueConstraint(
-                name        = "uk_item_checklist_ordem",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_item_checklist_ordem",
                 columnNames = {"checklist_id", "ordem"}
         )
 )
 @SQLDelete(sql = "UPDATE item_checklist SET ativo = false WHERE item_id = ?")
-@FilterDef(
-        name       = "ativoFilter",
-        parameters = @ParamDef(name = "ativo", type = boolean.class)
-)
-@Filter(name = "ativoFilter", condition = "ativo = :ativo")
+@Filter(name = "ativoFilter", condition = "ativo = :ativo") // apenas o @Filter
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
@@ -97,7 +93,12 @@ public class ItemChecklist implements Serializable {
 
     @PrePersist
     protected void prePersist() {
-        this.ativo  = true;
+        this.ativo = true;
         this.status = (this.status == null ? StatusItem.PENDENTE : this.status);
+    }
+
+    @Transient
+    public boolean isConcluido() {
+        return this.status == StatusItem.CONCLUIDO;
     }
 }

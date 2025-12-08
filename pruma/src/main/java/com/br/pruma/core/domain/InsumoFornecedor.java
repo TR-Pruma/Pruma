@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
-
 @Entity
 @Table(
         name = "insumo_fornecedor",
@@ -25,20 +24,16 @@ import java.math.BigDecimal;
 public class InsumoFornecedor {
 
     @EmbeddedId
-    @EqualsAndHashCode.Include
-    @ToString.Include
-    private InsumoFornecedorAux id;
+    private InsumoFornecedorAuxId id;
 
     @MapsId("insumoId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "insumo_id", nullable = false)
-    @ToString.Include(name = "insumo")
     private Insumo insumo;
 
     @MapsId("fornecedorId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fornecedor_id", nullable = false)
-    @ToString.Include(name = "fornecedor")
     private Fornecedor fornecedor;
 
     @NotNull
@@ -49,3 +44,4 @@ public class InsumoFornecedor {
     @Version
     private Long version;
 }
+

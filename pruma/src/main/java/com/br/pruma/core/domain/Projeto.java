@@ -114,4 +114,9 @@ public class Projeto implements Serializable {
         if (id == null) return null;
         return Projeto.builder().id(id).build();
     }
+    public Projeto(Integer id) {
+        this.id = id;
+    }
+
+
 }

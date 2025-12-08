@@ -40,6 +40,7 @@ import java.util.List;
     @Mapping(target = "tecnico", source = "tecnicoCpf", qualifiedByName = "profissionalFromCpf")
     void updateEntity(InspecaoRequestDTO dto, @MappingTarget Inspecao entity);
 
+
     // ====================
     // Converter lista
     // ====================

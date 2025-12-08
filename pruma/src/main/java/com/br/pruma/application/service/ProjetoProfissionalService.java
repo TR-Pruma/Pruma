@@ -4,7 +4,7 @@ import com.br.pruma.application.dto.request.ProjetoProfissionalRequestDTO;
 import com.br.pruma.application.dto.response.ProjetoProfissionalResponseDTO;
 import com.br.pruma.application.mapper.ProjetoProfissionalMapper;
 import com.br.pruma.core.domain.ProjetoProfissional;
-import com.br.pruma.infra.repository.ProjetoProfissionalRepository;
+import com.br.pruma.core.repository.ProjetoProfissionalRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

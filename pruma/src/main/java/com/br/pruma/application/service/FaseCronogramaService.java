@@ -4,7 +4,7 @@ import com.br.pruma.application.dto.request.FaseCronogramaRequestDTO;
 import com.br.pruma.application.dto.response.FaseCronogramaResponseDTO;
 import com.br.pruma.application.mapper.FaseCronogramaMapper;
 import com.br.pruma.core.domain.FaseCronograma;
-import com.br.pruma.infra.repository.FaseCronogramaRepository;
+import com.br.pruma.core.repository.FaseCronogramaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

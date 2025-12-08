@@ -2,7 +2,7 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.EmpresaRequestDTO;
 import com.br.pruma.application.dto.response.EmpresaResponseDTO;
-import com.br.pruma.infra.repository.EmpresaService;
+import com.br.pruma.application.service.EmpresaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -9,7 +9,7 @@ import com.br.pruma.application.dto.update.EquipamentoStatusUpdateDTO;
 import com.br.pruma.application.mapper.EquipamentoMapper;
 import com.br.pruma.core.domain.Equipamento;
 import com.br.pruma.core.enums.StatusEquipamento;
-import com.br.pruma.infra.repository.EquipamentoRepository;
+import com.br.pruma.core.repository.EquipamentoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

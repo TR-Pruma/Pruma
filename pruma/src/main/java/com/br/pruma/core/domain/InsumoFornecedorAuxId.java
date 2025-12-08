@@ -1,5 +1,6 @@
 package com.br.pruma.core.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 import java.io.Serializable;
@@ -8,7 +9,10 @@ import java.util.Objects;
 @Embeddable
 public class InsumoFornecedorAuxId implements Serializable {
 
+    @Column(name = "insumo_id")
     private Integer insumoId;
+
+    @Column(name = "fornecedor_id")
     private Integer fornecedorId;
 
     public InsumoFornecedorAuxId() {

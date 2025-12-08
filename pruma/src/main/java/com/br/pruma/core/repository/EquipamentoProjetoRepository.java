@@ -1,4 +1,4 @@
-package com.br.pruma.infra.repository;
+package com.br.pruma.core.repository;
 
 import com.br.pruma.core.domain.EquipamentoProjeto;
 import org.springframework.data.jpa.repository.JpaRepository;
