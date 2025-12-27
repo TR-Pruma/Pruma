@@ -1,52 +1,76 @@
 package com.br.pruma.core.domain;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "subcontrato")
 @Getter
 @Setter
-@NoArgsConstructor
-public class SubContrato {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
+public class SubContrato implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "subcontrato_id")
+    @Column(name = "subcontrato_id", updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private Integer id;
 
-    // CORREÇÃO: Mapeamento para a entidade Cliente.
-    // Assumindo que a entidade Cliente existe e tem um campo `cliente_cpf`.
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    /**
+     * Associação com Cliente.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cliente_cpf", referencedColumnName = "cliente_cpf", nullable = false)
+    @ToString.Exclude
     private Cliente cliente;
 
-    // CORREÇÃO: Mapeamento para a entidade Projeto.
-    // Assumindo que a entidade Projeto existe.
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    /**
+     * Associação com Projeto.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id", nullable = false)
+    @ToString.Exclude
     private Projeto projeto;
 
     @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;
 
-    @NotNull(message = "O valor é obrigatório.")
+    /**
+     * Valor do subcontrato.
+     */
     @Column(name = "valor", nullable = false)
     private Float valor;
 
-    // CORREÇÃO: Uso de java.time.LocalDate
-    @NotNull(message = "A data de início é obrigatória.")
+    /**
+     * Data de início do subcontrato.
+     */
     @Column(name = "data_inicio", nullable = false)
     private LocalDate dataInicio;
 
-    // CORREÇÃO: Uso de java.time.LocalDate
+    /**
+     * Data de término do subcontrato.
+     */
     @Column(name = "data_fim")
     private LocalDate dataFim;
+
+    /**
+     * Timestamp automático de criação no banco.
+     */
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDate createdAt;
 }
