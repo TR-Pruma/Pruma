@@ -2,7 +2,7 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.EnderecoRequestDTO;
 import com.br.pruma.application.dto.response.EnderecoResponseDTO;
-import com.br.pruma.core.repository.EnderecoService;
+import com.br.pruma.application.service.EnderecoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

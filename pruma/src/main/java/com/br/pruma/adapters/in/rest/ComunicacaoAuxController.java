@@ -6,7 +6,7 @@ import com.br.pruma.application.mapper.ComunicacaoAuxMapper;
 import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.Comunicacao;
 import com.br.pruma.core.domain.ComunicacaoAux;
-import com.br.pruma.core.repository.ComunicacaoAuxService;
+import com.br.pruma.application.service.ComunicacaoAuxService;
 import com.br.pruma.core.repository.ComunicacaoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

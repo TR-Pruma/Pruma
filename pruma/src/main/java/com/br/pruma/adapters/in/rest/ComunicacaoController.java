@@ -6,7 +6,7 @@ import com.br.pruma.application.mapper.ComunicacaoMapper;
 import com.br.pruma.core.domain.Cliente;
 import com.br.pruma.core.domain.Projeto;
 import com.br.pruma.core.repository.ClienteRepository;
-import com.br.pruma.core.repository.ComunicacaoService;
+import com.br.pruma.application.service.ComunicacaoService;
 import com.br.pruma.core.repository.ProjetoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

@@ -1,4 +1,4 @@
-package com.br.pruma.core.repository;
+package com.br.pruma.application.service;
 
 import com.br.pruma.core.domain.Comunicacao;
 import org.springframework.data.domain.Page;
