@@ -24,7 +24,7 @@ import java.util.List;
 )
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA requires a no-args constructor with at least protected visibility
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -114,9 +114,4 @@ public class Projeto implements Serializable {
         if (id == null) return null;
         return Projeto.builder().id(id).build();
     }
-    public Projeto(Integer id) {
-        this.id = id;
-    }
-
-
 }

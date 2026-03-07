@@ -1,6 +1,5 @@
 package com.br.pruma.core.domain;
 
-import com.br.pruma.config.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,4 +42,3 @@ public class Cliente extends AuditableEntity {
     @Column(nullable = false)
     private String senha;
 }
-
