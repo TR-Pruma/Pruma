@@ -1,25 +1,27 @@
 package com.br.pruma.core.domain;
 
+import com.br.pruma.config.AuditableEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
+import lombok.*;
 
 @Entity
 @Table(name = "cliente")
-@Data
+@AttributeOverrides({
+        @AttributeOverride(name = "createdAt", column = @Column(name = "data_criacao", nullable = false, updatable = false)),
+        @AttributeOverride(name = "updatedAt", column = @Column(name = "data_atualizacao")),
+        @AttributeOverride(name = "version", column = @Column(name = "versao"))
+})
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Cliente {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class Cliente extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Integer id;
 
     @Column(nullable = false, unique = true, length = 11)
@@ -40,20 +42,5 @@ public class Cliente {
 
     @Column(nullable = false)
     private String senha;
-
-    @CreationTimestamp
-    @Column(name = "data_criacao", nullable = false, updatable = false)
-    private LocalDateTime dataCriacao;
-
-    @UpdateTimestamp
-    @Column(name = "data_atualizacao")
-    private LocalDateTime dataAtualizacao;
-
-    @Version
-    @Column(name = "versao")
-    private Long versao;
-
-    @Column(nullable = false)
-    private Boolean ativo = true;
 }
 

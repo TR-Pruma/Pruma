@@ -28,8 +28,6 @@ public interface EquipamentoRepository extends JpaRepository<Equipamento, Intege
     Page<Equipamento> searchIncludingInativos(@Param("nome") String nome,
                                               @Param("status") StatusEquipamento status,
                                               @Param("ativo") Boolean ativo,
-                                              @Param("extra1") Object extra1,  // se não usar, pode remover
-                                              @Param("extra2") Object extra2,  // idem
                                               Pageable pageable);
 
     /**
