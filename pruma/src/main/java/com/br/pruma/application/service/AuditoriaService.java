@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AuditoriaService  {
+public class AuditoriaService {
 
     private final AuditoriaRepository repository;
 
@@ -27,8 +27,15 @@ public class AuditoriaService  {
     public Auditoria salvar(Auditoria auditoria) {
         return repository.save(auditoria);
     }
+    public Optional<Auditoria> atualizar(Integer id, Auditoria dadosNovos) {
+        return repository.findById(id).map(existente -> {
+            dadosNovos.setId(id);
+            return repository.save(dadosNovos);
+        });
+    }
 
     public void deletar(Integer id) {
         repository.deleteById(id);
     }
 }
+
