@@ -3,25 +3,23 @@ package com.br.pruma.core.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.EqualsAndHashCode;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "cliente_tipo")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 public class ClienteTipo implements Serializable {
 
     @Serial
@@ -29,20 +27,23 @@ public class ClienteTipo implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_cliente_tipo")
+    @Column(name = "id_cliente_tipo", updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tipo_usuario", nullable = false)
+    @ToString.Exclude
     private TipoUsuario tipoUsuario;
 
-    @NotBlank(message = "A descrição do cliente é obrigatória")
-    @Size(max = 255, message = "A descrição deve ter no máximo 255 caracteres")
+    @NotBlank(message = "A descri\u00e7\u00e3o do cliente \u00e9 obrigat\u00f3ria")
+    @Size(max = 255, message = "A descri\u00e7\u00e3o deve ter no m\u00e1ximo 255 caracteres")
     @Column(name = "descricao_cliente", length = 255, nullable = false)
     private String descricaoCliente;
 
     @CreationTimestamp
-    @Column(name = "data_criacao", updatable = false)
+    @Column(name = "data_criacao", updatable = false, nullable = false)
     private LocalDateTime dataCriacao;
 
     @UpdateTimestamp
@@ -55,11 +56,4 @@ public class ClienteTipo implements Serializable {
 
     @Column(name = "ativo", nullable = false)
     private Boolean ativo = true;
-
-    @PrePersist
-    protected void prePersist() {
-        if (ativo == null) {
-            ativo = true;
-        }
-    }
 }
