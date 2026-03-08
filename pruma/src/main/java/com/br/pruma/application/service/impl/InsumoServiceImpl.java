@@ -4,9 +4,9 @@ import com.br.pruma.application.dto.request.InsumoRequestDTO;
 import com.br.pruma.application.dto.response.InsumoResponseDTO;
 import com.br.pruma.application.mapper.InsumoMapper;
 import com.br.pruma.application.service.InsumoService;
-import com.br.pruma.config.ResourceNotFoundException;
 import com.br.pruma.core.domain.Insumo;
 import com.br.pruma.core.repository.InsumoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,13 +28,15 @@ public class InsumoServiceImpl implements InsumoService {
         Insumo saved = repository.save(entity);
         return mapper.toDto(saved);
     }
+
     @Override
     @Transactional(readOnly = true)
     public InsumoResponseDTO getById(Integer id) {
         Insumo entity = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Insumo não encontrado: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Insumo não encontrado: " + id));
         return mapper.toDto(entity);
     }
+
     @Override
     @Transactional(readOnly = true)
     public List<InsumoResponseDTO> getAll() {
@@ -43,10 +45,11 @@ public class InsumoServiceImpl implements InsumoService {
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
+
     @Override
     public InsumoResponseDTO update(Integer id, InsumoRequestDTO dto) {
         Insumo entity = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Insumo não encontrado: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Insumo não encontrado: " + id));
         mapper.updateFromDto(dto, entity);
         return mapper.toDto(repository.save(entity));
     }
@@ -54,7 +57,7 @@ public class InsumoServiceImpl implements InsumoService {
     @Override
     public void delete(Integer id) {
         if (!repository.existsById(id)) {
-            throw new ResourceNotFoundException("Insumo não encontrado: " + id);
+            throw new EntityNotFoundException("Insumo não encontrado: " + id);
         }
         repository.deleteById(id);
     }
