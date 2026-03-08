@@ -1,14 +1,14 @@
 package com.br.pruma.application.service;
 
-import org.springframework.transaction.annotation.Transactional;
 import com.br.pruma.application.dto.request.EquipamentoProjetoRequestDTO;
-import com.br.pruma.application.dto.update.EquipamentoProjetoResponseDTO;
+import com.br.pruma.application.dto.response.EquipamentoProjetoResponseDTO;
 import com.br.pruma.application.mapper.EquipamentoProjetoMapper;
 import com.br.pruma.core.domain.EquipamentoProjeto;
 import com.br.pruma.core.repository.EquipamentoProjetoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,16 +20,13 @@ public class EquipamentoProjetoService {
 
     @Transactional
     public EquipamentoProjetoResponseDTO criar(EquipamentoProjetoRequestDTO dto) {
-
         boolean existeConflito = repository.existsByEquipamentoIdAndDataAlocacao(
                 dto.getEquipamentoId(),
                 dto.getDataAlocacao()
         );
-
         if (existeConflito) {
             throw new IllegalArgumentException("Equipamento já alocado nesta data");
         }
-
         EquipamentoProjeto entity = mapper.toEntity(dto);
         repository.save(entity);
         return mapper.toResponseDTO(entity);
@@ -53,11 +50,8 @@ public class EquipamentoProjetoService {
     public EquipamentoProjetoResponseDTO atualizar(Long id, EquipamentoProjetoRequestDTO dto) {
         EquipamentoProjeto entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("EquipamentoProjeto não encontrado"));
-
-        entity.setEquipamento(entity.getEquipamento()); // pode ajustar via mapper
-        entity.setProjeto(entity.getProjeto());
+        mapper.toEntity(dto);
         entity.setDataAlocacao(dto.getDataAlocacao());
-
         repository.save(entity);
         return mapper.toResponseDTO(entity);
     }
