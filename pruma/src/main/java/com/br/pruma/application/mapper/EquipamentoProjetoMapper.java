@@ -1,7 +1,7 @@
 package com.br.pruma.application.mapper;
 
 import com.br.pruma.application.dto.request.EquipamentoProjetoRequestDTO;
-import com.br.pruma.application.dto.update.EquipamentoProjetoResponseDTO;
+import com.br.pruma.application.dto.response.EquipamentoProjetoResponseDTO;
 import com.br.pruma.core.domain.EquipamentoProjeto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,5 +17,4 @@ public interface EquipamentoProjetoMapper {
     @Mapping(target = "projetoId", source = "projeto.id")
     @Mapping(target = "projetoNome", source = "projeto.nome")
     EquipamentoProjetoResponseDTO toResponseDTO(EquipamentoProjeto entity);
-
 }

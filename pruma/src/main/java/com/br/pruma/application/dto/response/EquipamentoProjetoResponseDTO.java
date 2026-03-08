@@ -14,6 +14,12 @@ public class EquipamentoProjetoResponseDTO {
     @Schema(description = "Identificador do equipamento", example = "1")
     private Integer equipamentoId;
 
+    @Schema(description = "Nome do equipamento", example = "Escavadeira XYZ")
+    private String equipamentoNome;
+
     @Schema(description = "Identificador do projeto", example = "10")
     private Integer projetoId;
+
+    @Schema(description = "Nome do projeto", example = "Obra Centro")
+    private String projetoNome;
 }
