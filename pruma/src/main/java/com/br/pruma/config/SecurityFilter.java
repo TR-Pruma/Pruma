@@ -1,25 +1,28 @@
 package com.br.pruma.config;
 
-import com.br.pruma.core.repository.UsuarioRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class SecurityFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UsuarioRepository usuarioRepository;
 
+    // fix #2 — zero query ao banco por requisição; authorities vêm do JWT
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -30,12 +33,12 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
             if (jwtService.tokenValido(token)) {
-                String cpf = jwtService.extrairCpf(token);
-                usuarioRepository.findByCpf(cpf).ifPresent(usuario -> {
-                    var auth = new UsernamePasswordAuthenticationToken(
-                            usuario, null, usuario.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                });
+                Integer usuarioId = jwtService.extrairUsuarioId(token);
+                String role       = jwtService.extrairRole(token);
+
+                var auth = new UsernamePasswordAuthenticationToken(
+                        usuarioId, null, List.of(new SimpleGrantedAuthority(role)));
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
         chain.doFilter(request, response);

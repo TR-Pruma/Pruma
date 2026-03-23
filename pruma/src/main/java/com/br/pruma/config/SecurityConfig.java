@@ -23,9 +23,9 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // Remove o permitAll() do Swagger — agora delegado ao SwaggerSecurityConfig
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/usuario/login", "/usuario/cadastro",
-                                "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/usuario/login", "/usuario/cadastro").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
