@@ -4,13 +4,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +24,9 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class Projeto implements Serializable {
+public class Projeto extends AuditableEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -63,18 +60,6 @@ public class Projeto implements Serializable {
     @ToString.Exclude
     @Builder.Default
     private List<Obra> obras = new ArrayList<>();
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
-    @Version
-    @Column(name = "version", nullable = false)
-    private Long version;
 
     // ----------------- Domain helpers -----------------
 

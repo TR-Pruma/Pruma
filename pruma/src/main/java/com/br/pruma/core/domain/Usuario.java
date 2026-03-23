@@ -2,58 +2,67 @@ package com.br.pruma.core.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Entidade de autenticação do sistema.
+ * Herda auditoria de {@link AuditableEntity} (createdAt, updatedAt, ativo, version).
+ * O campo {@code ativo} da superclasse é reutilizado para isEnabled().
+ */
 @Entity
-@Table(name = "usuario")
+@Table(
+        name = "usuario",
+        indexes = {
+                @Index(name = "idx_usuario_cpf", columnList = "cpf", unique = true)
+        }
+)
 @Getter
 @Setter
-@NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class Usuario implements UserDetails {
+public class Usuario extends AuditableEntity implements UserDetails, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "usuario_id", updatable = false, nullable = false)
     @EqualsAndHashCode.Include
     @ToString.Include
-    private Integer usuarioId;
+    private Integer id;
 
-    @Column(unique = true, nullable = false, length = 11)
+    @Column(name = "cpf", unique = true, nullable = false, length = 11)
     private String cpf;
 
-    @Column(nullable = false)
+    @Column(name = "senha", nullable = false)
     private String senha;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "tipo", nullable = false, length = 20)
     private TipoUsuario tipo;
 
-    @Column(nullable = false)
-    private Boolean ativo = true;
-
-
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime criadoEm;
-
     // ── UserDetails ──────────────────────────────────────────────
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + tipo.name()));
     }
 
-    @Override public String getPassword()               { return senha; }
-    @Override public String getUsername()               { return cpf;   }
-    @Override public boolean isAccountNonExpired()      { return true;  }
-    @Override public boolean isAccountNonLocked()       { return ativo; }
-    @Override public boolean isCredentialsNonExpired()  { return true;  }
-    @Override public boolean isEnabled()                { return ativo; }
+    @Override public String getPassword()              { return senha;       }
+    @Override public String getUsername()              { return cpf;         }
+    @Override public boolean isAccountNonExpired()     { return true;        }
+    @Override public boolean isAccountNonLocked()      { return getAtivo();  }
+    @Override public boolean isCredentialsNonExpired() { return true;        }
+    @Override public boolean isEnabled()               { return getAtivo();  }
 }
