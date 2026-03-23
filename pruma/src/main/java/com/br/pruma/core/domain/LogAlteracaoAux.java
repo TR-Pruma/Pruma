@@ -1,13 +1,17 @@
 package com.br.pruma.core.domain;
 
+import com.br.pruma.core.enums.TipoAlteracao;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
 
+/**
+ * Entidade auxiliar com metadados de tipo para {@link LogAlteracao}.
+ * Herda auditoria de {@link AuditableEntity}.
+ */
 @Entity
 @Table(
         name = "log_alteracao_aux",
@@ -21,36 +25,28 @@ import java.io.Serializable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class LogAlteracaoAux implements Serializable {
+public class LogAlteracaoAux extends AuditableEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /**
-     * PK e FK para o LogAlteracao pai.
-     * @MapsId sincroniza este campo com o PK herdado de LogAlteracao.
-     */
     @Id
     @Column(name = "log_id", updatable = false, nullable = false)
     @EqualsAndHashCode.Include
     @ToString.Include
     private Integer logId;
 
-    /**
-     * Associação back-reference ao LogAlteracao.
-     */
+    @NotNull(message = "Log de alteração é obrigatório")
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId
     @JoinColumn(name = "log_id", nullable = false)
     private LogAlteracao log;
 
-    @NotBlank(message = "tipoAlteracao é obrigatório")
-    @Size(max = 15, message = "tipoAlteracao deve ter no máximo 15 caracteres")
-    @Column(name = "tipo_alteracao", length = 15, nullable = false)
+    @NotNull(message = "Tipo de alteração é obrigatório")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_alteracao", length = 30, nullable = false)
     @ToString.Include
-    private String tipoAlteracao;
+    private TipoAlteracao tipoAlteracao;
 }
-
-

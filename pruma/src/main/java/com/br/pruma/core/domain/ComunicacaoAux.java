@@ -1,47 +1,44 @@
 package com.br.pruma.core.domain;
 
+import com.br.pruma.core.enums.TipoComunicacao;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
+import java.io.Serial;
+import java.io.Serializable;
 
-@Data
+/**
+ * Entidade auxiliar que estende {@link Comunicacao} com metadados de tipo.
+ * Herda auditoria (createdAt, updatedAt, ativo, version) de {@link AuditableEntity}.
+ * Soft-delete via @SQLDelete — o filtro ativo=true é herdado de AuditableEntity.
+ */
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "comunicacao_aux")
 @SQLDelete(sql = "UPDATE comunicacao_aux SET ativo = false WHERE comunicacao_id = ?")
-@Where(clause = "ativo = true")
-public class ComunicacaoAux {
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
+public class ComunicacaoAux extends AuditableEntity implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comunicacao_id", referencedColumnName = "comunicacao_id")
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "comunicacao_id", referencedColumnName = "comunicacao_id", nullable = false)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private Comunicacao comunicacao;
 
-    @Column(name = "tipo_mensagem", length = 15, nullable = false)
-    private String tipoMensagem;
-
-    @CreationTimestamp
-    @Column(name = "data_criacao", nullable = false, updatable = false)
-    private LocalDateTime dataCriacao;
-
-    @UpdateTimestamp
-    @Column(name = "data_atualizacao")
-    private LocalDateTime dataAtualizacao;
-
-    @Version
-    @Column(name = "versao")
-    private Long versao;
-
-    @Column(name = "ativo", nullable = false)
-    private Boolean ativo = true;
+    @NotNull(message = "Tipo de mensagem é obrigatório")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_mensagem", length = 30, nullable = false)
+    @ToString.Include
+    private TipoComunicacao tipoMensagem;
 }

@@ -1,19 +1,17 @@
 package com.br.pruma.core.domain;
 
-
+import com.br.pruma.core.enums.TipoMensagem;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
+/**
+ * Entidade auxiliar com metadados de tipo para {@link MensagemInstantanea}.
+ * Herda auditoria de {@link AuditableEntity}.
+ */
 @Entity
 @Table(
         name = "mensagem_instantanea_aux",
@@ -26,15 +24,14 @@ import java.time.LocalDateTime;
                 columnList = "tipo_mensagem"
         )
 )
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class MensagemInstantaneaAux implements Serializable {
+public class MensagemInstantaneaAux extends AuditableEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -51,21 +48,9 @@ public class MensagemInstantaneaAux implements Serializable {
     @JoinColumn(name = "mensagem_id", referencedColumnName = "mensagem_id", nullable = false)
     private MensagemInstantanea mensagem;
 
-    @NotBlank(message = "tipoMensagem é obrigatório")
-    @Size(max = 15, message = "tipoMensagem deve ter no máximo 15 caracteres")
-    @Column(name = "tipo_mensagem", length = 15, nullable = false)
+    @NotNull(message = "Tipo de mensagem é obrigatório")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_mensagem", length = 30, nullable = false)
     @ToString.Include
-    private String tipoMensagem;
-
-    @Version
-    @Column(name = "version", nullable = false)
-    private Long version;
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    private TipoMensagem tipoMensagem;
 }
