@@ -38,12 +38,12 @@ public class ComunicacaoAuxServiceImpl implements ComunicacaoAuxService {
 
     @Override
     public Page<ComunicacaoAux> listarPorProjeto(Integer projetoId, Pageable pageable) {
-        return repository.findByComunicacao_ProjetoIdAndAtivoTrueOrderByDataCriacaoDesc(projetoId, pageable);
+        return repository.findByComunicacao_ProjetoIdAndAtivoTrueOrderByCreatedAtDesc(projetoId, pageable);
     }
 
     @Override
     public List<ComunicacaoAux> listarPorCliente(Integer clienteId) {
-        return repository.findByComunicacao_ClienteIdAndAtivoTrueOrderByDataCriacaoDesc(clienteId);
+        return repository.findByComunicacao_ClienteIdAndAtivoTrueOrderByCreatedAtDesc(clienteId);
     }
 
     @Override
