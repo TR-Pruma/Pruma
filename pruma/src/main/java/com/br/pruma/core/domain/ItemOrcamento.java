@@ -14,11 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "item_orcamento",
         uniqueConstraints = @UniqueConstraint(
                 name = "uk_item_orcamento_orcamento_descricao",
-                columnNames = {"orcamento_id","descricao"}
-        ),
-        indexes = @Index(
-                name = "idx_item_orcamento_ordem",
-                columnList = "orcamento_id,ordem"
+                columnNames = {"orcamento_id", "descricao"}
         )
 )
 @Getter
@@ -33,7 +29,7 @@ public class ItemOrcamento implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
-    @Column(name = "item_id", updatable = false)
+    @Column(name = "item_id", updatable = false, nullable = false)
     private Integer id;
 
     @NotNull
@@ -44,14 +40,16 @@ public class ItemOrcamento implements Serializable {
 
     @NotBlank
     @Size(max = 1000)
-    @Column(name = "descricao", columnDefinition = "TEXT", nullable = false)
+    @Column(name = "descricao", length = 1000, nullable = false)
     private String descricao;
 
-    @NotNull @Positive
+    @NotNull
+    @Positive
     @Column(name = "quantidade", nullable = false)
     private Integer quantidade;
 
-    @NotNull @DecimalMin("0.00")
+    @NotNull
+    @DecimalMin("0.00")
     @Column(name = "valor_unitario", nullable = false, precision = 18, scale = 2)
     private BigDecimal valorUnitario;
 
@@ -72,4 +70,3 @@ public class ItemOrcamento implements Serializable {
         return valorUnitario.multiply(BigDecimal.valueOf(quantidade));
     }
 }
-
