@@ -29,9 +29,11 @@ public class MensagemInstantaneaService {
     private final MensagemInstantaneaMapper mapper;
 
     public MensagemInstantaneaResponseDTO create(MensagemInstantaneaRequestDTO dto) {
-        Cliente cliente = clienteRepository.findById(Math.toIntExact(dto.getClienteCpf()))
+        // clienteCpf é Long no DTO — converte para String para buscar pelo campo cpf
+        String cpf = String.valueOf(dto.getClienteCpf());
+        Cliente cliente = clienteRepository.findByCpf(cpf)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Cliente não encontrado: " + dto.getClienteCpf())
+                        new EntityNotFoundException("Cliente não encontrado: " + cpf)
                 );
         TipoUsuario tipoUsuario = tipoUsuarioRepository.findById(dto.getTipoUsuarioId())
                 .orElseThrow(() ->
@@ -64,7 +66,8 @@ public class MensagemInstantaneaService {
 
     @Transactional(readOnly = true)
     public List<MensagemInstantaneaResponseDTO> listByCliente(Long clienteCpf) {
-        return repository.findAllByCliente_Cpf(clienteCpf).stream()
+        // converte Long -> String para bater com o tipo do campo cpf na entidade
+        return repository.findAllByCliente_Cpf(String.valueOf(clienteCpf)).stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }
@@ -90,9 +93,10 @@ public class MensagemInstantaneaService {
                 );
 
         if (dto.getClienteCpf() != null) {
-            Cliente cliente = clienteRepository.findById(Math.toIntExact(dto.getClienteCpf()))
+            String cpf = String.valueOf(dto.getClienteCpf());
+            Cliente cliente = clienteRepository.findByCpf(cpf)
                     .orElseThrow(() ->
-                            new EntityNotFoundException("Cliente não encontrado: " + dto.getClienteCpf())
+                            new EntityNotFoundException("Cliente não encontrado: " + cpf)
                     );
             entity.setCliente(cliente);
         }
