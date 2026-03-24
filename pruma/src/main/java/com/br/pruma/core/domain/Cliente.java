@@ -11,7 +11,13 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "cliente")
+@Table(
+        name = "cliente",
+        indexes = {
+                @Index(name = "idx_cliente_cpf", columnList = "cliente_cpf"),
+                @Index(name = "idx_cliente_email", columnList = "email")
+        }
+)
 @AttributeOverrides({
         @AttributeOverride(name = "createdAt",  column = @Column(name = "data_criacao",    nullable = false, updatable = false)),
         @AttributeOverride(name = "updatedAt",  column = @Column(name = "data_atualizacao")),
@@ -33,7 +39,9 @@ public class Cliente extends AuditableEntity implements UserDetails {
     @ToString.Include
     private Integer id;
 
-    @Column(nullable = false, unique = true, length = 11)
+    // Nome explicito necessario: outras entidades referenciam esta coluna
+    // via @JoinColumn(referencedColumnName = "cliente_cpf")
+    @Column(name = "cliente_cpf", nullable = false, unique = true, length = 11)
     private String cpf;
 
     @Column(nullable = false)
