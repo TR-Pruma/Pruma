@@ -44,6 +44,7 @@ public class DocumentoServiceImpl implements DocumentoService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Projeto com ID " + request.getProjetoId() + " não encontrado."));
 
+        // TipoDocumento é catálogo — usa findById simples
         TipoDocumento tipoDocumento = tipoDocumentoRepository.findById(request.getTipoDocumentoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "TipoDocumento com ID " + request.getTipoDocumentoId() + " não encontrado."));
