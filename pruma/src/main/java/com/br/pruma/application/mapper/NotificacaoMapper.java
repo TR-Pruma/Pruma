@@ -10,43 +10,33 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface NotificacaoMapper {
-    /**
-     * Converte DTO de criação em entidade.
-     * Ignora chaves, auditoria e associa stubs para FK.
-     */
+
     @Mapping(target = "id",          ignore = true)
     @Mapping(target = "version",     ignore = true)
     @Mapping(target = "createdAt",   ignore = true)
     @Mapping(target = "updatedAt",   ignore = true)
-    @Mapping(target = "cliente",     source = "clienteCpf",    qualifiedByName = "mapClienteByCpf")
-    @Mapping(target = "tipoUsuario", source = "tipoUsuarioId", qualifiedByName = "mapTipoUsuarioById")
+    @Mapping(target = "cliente",     source = "clienteCpf",     qualifiedByName = "mapClienteByCpf")
+    @Mapping(target = "tipoUsuario", source = "tipoUsuarioName", qualifiedByName = "mapTipoUsuarioByName")
     @Mapping(target = "mensagem",    source = "mensagem")
     @Mapping(target = "dataHora",    source = "dataHora")
     @Mapping(target = "lida",        ignore = true)
     Notificacao toEntity(NotificacaoRequestDTO dto);
 
-    /**
-     * Atualiza somente campos não-nulos do DTO.
-     * Preserva PK, versão e timestamps.
-     */
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id",          ignore = true)
     @Mapping(target = "version",     ignore = true)
     @Mapping(target = "createdAt",   ignore = true)
     @Mapping(target = "updatedAt",   ignore = true)
-    @Mapping(target = "cliente",     source = "clienteCpf",    qualifiedByName = "mapClienteByCpf")
-    @Mapping(target = "tipoUsuario", source = "tipoUsuarioId", qualifiedByName = "mapTipoUsuarioById")
+    @Mapping(target = "cliente",     source = "clienteCpf",     qualifiedByName = "mapClienteByCpf")
+    @Mapping(target = "tipoUsuario", source = "tipoUsuarioName", qualifiedByName = "mapTipoUsuarioByName")
     @Mapping(target = "mensagem",    source = "mensagem")
     @Mapping(target = "dataHora",    source = "dataHora")
     @Mapping(target = "lida",        source = "lida")
     void updateFromDto(NotificacaoUpdateDTO dto, @MappingTarget Notificacao entity);
 
-    /**
-     * Converte entidade em DTO de resposta.
-     */
     @Mapping(target = "id",            source = "id")
     @Mapping(target = "clienteCpf",    source = "cliente.cpf")
-    @Mapping(target = "tipoUsuarioId", source = "tipoUsuario.id")
+    @Mapping(target = "tipoUsuarioId", source = "tipoUsuario", qualifiedByName = "tipoUsuarioToName")
     @Mapping(target = "mensagem",      source = "mensagem")
     @Mapping(target = "dataHora",      source = "dataHora")
     @Mapping(target = "lida",          source = "lida")
@@ -55,30 +45,18 @@ public interface NotificacaoMapper {
     @Mapping(target = "updatedAt",     source = "updatedAt")
     NotificacaoResponseDTO toResponse(Notificacao entity);
 
-    /**
-     * Stub de Cliente para associação.
-     */
     @Named("mapClienteByCpf")
-    default Cliente mapClienteByCpf(Long cpf) {
-        if (cpf == null) {
-            return null;
-        }
-        return Cliente.builder()
-                .cpf(String.valueOf(cpf))
-                .build();
+    default Cliente mapClienteByCpf(String cpf) {
+        return cpf == null ? null : Cliente.builder().cpf(cpf).build();
     }
 
-    /**
-     * Stub de TipoUsuario para associação.
-     */
-    @Named("mapTipoUsuarioById")
-    default TipoUsuario mapTipoUsuarioById(Integer id) {
-        if (id == null) {
-            return null;
-        }
-        return TipoUsuario.builder()
-                .id(id)
-                .build();
+    @Named("mapTipoUsuarioByName")
+    default TipoUsuario mapTipoUsuarioByName(String name) {
+        return name == null ? null : TipoUsuario.valueOf(name);
     }
 
+    @Named("tipoUsuarioToName")
+    default String tipoUsuarioToName(TipoUsuario tipo) {
+        return tipo == null ? null : tipo.name();
+    }
 }
