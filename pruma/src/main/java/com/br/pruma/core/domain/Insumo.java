@@ -1,6 +1,5 @@
 package com.br.pruma.core.domain;
 
-
 import com.br.pruma.config.UnidadeMedidaConverter;
 import com.br.pruma.core.enums.UnidadeMedida;
 import jakarta.persistence.*;
@@ -24,7 +23,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
@@ -63,7 +62,6 @@ public class Insumo implements Serializable {
     @Column(name = "version", nullable = false)
     private Long version;
 
-    // ====== Métodos de atualização ======
     public void atualizarCusto(BigDecimal novoCusto) {
         if (novoCusto == null || novoCusto.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Novo custo deve ser maior que zero");

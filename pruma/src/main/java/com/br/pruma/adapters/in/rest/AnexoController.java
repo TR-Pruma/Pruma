@@ -4,11 +4,11 @@ import com.br.pruma.application.dto.request.AnexoRequestDTO;
 import com.br.pruma.application.dto.response.AnexoResponseDTO;
 import com.br.pruma.application.service.AnexoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
 import java.net.URI;
 import java.util.List;
@@ -18,6 +18,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("pruma/v1/anexos")
 public class AnexoController {
+
     private static final Logger log = LoggerFactory.getLogger(AnexoController.class);
     private final AnexoService service;
 
@@ -28,15 +29,14 @@ public class AnexoController {
     @GetMapping
     public ResponseEntity<List<AnexoResponseDTO>> listarTodos() {
         log.info("Listando todos os anexos");
-        List<AnexoResponseDTO> lista = service.listarTodos();
-        return ResponseEntity.ok(lista);
+        return ResponseEntity.ok(service.listarTodos());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AnexoResponseDTO> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<AnexoResponseDTO> buscarPorId(@PathVariable Integer id) {
         log.info("Buscando anexo por id: {}", id);
-        Optional<AnexoResponseDTO> dtoOpt = Optional.ofNullable(service.buscarPorId(id));
-        return dtoOpt.map(ResponseEntity::ok)
+        return Optional.ofNullable(service.buscarPorId(id))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -48,7 +48,7 @@ public class AnexoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         log.info("Deletando anexo com id: {}", id);
         service.deletar(id);
         return ResponseEntity.noContent().build();
