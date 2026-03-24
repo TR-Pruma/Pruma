@@ -1,38 +1,76 @@
 package com.br.pruma.core.domain;
 
+
 import jakarta.persistence.*;
-import lombok.Data;
-import java.util.Date;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "subcontrato")
-@Data
-public class SubContrato {
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
+public class SubContrato implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "subcontrato_id")
+    @Column(name = "subcontrato_id", updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "cliente_cpf", referencedColumnName = "cliente_cpf")
-    private Long cliente;
+    /**
+     * Associação com Cliente.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "cliente_cpf", referencedColumnName = "cliente_cpf", nullable = false)
+    @ToString.Exclude
+    private Cliente cliente;
 
-    @ManyToOne
-    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Integer projeto;
+    /**
+     * Associação com Projeto.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id", nullable = false)
+    @ToString.Exclude
+    private Projeto projeto;
 
     @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;
 
-    @Column(name = "valor")
+    /**
+     * Valor do subcontrato.
+     */
+    @Column(name = "valor", nullable = false)
     private Float valor;
 
-    @Column(name = "data_inicio")
-    @Temporal(TemporalType.DATE)
-    private Date dataInicio;
+    /**
+     * Data de início do subcontrato.
+     */
+    @Column(name = "data_inicio", nullable = false)
+    private LocalDate dataInicio;
 
+    /**
+     * Data de término do subcontrato.
+     */
     @Column(name = "data_fim")
-    @Temporal(TemporalType.DATE)
-    private Date dataFim;
+    private LocalDate dataFim;
+
+    /**
+     * Timestamp automático de criação no banco.
+     */
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDate createdAt;
 }

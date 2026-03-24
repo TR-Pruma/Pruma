@@ -1,26 +1,81 @@
 package com.br.pruma.core.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import java.util.Date;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "projeto")
-@Data
-public class Projeto {
+@Table(
+        name = "projeto",
+        indexes = {
+                @Index(name = "idx_projeto_nome", columnList = "nome"),
+                @Index(name = "idx_projeto_data_criacao", columnList = "data_criacao")
+        }
+)
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
+public class Projeto extends AuditableEntity implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "projeto_id")
+    @Column(name = "projeto_id", updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private Integer id;
 
     @Column(name = "nome", length = 100, nullable = false)
+    @NotBlank(message = "Nome do projeto é obrigatório")
+    @Size(max = 100)
     private String nome;
 
     @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;
 
     @Column(name = "data_criacao")
-    @Temporal(TemporalType.DATE)
-    private Date dataCriacao;
+    private LocalDate dataCriacao;
+
+    @OneToMany(mappedBy = "projeto", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @Builder.Default
+    private List<Obra> obras = new ArrayList<>();
+
+    public void applyPatch(Projeto patch) {
+        if (patch == null) return;
+        if (patch.getNome() != null && !patch.getNome().isBlank()) this.setNome(patch.getNome());
+        if (patch.getDescricao() != null) this.setDescricao(patch.getDescricao());
+        if (patch.getDataCriacao() != null) this.setDataCriacao(patch.getDataCriacao());
+    }
+
+    public void addObra(Obra obra) {
+        if (obra == null) return;
+        obras.add(obra);
+        obra.setProjeto(this);
+    }
+
+    public void removeObra(Obra obra) {
+        if (obra == null) return;
+        obras.remove(obra);
+        obra.setProjeto(null);
+    }
+
+    public static Projeto ofId(Integer id) {
+        if (id == null) return null;
+        return Projeto.builder().id(id).build();
+    }
 }

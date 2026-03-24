@@ -1,25 +1,44 @@
 package com.br.pruma.core.domain;
 
+import com.br.pruma.core.enums.StatusEquipamento;
 import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
-@Data
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+@ToString(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "equipamento")
-public class Equipamento {
+@SQLDelete(sql = "UPDATE equipamento SET ativo = false WHERE equipamento_id = ?")
+@SQLRestriction("ativo = true")
+public class Equipamento extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "equipamento_id")
+    @Column(name = "equipamento_id", updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private Integer id;
 
-    @Column(name = "nome", length = 255)
+    @NotBlank
+    @Column(name = "nome", length = 255, nullable = false)
     private String nome;
 
-    @Column(name = "descricao", length = 255)
+    @NotBlank
+    @Column(name = "descricao", length = 255, nullable = false)
     private String descricao;
 
-    @ManyToOne
-    @JoinColumn(name = "status_id", referencedColumnName = "status_id")
-    private Integer status;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private StatusEquipamento status;
 }

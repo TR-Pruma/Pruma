@@ -1,31 +1,74 @@
 package com.br.pruma.core.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import java.time.LocalDate;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
-@Data
 @Entity
 @Table(name = "documento")
-public class Documento {
+@SQLDelete(sql = "UPDATE documento SET ativo = false WHERE documento_id = ?")
+@SQLRestriction("ativo = true")
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
+public class Documento implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "documento_id")
-    private Integer id;
+    @Column(name = "documento_id", updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
+    @ToString.Include
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Integer projeto;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "projeto_id", nullable = false)
+    @ToString.Exclude
+    private Projeto projeto;
 
-    @ManyToOne
-    @JoinColumn(name = "id_tipo_documento", referencedColumnName = "id_tipo_documento")
-    private Integer tipoDocumento;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tipo_documento_id", nullable = false)
+    @ToString.Exclude
+    private TipoDocumento tipoDocumento;
 
-    @Column(name = "caminho_arquivo", length = 50)
+    @Column(name = "nome_arquivo", nullable = false)
+    private String nomeArquivo;
+
+    @Column(name = "caminho_arquivo", nullable = false)
     private String caminhoArquivo;
 
-    @Column(name = "data_upload")
-    private LocalDate dataUpload;
+    @Column(name = "tipo_arquivo", nullable = false, length = 50)
+    private String tipoArquivo;
+
+    @Column(name = "tamanho_arquivo")
+    private Long tamanhoArquivo;
+
+    @CreationTimestamp
+    @Column(name = "data_upload", nullable = false, updatable = false)
+    private LocalDateTime dataUpload;
+
+    @UpdateTimestamp
+    @Column(name = "data_atualizacao")
+    private LocalDateTime dataAtualizacao;
+
+    @Column(name = "ativo", nullable = false)
+    @Builder.Default
+    private Boolean ativo = true;
+
+    @Version
+    @Column(name = "versao")
+    private Long versao;
 }

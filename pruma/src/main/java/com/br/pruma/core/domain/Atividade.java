@@ -1,41 +1,83 @@
 package com.br.pruma.core.domain;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import com.br.pruma.core.enums.StatusAtividade;
 import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.Version;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
-@ApiModel(description = "Representa uma atividade dentro de um projeto")
-@Data
 @Entity
 @Table(name = "atividade")
-public class Atividade {
+@EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
+public class Atividade implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "atividade_id")
-    @ApiModelProperty(value = "Identificador único da atividade", example = "1")
+    @Column(name = "atividade_id", nullable = false, updatable = false)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    @ApiModelProperty(value = "Identificador do projeto ao qual a atividade pertence", example = "101")
-    private Integer projeto;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "projeto_id", nullable = false)
+    private Projeto projeto;
 
-    @Column(name = "descricao", columnDefinition = "TEXT")
-    @ApiModelProperty(value = "Descrição detalhada da atividade", example = "Desenvolvimento do módulo de autenticação")
+    @NotBlank
+    @Size(max = 4000)
+    @Column(name = "descricao", columnDefinition = "TEXT", nullable = false)
+    @ToString.Include
     private String descricao;
 
-    @Column(name = "status", length = 15)
-    @ApiModelProperty(value = "Status atual da atividade", example = "Em andamento")
-    private String status;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 15, nullable = false)
+    private StatusAtividade status;
 
-    @Column(name = "data_inicio")
-    @ApiModelProperty(value = "Data de início da atividade", example = "2024-03-01")
+    @NotNull
+    @Column(name = "data_inicio", nullable = false)
     private LocalDate dataInicio;
 
     @Column(name = "data_fim")
-    @ApiModelProperty(value = "Data prevista ou real de conclusão da atividade", example = "2024-04-01")
     private LocalDate dataFim;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @OneToMany(
+            mappedBy = "atividade",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @ToString.Include(name = "materiaisCount")
+    @EqualsAndHashCode.Exclude
+    private List<MaterialUtilizado> materiaisUtilizados = new ArrayList<>();
 }

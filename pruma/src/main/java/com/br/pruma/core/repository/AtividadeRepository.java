@@ -1,13 +1,7 @@
 package com.br.pruma.core.repository;
 
 import com.br.pruma.core.domain.Atividade;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-import java.util.Optional;
-
-public interface AtividadeRepository {
-    List<Atividade> findAll();
-    Optional<Atividade> findById(Integer id);
-    Atividade save(Atividade atividade);
-    void deleteById(Integer id);
+public interface AtividadeRepository extends JpaRepository<Atividade, Integer> {
 }

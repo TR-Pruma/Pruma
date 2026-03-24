@@ -28,6 +28,14 @@ public class AtividadeService {
         return repository.save(atividade);
     }
 
+    // ✅ Método atômico para update — sem race condition
+    public Optional<Atividade> atualizar(Integer id, Atividade dadosNovos) {
+        return repository.findById(id).map(existente -> {
+            dadosNovos.setId(id);
+            return repository.save(dadosNovos);
+        });
+    }
+
     public void deletar(Integer id) {
         repository.deleteById(id);
     }

@@ -6,9 +6,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
-public class AuditoriaService  {
+public class AuditoriaService {
 
     private final AuditoriaRepository repository;
 
@@ -20,7 +21,7 @@ public class AuditoriaService  {
         return repository.findAll();
     }
 
-    public Optional<Auditoria> buscarPorId(Integer id) {
+    public Optional<Auditoria> buscarPorId(UUID id) {
         return repository.findById(id);
     }
 
@@ -28,7 +29,14 @@ public class AuditoriaService  {
         return repository.save(auditoria);
     }
 
-    public void deletar(Integer id) {
+    public Optional<Auditoria> atualizar(UUID id, Auditoria dadosNovos) {
+        return repository.findById(id).map(existente -> {
+            dadosNovos.setId(id);
+            return repository.save(dadosNovos);
+        });
+    }
+
+    public void deletar(UUID id) {
         repository.deleteById(id);
     }
 }

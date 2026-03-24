@@ -1,36 +1,73 @@
 package com.br.pruma.core.domain;
 
 
+
 import jakarta.persistence.*;
-import lombok.Data;
-import java.util.Date;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "solicitacao_mudanca")
-@Data
-public class SolicitacaoMudanca {
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
+public class SolicitacaoMudanca implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "solicitacao_id")
+    @Column(name = "solicitacao_id", updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id")
-    private Integer projeto;
+    /**
+     * Associação com Projeto.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "projeto_id", referencedColumnName = "projeto_id", nullable = false)
+    @ToString.Exclude
+    private Projeto projeto;
 
-    @Column(name = "descricao")
+    @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;
 
-    @ManyToOne
-    @JoinColumn(name = "status_solicitacao_id", referencedColumnName = "status_solicitacao_id")
-    private Integer statusSolicitacao;
+    /**
+     * Associação com Status da Solicitação.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "status_solicitacao_id", referencedColumnName = "status_solicitacao_id", nullable = false)
+    @ToString.Exclude
+    private StatusSolicitacao statusSolicitacao;
 
-    @Column(name = "data_solicitacao")
-    @Temporal(TemporalType.DATE)
-    private Date dataSolicitacao;
+    /**
+     * Data lógica da solicitação.
+     * Usa LocalDate para representar apenas a data.
+     */
+    @Column(name = "data_solicitacao", nullable = false)
+    private LocalDate dataSolicitacao;
 
+    /**
+     * Data de resposta da solicitação.
+     * Usa LocalDate para representar apenas a data.
+     */
     @Column(name = "data_resposta")
-    @Temporal(TemporalType.DATE)
-    private Date dataResposta;
+    private LocalDate dataResposta;
+
+    /**
+     * Timestamp automático de criação no banco.
+     */
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDate createdAt;
 }

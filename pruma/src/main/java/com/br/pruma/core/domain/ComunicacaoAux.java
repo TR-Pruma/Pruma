@@ -1,19 +1,54 @@
 package com.br.pruma.core.domain;
 
-
+import com.br.pruma.core.enums.TipoComunicacao;
 import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLDelete;
 
-@Data
+import java.io.Serial;
+import java.io.Serializable;
+
+/**
+ * Entidade auxiliar que estende {@link Comunicacao} com metadados de tipo.
+ * Usa @MapsId para compartilhar a PK de Comunicacao (relacao 1:1 derivada).
+ * Herda auditoria (createdAt, updatedAt, ativo, version) de {@link AuditableEntity}.
+ */
 @Entity
 @Table(name = "comunicacao_aux")
-public class ComunicacaoAux {
+@SQLDelete(sql = "UPDATE comunicacao_aux SET ativo = false WHERE comunicacao_id = ?")
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
+public class ComunicacaoAux extends AuditableEntity implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * PK derivada: mesmo valor que Comunicacao.id.
+     * @MapsId faz o Hibernate preencher este campo automaticamente
+     * a partir do id do lado @OneToOne.
+     */
     @Id
-    @OneToOne
-    @JoinColumn(name = "comunicacao_id", referencedColumnName = "comunicacao_id")
-    private Integer comunicacao;
+    @Column(name = "comunicacao_id")
+    @EqualsAndHashCode.Include
+    @ToString.Include
+    private Integer id;
 
-    @Column(name = "tipo_mensagem", length = 15)
-    private String tipoMensagem;
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "comunicacao_id", referencedColumnName = "comunicacao_id", nullable = false)
+    private Comunicacao comunicacao;
+
+    @NotNull(message = "Tipo de mensagem é obrigatório")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_mensagem", length = 30, nullable = false)
+    @ToString.Include
+    private TipoComunicacao tipoMensagem;
 }
