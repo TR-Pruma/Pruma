@@ -12,6 +12,7 @@ import java.io.Serializable;
 
 /**
  * Entidade auxiliar que estende {@link Comunicacao} com metadados de tipo.
+ * Usa @MapsId para compartilhar a PK de Comunicacao (relacao 1:1 derivada).
  * Herda auditoria (createdAt, updatedAt, ativo, version) de {@link AuditableEntity}.
  */
 @Entity
@@ -29,11 +30,20 @@ public class ComunicacaoAux extends AuditableEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * PK derivada: mesmo valor que Comunicacao.id.
+     * @MapsId faz o Hibernate preencher este campo automaticamente
+     * a partir do id do lado @OneToOne.
+     */
     @Id
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "comunicacao_id", referencedColumnName = "comunicacao_id", nullable = false)
+    @Column(name = "comunicacao_id")
     @EqualsAndHashCode.Include
     @ToString.Include
+    private Integer id;
+
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "comunicacao_id", referencedColumnName = "comunicacao_id", nullable = false)
     private Comunicacao comunicacao;
 
     @NotNull(message = "Tipo de mensagem é obrigatório")
