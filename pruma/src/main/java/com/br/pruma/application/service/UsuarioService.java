@@ -36,10 +36,11 @@ public class UsuarioService {
         if (usuarioRepository.existsByCpf(dto.getCpf())) {
             throw new RuntimeException("CPF já cadastrado");
         }
-        Usuario novo = new Usuario();
-        novo.setCpf(dto.getCpf());
-        novo.setSenha(passwordEncoder.encode(dto.getSenha())); // ✅ bcrypt
-        novo.setTipo(dto.getTipo());
+        Usuario novo = Usuario.builder()
+                .cpf(dto.getCpf())
+                .senha(passwordEncoder.encode(dto.getSenha()))
+                .tipo(dto.getTipo())
+                .build();
         usuarioRepository.save(novo);
     }
 }
