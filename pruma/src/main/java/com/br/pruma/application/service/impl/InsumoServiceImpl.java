@@ -22,36 +22,38 @@ public class InsumoServiceImpl implements InsumoService {
     @Override
     public InsumoResponseDTO create(InsumoRequestDTO dto) {
         Insumo insumo = mapper.toEntity(dto);
-        return mapper.toResponseDTO(repository.save(insumo));
+        return mapper.toDto(repository.save(insumo));
     }
 
     @Override
     public InsumoResponseDTO getById(Integer id) {
         return repository.findById(id)
-                .map(mapper::toResponseDTO)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Insumo com ID " + id + " não encontrado."));
+                .map(mapper::toDto)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Insumo com ID " + id + " não encontrado."));
     }
 
     @Override
     public List<InsumoResponseDTO> getAll() {
         return repository.findAll().stream()
-                .map(mapper::toResponseDTO)
+                .map(mapper::toDto)
                 .toList();
     }
 
     @Override
     public InsumoResponseDTO update(Integer id, InsumoRequestDTO dto) {
-        repository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Insumo com ID " + id + " não encontrado."));
-        Insumo insumo = mapper.toEntity(dto);
-        insumo.setId(id);
-        return mapper.toResponseDTO(repository.save(insumo));
+        Insumo insumo = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Insumo com ID " + id + " não encontrado."));
+        mapper.updateFromDto(dto, insumo);
+        return mapper.toDto(repository.save(insumo));
     }
 
     @Override
     public void delete(Integer id) {
         if (!repository.existsById(id)) {
-            throw new RecursoNaoEncontradoException("Não é possível deletar. Insumo com ID " + id + " não existe.");
+            throw new RecursoNaoEncontradoException(
+                    "Não é possível deletar. Insumo com ID " + id + " não existe.");
         }
         repository.deleteById(id);
     }

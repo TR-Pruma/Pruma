@@ -27,10 +27,14 @@ public class HistoricoLocalizacaoServiceImpl implements HistoricoLocalizacaoServ
 
     @Override
     public HistoricoLocalizacaoResponseDTO salvar(HistoricoLocalizacaoRequestDTO dto) {
-        ProfissionalDeBase profissional = profissionalRepository.findById(dto.profissionalCpf())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Profissional com CPF " + dto.profissionalCpf() + " não encontrado."));
+        // CPF é Long — usa findByCpf em vez de findById (que espera Integer)
+        ProfissionalDeBase profissional = (ProfissionalDeBase) profissionalRepository
+                .findByCpf(dto.profissionalCpf())
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Profissional com CPF " + dto.profissionalCpf() + " não encontrado."));
         Projeto projeto = projetoRepository.findById(dto.projetoId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Projeto com ID " + dto.projetoId() + " não encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Projeto com ID " + dto.projetoId() + " não encontrado."));
         HistoricoLocalizacao entity = mapper.toEntity(dto, profissional, projeto);
         return mapper.toDTO(repository.save(entity));
     }
@@ -46,13 +50,15 @@ public class HistoricoLocalizacaoServiceImpl implements HistoricoLocalizacaoServ
     public HistoricoLocalizacaoResponseDTO buscarPorId(Integer id) {
         return repository.findById(id)
                 .map(mapper::toDTO)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("HistoricoLocalizacao com ID " + id + " não encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "HistoricoLocalizacao com ID " + id + " não encontrado."));
     }
 
     @Override
     public void deletar(Integer id) {
         if (!repository.existsById(id)) {
-            throw new RecursoNaoEncontradoException("Não é possível deletar. HistoricoLocalizacao com ID " + id + " não existe.");
+            throw new RecursoNaoEncontradoException(
+                    "Não é possível deletar. HistoricoLocalizacao com ID " + id + " não existe.");
         }
         repository.deleteById(id);
     }
