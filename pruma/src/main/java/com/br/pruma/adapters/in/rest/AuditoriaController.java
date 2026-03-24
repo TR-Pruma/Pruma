@@ -14,6 +14,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/pruma/v1/auditorias")
@@ -34,13 +35,13 @@ public class AuditoriaController {
         List<AuditoriaResponseDTO> dtos = auditoriaService.listarTodos()
                 .stream()
                 .map(auditoriaMapper::toResponseDTO)
-                .toList(); // ✅ Java 16+
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar auditoria por ID")
-    public ResponseEntity<AuditoriaResponseDTO> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<AuditoriaResponseDTO> buscarPorId(@PathVariable UUID id) {
         return auditoriaService.buscarPorId(id)
                 .map(e -> ResponseEntity.ok(auditoriaMapper.toResponseDTO(e)))
                 .orElse(ResponseEntity.notFound().build());
@@ -49,11 +50,8 @@ public class AuditoriaController {
     @PostMapping
     @Operation(summary = "Criar nova auditoria")
     public ResponseEntity<AuditoriaResponseDTO> criar(@Valid @RequestBody AuditoriaRequestDTO dto) {
-        // ✅ @Valid ativo
         Auditoria salva = auditoriaService.salvar(auditoriaMapper.toEntity(dto));
         AuditoriaResponseDTO resposta = auditoriaMapper.toResponseDTO(salva);
-
-        // ✅ Retorna 201 Created
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(salva.getId())
@@ -64,9 +62,8 @@ public class AuditoriaController {
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar auditoria existente")
     public ResponseEntity<AuditoriaResponseDTO> atualizar(
-            @PathVariable Integer id,
+            @PathVariable UUID id,
             @Valid @RequestBody AuditoriaRequestDTO dto) {
-        // ✅ Operação atômica — sem race condition e sem bug de UUID
         return auditoriaService.atualizar(id, auditoriaMapper.toEntity(dto))
                 .map(salva -> ResponseEntity.ok(auditoriaMapper.toResponseDTO(salva)))
                 .orElse(ResponseEntity.notFound().build());
@@ -74,8 +71,7 @@ public class AuditoriaController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar auditoria por ID")
-    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
-        // ✅ Verifica existência antes de deletar
+    public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         if (auditoriaService.buscarPorId(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }

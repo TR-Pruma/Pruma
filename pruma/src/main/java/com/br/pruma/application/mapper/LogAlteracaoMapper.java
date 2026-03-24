@@ -18,11 +18,6 @@ public interface LogAlteracaoMapper {
 
     @Mapping(target = "projetoId",     source = "projeto.id")
     @Mapping(target = "clienteCpf",    source = "cliente.cpf")
-    @Mapping(target = "tipoUsuarioId", source = "tipoUsuario", qualifiedByName = "tipoUsuarioToName")
+    @Mapping(target = "tipoUsuarioId", source = "tipoUsuario.id")
     LogAlteracaoResponseDTO toResponse(LogAlteracao entity);
-
-    @Named("tipoUsuarioToName")
-    default String tipoUsuarioToName(TipoUsuario tipo) {
-        return tipo == null ? null : tipo.name();
-    }
 }

@@ -1,6 +1,6 @@
 package com.br.pruma.application.dto.request;
 
-import com.br.pruma.core.domain.TipoUsuario;
+import com.br.pruma.core.enums.TipoUsuarioEnum;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -19,6 +19,5 @@ public class CadastroRequestDTO {
     private String senha;
 
     @NotNull(message = "O tipo de usuário é obrigatório")
-    private TipoUsuario tipo;
+    private TipoUsuarioEnum tipo;
 }
-

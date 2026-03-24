@@ -27,11 +27,6 @@ public interface LembreteMapper {
     void updateFromDto(LembreteUpdateDTO dto, @MappingTarget Lembrete entity);
 
     @Mapping(target = "clienteCpf",    source = "cliente.cpf")
-    @Mapping(target = "tipoUsuarioId", source = "tipoUsuario", qualifiedByName = "tipoUsuarioToName")
+    @Mapping(target = "tipoUsuarioId", source = "tipoUsuario.id")
     LembreteResponseDTO toResponse(Lembrete entity);
-
-    @Named("tipoUsuarioToName")
-    default String tipoUsuarioToName(TipoUsuario tipo) {
-        return tipo == null ? null : tipo.name();
-    }
 }

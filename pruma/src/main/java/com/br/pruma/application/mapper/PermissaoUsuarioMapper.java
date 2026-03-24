@@ -17,8 +17,8 @@ public interface PermissaoUsuarioMapper {
 
     @Mapping(target = "clienteCpf",           source = "cliente.cpf")
     @Mapping(target = "clienteNome",          source = "cliente.nome")
-    @Mapping(target = "tipoUsuarioId",        source = "tipoUsuario", qualifiedByName = "tipoUsuarioToName")
-    @Mapping(target = "tipoUsuarioDescricao", source = "tipoUsuario", qualifiedByName = "tipoUsuarioToName")
+    @Mapping(target = "tipoUsuarioId",        source = "tipoUsuario.id")
+    @Mapping(target = "tipoUsuarioDescricao", source = "tipoUsuario.descricao")
     PermissaoUsuarioResponseDTO toResponseDTO(PermissaoUsuario entity);
 
     @Named("clienteFromCpf")
@@ -28,14 +28,6 @@ public interface PermissaoUsuarioMapper {
 
     @Named("tipoUsuarioFromId")
     default TipoUsuario tipoUsuarioFromId(Integer id) {
-        if (id == null) return null;
-        TipoUsuario[] values = TipoUsuario.values();
-        int idx = id - 1;
-        return (idx >= 0 && idx < values.length) ? values[idx] : null;
-    }
-
-    @Named("tipoUsuarioToName")
-    default String tipoUsuarioToName(TipoUsuario tipo) {
-        return tipo == null ? null : tipo.name();
+        return id == null ? null : TipoUsuario.builder().id(id).build();
     }
 }

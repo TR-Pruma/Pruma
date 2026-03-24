@@ -38,7 +38,7 @@ public interface MensagemInstantaneaMapper {
 
     @Mapping(target = "id",               source = "id")
     @Mapping(target = "clienteCpf",       source = "cliente.cpf")
-    @Mapping(target = "tipoUsuarioId",    source = "tipoUsuario",   qualifiedByName = "tipoUsuarioToName")
+    @Mapping(target = "tipoUsuarioId",    source = "tipoUsuario.id")
     @Mapping(target = "destinatarioId",   source = "destinatarioId")
     @Mapping(target = "tipoDestinatario", source = "tipoDestinatario")
     @Mapping(target = "conteudo",         source = "conteudo")
@@ -55,14 +55,6 @@ public interface MensagemInstantaneaMapper {
 
     @Named("mapTipoUsuarioById")
     default TipoUsuario mapTipoUsuarioById(Integer id) {
-        if (id == null) return null;
-        TipoUsuario[] values = TipoUsuario.values();
-        int idx = id - 1;
-        return (idx >= 0 && idx < values.length) ? values[idx] : null;
-    }
-
-    @Named("tipoUsuarioToName")
-    default String tipoUsuarioToName(TipoUsuario tipo) {
-        return tipo == null ? null : tipo.name();
+        return id == null ? null : TipoUsuario.builder().id(id).build();
     }
 }

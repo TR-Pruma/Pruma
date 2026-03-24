@@ -1,7 +1,9 @@
 package com.br.pruma.core.domain;
 
+import com.br.pruma.core.enums.TipoUsuarioEnum;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,9 +14,12 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Entidade de autenticação do sistema.
+ * Entidade de autenticacao do sistema.
  * Herda auditoria de {@link AuditableEntity} (createdAt, updatedAt, ativo, version).
- * O campo {@code ativo} da superclasse é reutilizado para isEnabled().
+ * O campo {@code ativo} da superclasse e reutilizado para isEnabled().
+ *
+ * {@code tipo} usa {@link TipoUsuarioEnum} (enum simples) pois e armazenado como
+ * coluna STRING, sem FK para a tabela tipo_usuario.
  */
 @Entity
 @Table(
@@ -25,9 +30,9 @@ import java.util.List;
 )
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 public class Usuario extends AuditableEntity implements UserDetails, Serializable {
@@ -50,19 +55,17 @@ public class Usuario extends AuditableEntity implements UserDetails, Serializabl
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false, length = 20)
-    private TipoUsuario tipo;
-
-    // ── UserDetails ──────────────────────────────────────────────
+    private TipoUsuarioEnum tipo;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + tipo.name()));
     }
 
-    @Override public String getPassword()              { return senha;       }
-    @Override public String getUsername()              { return cpf;         }
-    @Override public boolean isAccountNonExpired()     { return true;        }
-    @Override public boolean isAccountNonLocked()      { return getAtivo();  }
-    @Override public boolean isCredentialsNonExpired() { return true;        }
-    @Override public boolean isEnabled()               { return getAtivo();  }
+    @Override public String  getPassword()             { return senha;      }
+    @Override public String  getUsername()             { return cpf;        }
+    @Override public boolean isAccountNonExpired()     { return true;       }
+    @Override public boolean isAccountNonLocked()      { return getAtivo(); }
+    @Override public boolean isCredentialsNonExpired() { return true;       }
+    @Override public boolean isEnabled()               { return getAtivo(); }
 }
