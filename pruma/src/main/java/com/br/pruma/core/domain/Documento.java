@@ -3,6 +3,8 @@ package com.br.pruma.core.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serial;
@@ -11,6 +13,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "documento")
+@SQLDelete(sql = "UPDATE documento SET ativo = false WHERE documento_id = ?")
+@SQLRestriction("ativo = true")
 @Getter
 @Setter
 @Builder
@@ -59,6 +63,10 @@ public class Documento implements Serializable {
     @UpdateTimestamp
     @Column(name = "data_atualizacao")
     private LocalDateTime dataAtualizacao;
+
+    @Column(name = "ativo", nullable = false)
+    @Builder.Default
+    private Boolean ativo = true;
 
     @Version
     @Column(name = "versao")
