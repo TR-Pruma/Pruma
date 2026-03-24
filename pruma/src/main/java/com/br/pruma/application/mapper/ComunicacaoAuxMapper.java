@@ -9,20 +9,20 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ComunicacaoAuxMapper {
 
-    @Mapping(target = "comunicacao", source = "comunicacao")
-    @Mapping(target = "ativo", constant = "true")
-    @Mapping(target = "dataCriacao", ignore = true)
-    @Mapping(target = "dataAtualizacao", ignore = true)
-    @Mapping(target = "versao", ignore = true)
+    @Mapping(target = "comunicacao",  source = "comunicacao")
+    @Mapping(target = "ativo",        ignore = true)
+    @Mapping(target = "createdAt",    ignore = true)
+    @Mapping(target = "updatedAt",    ignore = true)
+    @Mapping(target = "version",      ignore = true)
     ComunicacaoAux toEntity(ComunicacaoAuxRequestDTO dto, Comunicacao comunicacao);
 
-    @Mapping(target = "comunicacaoId", source = "comunicacao.id")
-    @Mapping(target = "mensagem", source = "comunicacao.mensagem")
-    @Mapping(target = "tipoRemetente", source = "comunicacao.tipoRemetente")
-    @Mapping(target = "projetoId", source = "comunicacao.projeto.id")
-    @Mapping(target = "projetoNome", source = "comunicacao.projeto.nome")
-    @Mapping(target = "clienteId", source = "comunicacao.cliente.id")
-    @Mapping(target = "clienteNome", source = "comunicacao.cliente.nome")
+    @Mapping(target = "comunicacaoId",   source = "comunicacao.id")
+    @Mapping(target = "mensagem",        source = "comunicacao.mensagem")
+    @Mapping(target = "tipoRemetente",   source = "comunicacao.tipoRemetente")
+    @Mapping(target = "projetoId",       source = "comunicacao.projeto.id")
+    @Mapping(target = "projetoNome",     source = "comunicacao.projeto.nome")
+    @Mapping(target = "clienteId",       source = "comunicacao.cliente.id")
+    @Mapping(target = "clienteNome",     source = "comunicacao.cliente.nome")
     ComunicacaoAuxResponseDTO toDTO(ComunicacaoAux entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
