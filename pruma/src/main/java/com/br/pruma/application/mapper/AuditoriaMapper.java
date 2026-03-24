@@ -13,19 +13,17 @@ import org.mapstruct.*;
 )
 public interface AuditoriaMapper {
 
-    @Mapping(target = "id",      ignore = true)
-    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "id",          ignore = true)
+    @Mapping(target = "version",     ignore = true)
+    @Mapping(target = "dataHora",    ignore = true)
+    @Mapping(target = "tipoUsuario", source = "tipoUsuarioId", qualifiedByName = "tipoUsuarioFromId")
     Auditoria toEntity(AuditoriaRequestDTO dto);
 
-    @Mapping(target = "id",          source = "id")
-    @Mapping(target = "acao",        source = "acao")
-    @Mapping(target = "dataHora",    source = "dataHora")
-    @Mapping(target = "version",     source = "version")
-    @Mapping(target = "tipoUsuario", source = "tipoUsuario", qualifiedByName = "tipoUsuarioToName")
+    @Mapping(target = "tipoUsuarioId", source = "tipoUsuario.id")
     AuditoriaResponseDTO toResponseDTO(Auditoria auditoria);
 
-    @Named("tipoUsuarioToName")
-    default String tipoUsuarioToName(TipoUsuario tipo) {
-        return tipo == null ? null : tipo.name();
+    @Named("tipoUsuarioFromId")
+    default TipoUsuario tipoUsuarioFromId(Integer id) {
+        return id == null ? null : TipoUsuario.builder().id(id).build();
     }
 }

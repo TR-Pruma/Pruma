@@ -20,7 +20,7 @@ public class ClienteTipoMapper {
     public ClienteTipoResponseDTO toDTO(ClienteTipo entity) {
         return ClienteTipoResponseDTO.builder()
                 .id(entity.getId())
-                .tipoUsuarioId(entity.getTipoUsuario().getId())
+                .tipoUsuarioId(entity.getTipoUsuario() != null ? entity.getTipoUsuario().getId() : null)
                 .descricaoCliente(entity.getDescricaoCliente())
                 .dataCriacao(entity.getDataCriacao())
                 .dataAtualizacao(entity.getDataAtualizacao())

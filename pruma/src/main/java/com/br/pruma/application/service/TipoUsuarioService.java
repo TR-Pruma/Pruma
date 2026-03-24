@@ -24,33 +24,33 @@ public class TipoUsuarioService {
 
     public TipoUsuarioResponseDTO create(TipoUsuarioRequestDTO dto) {
         TipoUsuario entity = mapper.toEntity(dto);
-        TipoUsuario saved = repository.save(entity);
-        return mapper.toResponse(saved);
+        return mapper.toResponse(repository.save(entity));
     }
 
     @Transactional(readOnly = true)
     public TipoUsuarioResponseDTO getById(Integer id) {
         TipoUsuario entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tipo de usuário não encontrado: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Tipo de usu\u00e1rio n\u00e3o encontrado: " + id));
         return mapper.toResponse(entity);
     }
 
     @Transactional(readOnly = true)
     public List<TipoUsuarioResponseDTO> listAll() {
-        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
+        return repository.findAll().stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     public TipoUsuarioResponseDTO update(Integer id, TipoUsuarioUpdateDTO dto) {
         TipoUsuario entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tipo de usuário não encontrado: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Tipo de usu\u00e1rio n\u00e3o encontrado: " + id));
         mapper.updateFromDto(dto, entity);
-        TipoUsuario updated = repository.save(entity);
-        return mapper.toResponse(updated);
+        return mapper.toResponse(repository.save(entity));
     }
 
     public void delete(Integer id) {
         if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Tipo de usuário não encontrado: " + id);
+            throw new EntityNotFoundException("Tipo de usu\u00e1rio n\u00e3o encontrado: " + id);
         }
         repository.deleteById(id);
     }

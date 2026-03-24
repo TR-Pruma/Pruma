@@ -1,6 +1,5 @@
 package com.br.pruma.application.service;
 
-
 import com.br.pruma.application.dto.request.EquipamentoRequestDTO;
 import com.br.pruma.application.dto.update.EquipamentoAtivoUpdateDTO;
 import com.br.pruma.application.dto.response.EquipamentoListDTO;
@@ -35,7 +34,7 @@ public class EquipamentoService {
     @Transactional
     public EquipamentoResponseDTO atualizar(Integer id, EquipamentoRequestDTO dto) {
         Equipamento entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Equipamento não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Equipamento n\u00e3o encontrado"));
         mapper.updateEntityFromDto(dto, entity);
         return mapper.toResponseDto(repository.save(entity));
     }
@@ -43,20 +42,21 @@ public class EquipamentoService {
     @Transactional(readOnly = true)
     public EquipamentoResponseDTO buscarPorId(Integer id) {
         Equipamento entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Equipamento não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Equipamento n\u00e3o encontrado"));
         return mapper.toResponseDto(entity);
     }
 
     @Transactional(readOnly = true)
     public Page<EquipamentoListDTO> listar(String nome, StatusEquipamento status, Boolean ativo, Pageable pageable) {
-        return repository.searchIncludingInativos(nome, status, ativo, null, null, pageable)
+        // searchIncludingInativos aceita exatamente (nome, status, ativo, pageable)
+        return repository.searchIncludingInativos(nome, status, ativo, pageable)
                 .map(mapper::toListDto);
     }
 
     @Transactional
     public void atualizarStatus(Integer id, EquipamentoStatusUpdateDTO dto) {
         Equipamento entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Equipamento não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Equipamento n\u00e3o encontrado"));
         mapper.updateStatusFromDto(dto, entity);
         repository.save(entity);
     }
@@ -64,14 +64,14 @@ public class EquipamentoService {
     @Transactional
     public void atualizarAtivo(Integer id, EquipamentoAtivoUpdateDTO dto) {
         Equipamento entity = repository.findByIdIncludingInativos(id)
-                .orElseThrow(() -> new EntityNotFoundException("Equipamento não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Equipamento n\u00e3o encontrado"));
         mapper.updateAtivoFromDto(dto, entity);
         repository.save(entity);
     }
 
     @Transactional
     public void deletar(Integer id) {
-        repository.deleteById(id); // Soft delete pelo @SQLDelete
+        repository.deleteById(id);
     }
 
     @Transactional
