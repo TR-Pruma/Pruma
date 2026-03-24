@@ -28,8 +28,9 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findByCpf(dto.getCpf())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        String token = jwtService.gerarToken(usuario.getCpf());
-        return new TokenResponseDTO(token, "Bearer", usuario.getCpf(), usuario.getTipo().name());
+        String role = usuario.getTipo().name();
+        String token = jwtService.gerarToken(usuario.getId(), role);
+        return new TokenResponseDTO(token, "Bearer", usuario.getId(), role);
     }
 
     public void cadastrar(CadastroRequestDTO dto) {
