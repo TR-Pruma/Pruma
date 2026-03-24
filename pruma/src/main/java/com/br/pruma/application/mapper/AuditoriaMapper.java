@@ -3,7 +3,6 @@ package com.br.pruma.application.mapper;
 import com.br.pruma.application.dto.request.AuditoriaRequestDTO;
 import com.br.pruma.application.dto.response.AuditoriaResponseDTO;
 import com.br.pruma.core.domain.Auditoria;
-import com.br.pruma.core.domain.TipoUsuario;
 import org.mapstruct.*;
 
 @Mapper(
@@ -13,17 +12,15 @@ import org.mapstruct.*;
 )
 public interface AuditoriaMapper {
 
+    // AuditoriaRequestDTO nao tem tipoUsuario - campos: entidade, acao, usuario, dataHora
     @Mapping(target = "id",          ignore = true)
     @Mapping(target = "version",     ignore = true)
-    @Mapping(target = "dataHora",    ignore = true)
-    @Mapping(target = "tipoUsuario", source = "tipoUsuarioId", qualifiedByName = "tipoUsuarioFromId")
+    @Mapping(target = "tipoUsuario", ignore = true)
+    @Mapping(target = "clienteCpf",  source = "usuario")
     Auditoria toEntity(AuditoriaRequestDTO dto);
 
-    @Mapping(target = "tipoUsuarioId", source = "tipoUsuario.id")
+    // AuditoriaResponseDTO.tipoUsuario e String (descricao do tipo)
+    @Mapping(target = "tipoUsuario", source = "tipoUsuario.descricao")
+    @Mapping(target = "clienteCpf",  source = "clienteCpf")
     AuditoriaResponseDTO toResponseDTO(Auditoria auditoria);
-
-    @Named("tipoUsuarioFromId")
-    default TipoUsuario tipoUsuarioFromId(Integer id) {
-        return id == null ? null : TipoUsuario.builder().id(id).build();
-    }
 }
