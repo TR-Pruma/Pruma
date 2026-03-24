@@ -47,15 +47,18 @@ class MaterialServiceTest {
                 .custoUnitario(new BigDecimal("32.50"))
                 .build();
 
-        requestDTO = new MaterialRequestDTO();
-        requestDTO.setDescricao("Cimento CP-II");
-        requestDTO.setQuantidade(100);
-        requestDTO.setCustoUnitario(new BigDecimal("32.50"));
+        // DTOs usam builder pois construtores são PROTECTED
+        requestDTO = MaterialRequestDTO.builder()
+                .descricao("Cimento CP-II")
+                .quantidade(100)
+                .custoUnitario(new BigDecimal("32.50"))
+                .build();
 
-        responseDTO = new MaterialResponseDTO();
-        responseDTO.setDescricao("Cimento CP-II");
-        responseDTO.setQuantidade(100);
-        responseDTO.setCustoUnitario(new BigDecimal("32.50"));
+        responseDTO = MaterialResponseDTO.builder()
+                .descricao("Cimento CP-II")
+                .quantidade(100)
+                .custoUnitario(new BigDecimal("32.50"))
+                .build();
     }
 
     // -----------------------------------------------------------------------
@@ -148,27 +151,22 @@ class MaterialServiceTest {
     @Test
     @DisplayName("update: deve atualizar material com nova descrição única")
     void update_sucesso() {
-        MaterialUpdateDTO updateDTO = new MaterialUpdateDTO();
-        updateDTO.setDescricao("Cimento CP-III");
+        MaterialUpdateDTO updateDTO = MaterialUpdateDTO.builder()
+                .descricao("Cimento CP-III")
+                .build();
 
-        Material materialComId = material;
-        // simula id preenchido
-        try {
-            var field = Material.class.getDeclaredField("id");
-            field.setAccessible(true);
-            field.set(materialComId, 1);
-        } catch (Exception ignored) {}
+        setId(material, 1);
 
-        when(repository.findById(1)).thenReturn(Optional.of(materialComId));
+        when(repository.findById(1)).thenReturn(Optional.of(material));
         when(repository.findByDescricao("Cimento CP-III")).thenReturn(Optional.empty());
-        when(repository.save(materialComId)).thenReturn(materialComId);
-        when(mapper.toResponse(materialComId)).thenReturn(responseDTO);
+        when(repository.save(material)).thenReturn(material);
+        when(mapper.toResponse(material)).thenReturn(responseDTO);
 
         MaterialResponseDTO result = service.update(1, updateDTO);
 
         assertThat(result).isNotNull();
-        verify(mapper).updateFromDto(updateDTO, materialComId);
-        verify(repository).save(materialComId);
+        verify(mapper).updateFromDto(updateDTO, material);
+        verify(repository).save(material);
     }
 
     @Test
@@ -176,7 +174,7 @@ class MaterialServiceTest {
     void update_naoEncontrado() {
         when(repository.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.update(99, new MaterialUpdateDTO()))
+        assertThatThrownBy(() -> service.update(99, MaterialUpdateDTO.builder().build()))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("99");
     }
@@ -184,20 +182,18 @@ class MaterialServiceTest {
     @Test
     @DisplayName("update: deve lançar IllegalArgumentException quando nova descrição pertence a outro material")
     void update_descricaoDuplicadaOutroMaterial() {
-        MaterialUpdateDTO updateDTO = new MaterialUpdateDTO();
-        updateDTO.setDescricao("Cimento CP-III");
+        MaterialUpdateDTO updateDTO = MaterialUpdateDTO.builder()
+                .descricao("Cimento CP-III")
+                .build();
 
         Material outro = Material.builder()
                 .descricao("Cimento CP-III")
                 .quantidade(50)
                 .custoUnitario(BigDecimal.TEN)
                 .build();
-        try {
-            var field = Material.class.getDeclaredField("id");
-            field.setAccessible(true);
-            field.set(material, 1);
-            field.set(outro, 2);
-        } catch (Exception ignored) {}
+
+        setId(material, 1);
+        setId(outro, 2);
 
         when(repository.findById(1)).thenReturn(Optional.of(material));
         when(repository.findByDescricao("Cimento CP-III")).thenReturn(Optional.of(outro));
@@ -231,5 +227,19 @@ class MaterialServiceTest {
                 .hasMessageContaining("99");
 
         verify(repository, never()).deleteById(any());
+    }
+
+    // -----------------------------------------------------------------------
+    // helper
+    // -----------------------------------------------------------------------
+
+    private void setId(Material m, Integer id) {
+        try {
+            var field = Material.class.getDeclaredField("id");
+            field.setAccessible(true);
+            field.set(m, id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
