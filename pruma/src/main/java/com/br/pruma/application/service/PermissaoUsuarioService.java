@@ -1,7 +1,5 @@
 package com.br.pruma.application.service;
 
-
-
 import com.br.pruma.application.dto.request.PermissaoUsuarioRequestDTO;
 import com.br.pruma.application.dto.response.PermissaoUsuarioResponseDTO;
 import com.br.pruma.application.mapper.PermissaoUsuarioMapper;
@@ -40,7 +38,6 @@ public class PermissaoUsuarioService {
         PermissaoUsuario existente = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Permissão não encontrada para id: " + id));
 
-        // Atualiza os dados usando o mapper
         PermissaoUsuario atualizado = mapper.toEntity(dto);
         atualizado.setId(existente.getId());
 
@@ -57,8 +54,8 @@ public class PermissaoUsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public List<PermissaoUsuarioResponseDTO> buscarPorCliente(String clienteCpf) {
-        return repository.findByCliente_ClienteCpf(clienteCpf)
+    public List<PermissaoUsuarioResponseDTO> buscarPorCliente(String cpf) {
+        return repository.findByCliente_Cpf(cpf)
                 .stream()
                 .map(mapper::toResponseDTO)
                 .toList();
@@ -66,7 +63,7 @@ public class PermissaoUsuarioService {
 
     @Transactional(readOnly = true)
     public List<PermissaoUsuarioResponseDTO> buscarPorTipoUsuario(Integer tipoUsuarioId) {
-        return repository.findByTipoUsuario_TipoUsuario(tipoUsuarioId)
+        return repository.findByTipoUsuario_Id(tipoUsuarioId)
                 .stream()
                 .map(mapper::toResponseDTO)
                 .toList();

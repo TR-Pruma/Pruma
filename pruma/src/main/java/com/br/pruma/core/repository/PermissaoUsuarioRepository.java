@@ -10,12 +10,12 @@ import java.util.Optional;
 @Repository
 public interface PermissaoUsuarioRepository extends JpaRepository<PermissaoUsuario, Long> {
 
-    // Busca permissões de um cliente específico (por CPF)
-    List<PermissaoUsuario> findByCliente_ClienteCpf(String clienteCpf);
+    // Cliente.cpf (não clienteCpf)
+    List<PermissaoUsuario> findByCliente_Cpf(String cpf);
 
-    // Busca permissões filtrando pelo tipo de usuário
-    List<PermissaoUsuario> findByTipoUsuario_TipoUsuario(Integer tipoUsuarioId);
+    // TipoUsuario.id (a PK do TipoUsuario se chama 'id' em Java, coluna tipo_usuario)
+    List<PermissaoUsuario> findByTipoUsuario_Id(Integer tipoUsuarioId);
 
-    // Busca uma permissão específica pelo cliente e pela descrição da permissão
-    Optional<PermissaoUsuario> findByCliente_ClienteCpfAndPermissao(String clienteCpf, String permissao);
+    // Busca permissão específica por cpf do cliente + descrição da permissão
+    Optional<PermissaoUsuario> findByCliente_CpfAndPermissao(String cpf, String permissao);
 }
