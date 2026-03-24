@@ -44,9 +44,12 @@ public class Material implements Serializable {
     @ToString.Include
     private Integer id;
 
+    // Reduzido de 1000 para 500: com utf8mb4 (4 bytes/char), length 1000 = 4000 bytes
+    // que excede o limite de index do MySQL InnoDB (3072 bytes).
+    // 500 chars x 4 bytes = 2000 bytes — dentro do limite com folga.
     @NotBlank(message = "Descri\u00e7\u00e3o \u00e9 obrigat\u00f3ria")
-    @Size(max = 1000, message = "Descri\u00e7\u00e3o deve ter no m\u00e1ximo 1000 caracteres")
-    @Column(name = "descricao", length = 1000, nullable = false)
+    @Size(max = 500, message = "Descri\u00e7\u00e3o deve ter no m\u00e1ximo 500 caracteres")
+    @Column(name = "descricao", length = 500, nullable = false)
     @ToString.Include
     private String descricao;
 
