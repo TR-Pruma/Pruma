@@ -1,6 +1,8 @@
 package com.br.pruma.core.domain;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,13 +16,14 @@ import java.time.LocalDateTime;
 @Table(
         name = "profissional_de_base",
         indexes = {
-                @Index(name = "idx_profissional_nome", columnList = "nome"),
+                @Index(name = "idx_profissional_cpf",          columnList = "profissional_cpf"),
+                @Index(name = "idx_profissional_nome",         columnList = "nome"),
                 @Index(name = "idx_profissional_especialidade", columnList = "especialidade")
         }
 )
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA requires a no-args constructor with at least protected visibility
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -37,17 +40,24 @@ public class ProfissionalDeBase implements Serializable {
     @ToString.Include
     private Integer id;
 
-    @Column(name = "nome", length = 100, nullable = false)
+    // Nome explicito necessario: HistoricoLocalizacao e Inspecao referenciam
+    // esta coluna via @JoinColumn(referencedColumnName = "profissional_cpf")
+    @NotBlank(message = "CPF é obrigatório")
+    @Pattern(regexp = "^\\d{11}$", message = "CPF deve conter 11 dígitos numéricos")
+    @Column(name = "profissional_cpf", nullable = false, unique = true, length = 11)
+    private String cpf;
+
     @NotBlank(message = "Nome é obrigatório")
     @Size(max = 100)
+    @Column(name = "nome", length = 100, nullable = false)
     private String nome;
 
-    @Column(name = "especialidade", length = 50)
     @Size(max = 50)
+    @Column(name = "especialidade", length = 50)
     private String especialidade;
 
-    @Column(name = "telefone", length = 20)
     @Size(max = 20)
+    @Column(name = "telefone", length = 20)
     @ToString.Exclude
     private String telefone;
 
@@ -63,20 +73,14 @@ public class ProfissionalDeBase implements Serializable {
     @Column(name = "version", nullable = false)
     private Long version;
 
-    /**
-     * Atualiza apenas os campos não-nulos/válidos do DTO/entidade fonte.
-     */
     public void applyPatch(ProfissionalDeBase patch) {
         if (patch == null) return;
         if (patch.getNome() != null && !patch.getNome().isBlank()) this.setNome(patch.getNome());
+        if (patch.getCpf() != null && !patch.getCpf().isBlank()) this.setCpf(patch.getCpf());
         if (patch.getEspecialidade() != null) this.setEspecialidade(patch.getEspecialidade());
         if (patch.getTelefone() != null) this.setTelefone(patch.getTelefone());
     }
 
-    /**
-     * Conveniência para mappers (MapStruct) quando for necessário criar uma referência
-     * apenas com o identificador (por exemplo @MapsId ou associações).
-     */
     public static ProfissionalDeBase ofId(Integer id) {
         if (id == null) return null;
         return ProfissionalDeBase.builder().id(id).build();
