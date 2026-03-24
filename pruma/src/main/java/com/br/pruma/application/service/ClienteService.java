@@ -2,9 +2,11 @@ package com.br.pruma.application.service;
 
 import com.br.pruma.application.dto.request.ClienteRequestDTO;
 import com.br.pruma.application.dto.response.ClienteResponseDTO;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public interface ClienteService {
     ClienteResponseDTO create(ClienteRequestDTO dto);
     ClienteResponseDTO update(Integer id, ClienteRequestDTO dto);
