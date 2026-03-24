@@ -9,19 +9,10 @@ import java.util.List;
 @Repository
 public interface NotificacaoRepository extends JpaRepository<Notificacao, Integer> {
 
-    /**
-     * Lista todas as notificações de um cliente específico.
-     */
-    List<Notificacao> findAllByCliente_Cpf(Long clienteCpf);
+    // Cliente.cpf é String (11 dígitos) — mesmo padrão dos outros repositories
+    List<Notificacao> findAllByCliente_Cpf(String clienteCpf);
 
-    /**
-     * Lista todas as notificações de um tipo de usuário específico.
-     */
     List<Notificacao> findAllByTipoUsuario_Id(Integer tipoUsuarioId);
 
-    /**
-     * Lista todas as notificações filtradas por se foram lidas ou não.
-     */
     List<Notificacao> findAllByLida(Boolean lida);
 }
-

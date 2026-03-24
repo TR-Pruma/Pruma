@@ -28,13 +28,11 @@ public class NotificacaoService {
     private final TipoUsuarioRepository tipoUsuarioRepository;
     private final NotificacaoMapper mapper;
 
-    /**
-     * Cria uma nova notificação.
-     */
     public NotificacaoResponseDTO create(NotificacaoRequestDTO dto) {
-        Cliente cliente = clienteRepository.findById(Math.toIntExact(dto.getClienteCpf()))
+        String cpf = String.valueOf(dto.getClienteCpf());
+        Cliente cliente = clienteRepository.findByCpf(cpf)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Cliente não encontrado: " + dto.getClienteCpf())
+                        new EntityNotFoundException("Cliente não encontrado: " + cpf)
                 );
         TipoUsuario tipoUsuario = tipoUsuarioRepository.findById(dto.getTipoUsuarioId())
                 .orElseThrow(() ->
@@ -49,9 +47,6 @@ public class NotificacaoService {
         return mapper.toResponse(saved);
     }
 
-    /**
-     * Recupera uma notificação pelo seu ID.
-     */
     @Transactional(readOnly = true)
     public NotificacaoResponseDTO getById(Integer id) {
         Notificacao entity = notificacaoRepository.findById(id)
@@ -61,9 +56,6 @@ public class NotificacaoService {
         return mapper.toResponse(entity);
     }
 
-    /**
-     * Lista todas as notificações.
-     */
     @Transactional(readOnly = true)
     public List<NotificacaoResponseDTO> listAll() {
         return notificacaoRepository.findAll().stream()
@@ -71,19 +63,13 @@ public class NotificacaoService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Lista notificações por cliente.
-     */
     @Transactional(readOnly = true)
     public List<NotificacaoResponseDTO> listByCliente(Long clienteCpf) {
-        return notificacaoRepository.findAllByCliente_Cpf(clienteCpf).stream()
+        return notificacaoRepository.findAllByCliente_Cpf(String.valueOf(clienteCpf)).stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Lista notificações por tipo de usuário.
-     */
     @Transactional(readOnly = true)
     public List<NotificacaoResponseDTO> listByTipoUsuario(Integer tipoUsuarioId) {
         return notificacaoRepository.findAllByTipoUsuario_Id(tipoUsuarioId).stream()
@@ -91,9 +77,6 @@ public class NotificacaoService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Lista notificações por status de leitura.
-     */
     @Transactional(readOnly = true)
     public List<NotificacaoResponseDTO> listByLida(Boolean lida) {
         return notificacaoRepository.findAllByLida(lida).stream()
@@ -101,9 +84,6 @@ public class NotificacaoService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Atualiza parcialmente uma notificação existente.
-     */
     public NotificacaoResponseDTO update(Integer id, NotificacaoUpdateDTO dto) {
         Notificacao entity = notificacaoRepository.findById(id)
                 .orElseThrow(() ->
@@ -111,9 +91,10 @@ public class NotificacaoService {
                 );
 
         if (dto.getClienteCpf() != null) {
-            Cliente cliente = clienteRepository.findById(Math.toIntExact(dto.getClienteCpf()))
+            String cpf = String.valueOf(dto.getClienteCpf());
+            Cliente cliente = clienteRepository.findByCpf(cpf)
                     .orElseThrow(() ->
-                            new EntityNotFoundException("Cliente não encontrado: " + dto.getClienteCpf())
+                            new EntityNotFoundException("Cliente não encontrado: " + cpf)
                     );
             entity.setCliente(cliente);
         }
@@ -130,9 +111,6 @@ public class NotificacaoService {
         return mapper.toResponse(updated);
     }
 
-    /**
-     * Exclui logicamente uma notificação por ID.
-     */
     public void delete(Integer id) {
         if (!notificacaoRepository.existsById(id)) {
             throw new EntityNotFoundException("Notificação não encontrada: " + id);
