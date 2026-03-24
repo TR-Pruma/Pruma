@@ -1,32 +1,43 @@
 package com.br.pruma.core.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "documento")
-@Data
+@Getter
+@Setter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class Documento {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
+public class Documento implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "documento_id", updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projeto_id", nullable = false)
+    @ToString.Exclude
     private Projeto projeto;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tipo_documento_id", nullable = false)
+    @ToString.Exclude
     private TipoDocumento tipoDocumento;
 
     @Column(name = "nome_arquivo", nullable = false)
