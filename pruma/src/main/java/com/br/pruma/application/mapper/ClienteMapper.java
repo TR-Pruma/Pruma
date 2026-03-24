@@ -14,6 +14,7 @@ public interface ClienteMapper {
     @Mapping(source = "dto.email",    target = "email")
     @Mapping(source = "dto.telefone", target = "telefone")
     @Mapping(source = "dto.senha",    target = "senha")
+    @Mapping(source = "dto.ativo",    target = "ativo")
     @Mapping(source = "endereco",     target = "endereco")
     Cliente toEntity(ClienteRequestDTO dto, Endereco endereco);
 
@@ -25,6 +26,7 @@ public interface ClienteMapper {
     @Mapping(source = "dto.email",    target = "email")
     @Mapping(source = "dto.telefone", target = "telefone")
     @Mapping(source = "dto.senha",    target = "senha")
+    @Mapping(source = "dto.ativo",    target = "ativo")
     @Mapping(source = "endereco",     target = "endereco")
     void updateEntity(@MappingTarget Cliente entity, ClienteRequestDTO dto, Endereco endereco);
 }

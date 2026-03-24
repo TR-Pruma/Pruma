@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -21,9 +22,9 @@ import java.util.List;
 )
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 public class Projeto extends AuditableEntity implements Serializable {
@@ -46,26 +47,14 @@ public class Projeto extends AuditableEntity implements Serializable {
     @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;
 
-    /**
-     * Data de criação do projeto no sentido de negócio (p.ex. quando foi iniciado).
-     */
     @Column(name = "data_criacao")
     private LocalDate dataCriacao;
 
-    /**
-     * Relação com obras pertencentes a este projeto.
-     * Fetch LAZY para evitar carregamento desnecessário; cascade para manter integridade do agregado.
-     */
     @OneToMany(mappedBy = "projeto", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @Builder.Default
     private List<Obra> obras = new ArrayList<>();
 
-    // ----------------- Domain helpers -----------------
-
-    /**
-     * Atualiza apenas os campos não-nulos e válidos do patch.
-     */
     public void applyPatch(Projeto patch) {
         if (patch == null) return;
         if (patch.getNome() != null && !patch.getNome().isBlank()) this.setNome(patch.getNome());
@@ -73,28 +62,18 @@ public class Projeto extends AuditableEntity implements Serializable {
         if (patch.getDataCriacao() != null) this.setDataCriacao(patch.getDataCriacao());
     }
 
-    /**
-     * Adiciona uma obra ao projeto e faz o binding bidirecional.
-     */
     public void addObra(Obra obra) {
         if (obra == null) return;
         obras.add(obra);
         obra.setProjeto(this);
     }
 
-    /**
-     * Remove uma obra do projeto e limpa o relacionamento.
-     */
     public void removeObra(Obra obra) {
         if (obra == null) return;
         obras.remove(obra);
         obra.setProjeto(null);
     }
 
-    /**
-     * Conveniência para mappers (MapStruct) quando for necessário criar uma referência
-     * apenas com o identificador (por exemplo @MapsId ou associações).
-     */
     public static Projeto ofId(Integer id) {
         if (id == null) return null;
         return Projeto.builder().id(id).build();

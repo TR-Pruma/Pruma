@@ -11,8 +11,8 @@ import org.mapstruct.*;
 public interface PermissaoUsuarioMapper {
 
     @Mapping(target = "id",          ignore = true)
-    @Mapping(target = "cliente",     source = "clienteCpf",     qualifiedByName = "clienteFromCpf")
-    @Mapping(target = "tipoUsuario", source = "tipoUsuarioName", qualifiedByName = "tipoUsuarioFromName")
+    @Mapping(target = "cliente",     source = "clienteCpf",    qualifiedByName = "clienteFromCpf")
+    @Mapping(target = "tipoUsuario", source = "tipoUsuarioId", qualifiedByName = "tipoUsuarioFromId")
     PermissaoUsuario toEntity(PermissaoUsuarioRequestDTO dto);
 
     @Mapping(target = "clienteCpf",           source = "cliente.cpf")
@@ -26,9 +26,12 @@ public interface PermissaoUsuarioMapper {
         return cpf == null ? null : Cliente.builder().cpf(cpf).build();
     }
 
-    @Named("tipoUsuarioFromName")
-    default TipoUsuario tipoUsuarioFromName(String name) {
-        return name == null ? null : TipoUsuario.valueOf(name);
+    @Named("tipoUsuarioFromId")
+    default TipoUsuario tipoUsuarioFromId(Integer id) {
+        if (id == null) return null;
+        TipoUsuario[] values = TipoUsuario.values();
+        int idx = id - 1;
+        return (idx >= 0 && idx < values.length) ? values[idx] : null;
     }
 
     @Named("tipoUsuarioToName")

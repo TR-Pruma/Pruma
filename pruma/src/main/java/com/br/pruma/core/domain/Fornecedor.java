@@ -5,14 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serial;
 import java.io.Serializable;
 
-/**
- * Fornecedor de insumos para projetos/obras.
- * Herda auditoria (createdAt, updatedAt, ativo, version) de {@link AuditableEntity}.
- */
 @Entity
 @Table(
         name = "fornecedor",
@@ -23,9 +20,9 @@ import java.io.Serializable;
 )
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 public class Fornecedor extends AuditableEntity implements Serializable {
@@ -46,9 +43,6 @@ public class Fornecedor extends AuditableEntity implements Serializable {
     @ToString.Include
     private String nome;
 
-    /**
-     * CNPJ no formato XX.XXX.XXX/XXXX-XX (18 chars com máscara) ou 14 dígitos sem máscara.
-     */
     @NotBlank(message = "CNPJ é obrigatório")
     @Pattern(
             regexp = "^(\\d{14}|\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2})$",

@@ -15,8 +15,8 @@ public interface NotificacaoMapper {
     @Mapping(target = "version",     ignore = true)
     @Mapping(target = "createdAt",   ignore = true)
     @Mapping(target = "updatedAt",   ignore = true)
-    @Mapping(target = "cliente",     source = "clienteCpf",     qualifiedByName = "mapClienteByCpf")
-    @Mapping(target = "tipoUsuario", source = "tipoUsuarioName", qualifiedByName = "mapTipoUsuarioByName")
+    @Mapping(target = "cliente",     source = "clienteCpf",    qualifiedByName = "mapClienteByCpf")
+    @Mapping(target = "tipoUsuario", source = "tipoUsuarioId", qualifiedByName = "mapTipoUsuarioById")
     @Mapping(target = "mensagem",    source = "mensagem")
     @Mapping(target = "dataHora",    source = "dataHora")
     @Mapping(target = "lida",        ignore = true)
@@ -27,8 +27,8 @@ public interface NotificacaoMapper {
     @Mapping(target = "version",     ignore = true)
     @Mapping(target = "createdAt",   ignore = true)
     @Mapping(target = "updatedAt",   ignore = true)
-    @Mapping(target = "cliente",     source = "clienteCpf",     qualifiedByName = "mapClienteByCpf")
-    @Mapping(target = "tipoUsuario", source = "tipoUsuarioName", qualifiedByName = "mapTipoUsuarioByName")
+    @Mapping(target = "cliente",     source = "clienteCpf",    qualifiedByName = "mapClienteByCpf")
+    @Mapping(target = "tipoUsuario", source = "tipoUsuarioId", qualifiedByName = "mapTipoUsuarioById")
     @Mapping(target = "mensagem",    source = "mensagem")
     @Mapping(target = "dataHora",    source = "dataHora")
     @Mapping(target = "lida",        source = "lida")
@@ -36,7 +36,7 @@ public interface NotificacaoMapper {
 
     @Mapping(target = "id",            source = "id")
     @Mapping(target = "clienteCpf",    source = "cliente.cpf")
-    @Mapping(target = "tipoUsuarioId", source = "tipoUsuario", qualifiedByName = "tipoUsuarioToName")
+    @Mapping(target = "tipoUsuarioId", source = "tipoUsuario",  qualifiedByName = "tipoUsuarioToName")
     @Mapping(target = "mensagem",      source = "mensagem")
     @Mapping(target = "dataHora",      source = "dataHora")
     @Mapping(target = "lida",          source = "lida")
@@ -46,13 +46,16 @@ public interface NotificacaoMapper {
     NotificacaoResponseDTO toResponse(Notificacao entity);
 
     @Named("mapClienteByCpf")
-    default Cliente mapClienteByCpf(String cpf) {
-        return cpf == null ? null : Cliente.builder().cpf(cpf).build();
+    default Cliente mapClienteByCpf(Long cpf) {
+        return cpf == null ? null : Cliente.builder().cpf(String.valueOf(cpf)).build();
     }
 
-    @Named("mapTipoUsuarioByName")
-    default TipoUsuario mapTipoUsuarioByName(String name) {
-        return name == null ? null : TipoUsuario.valueOf(name);
+    @Named("mapTipoUsuarioById")
+    default TipoUsuario mapTipoUsuarioById(Integer id) {
+        if (id == null) return null;
+        TipoUsuario[] values = TipoUsuario.values();
+        int idx = id - 1;
+        return (idx >= 0 && idx < values.length) ? values[idx] : null;
     }
 
     @Named("tipoUsuarioToName")
