@@ -15,6 +15,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class EquipamentoProjetoService {
+
     private final EquipamentoProjetoRepository repository;
     private final EquipamentoProjetoMapper mapper;
 
@@ -50,7 +51,7 @@ public class EquipamentoProjetoService {
     public EquipamentoProjetoResponseDTO atualizar(Long id, EquipamentoProjetoRequestDTO dto) {
         EquipamentoProjeto entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("EquipamentoProjeto não encontrado"));
-        mapper.toEntity(dto);
+        // atualiza apenas campos permitidos diretamente na entidade gerenciada
         entity.setDataAlocacao(dto.getDataAlocacao());
         repository.save(entity);
         return mapper.toResponseDTO(entity);
