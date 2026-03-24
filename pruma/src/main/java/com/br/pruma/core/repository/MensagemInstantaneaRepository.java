@@ -9,19 +9,10 @@ import java.util.List;
 @Repository
 public interface MensagemInstantaneaRepository extends JpaRepository<MensagemInstantanea, Integer> {
 
-    /**
-     * Lista todas as mensagens enviadas por um cliente específico.
-     */
-    List<MensagemInstantanea> findAllByCliente_Cpf(Long clienteCpf);
+    // Cliente.cpf é String (11 dígitos numéricos) — mesmo padrão de ProfissionalDeBase
+    List<MensagemInstantanea> findAllByCliente_Cpf(String clienteCpf);
 
-    /**
-     * Lista todas as mensagens de um tipo de usuário específico.
-     */
     List<MensagemInstantanea> findAllByTipoUsuario_Id(Integer tipoUsuarioId);
 
-    /**
-     * Lista todas as mensagens destinadas a um canal ou usuário específico.
-     */
     List<MensagemInstantanea> findAllByDestinatarioId(String destinatarioId);
 }
-
