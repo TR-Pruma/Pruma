@@ -27,14 +27,18 @@ public class HistoricoLocalizacaoServiceImpl implements HistoricoLocalizacaoServ
 
     @Override
     public HistoricoLocalizacaoResponseDTO salvar(HistoricoLocalizacaoRequestDTO dto) {
-        // CPF é Long — usa findByCpf em vez de findById (que espera Integer)
-        ProfissionalDeBase profissional = (ProfissionalDeBase) profissionalRepository
-                .findByCpf(dto.profissionalCpf())
+        // dto.profissionalCpf() é Long — converte para String de 11 dígitos
+        String cpfStr = String.valueOf(dto.profissionalCpf());
+
+        ProfissionalDeBase profissional = profissionalRepository
+                .findByCpf(cpfStr)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
-                        "Profissional com CPF " + dto.profissionalCpf() + " não encontrado."));
+                        "Profissional com CPF " + cpfStr + " não encontrado."));
+
         Projeto projeto = projetoRepository.findById(dto.projetoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Projeto com ID " + dto.projetoId() + " não encontrado."));
+
         HistoricoLocalizacao entity = mapper.toEntity(dto, profissional, projeto);
         return mapper.toDTO(repository.save(entity));
     }

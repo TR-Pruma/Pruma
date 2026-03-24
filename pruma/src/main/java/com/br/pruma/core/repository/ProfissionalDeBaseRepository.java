@@ -10,30 +10,16 @@ import java.util.Optional;
 @Repository
 public interface ProfissionalDeBaseRepository extends JpaRepository<ProfissionalDeBase, Integer> {
 
-    /**
-     * Busca profissionais cujo nome contenha o texto informado (case-insensitive).
-     */
     List<ProfissionalDeBase> findAllByNomeContainingIgnoreCase(String nome);
 
-    /**
-     * Busca profissionais pela especialidade (exata).
-     */
     List<ProfissionalDeBase> findAllByEspecialidade(String especialidade);
 
-    /**
-     * Busca profissionais cuja especialidade contenha o texto informado (case-insensitive).
-     */
     List<ProfissionalDeBase> findAllByEspecialidadeContainingIgnoreCase(String especialidade);
 
-    /**
-     * Procura por telefone (exato).
-     */
     Optional<ProfissionalDeBase> findByTelefone(String telefone);
 
-    /**
-     * Verifica existência por nome exato.
-     */
     boolean existsByNome(String nome);
 
-    Optional<Object> findByCpf(Long aLong);
+    // cpf é String na entidade (11 dígitos numéricos sem formatação)
+    Optional<ProfissionalDeBase> findByCpf(String cpf);
 }
