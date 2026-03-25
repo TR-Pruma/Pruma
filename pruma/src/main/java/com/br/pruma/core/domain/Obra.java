@@ -4,14 +4,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(
@@ -21,15 +18,14 @@ import java.time.LocalDateTime;
                 @Index(name = "idx_obra_data_inicio", columnList = "data_inicio")
         }
 )
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class Obra implements Serializable {
+public class Obra extends AuditableEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -58,32 +54,8 @@ public class Obra implements Serializable {
     @Column(name = "data_fim")
     private LocalDate dataFim;
 
-    /**
-     * Marca de soft delete opcional.
-     * Se quiser usar soft-delete, descomente o campo, adicione @Where(clause = "deleted = false")
-     * na entidade e adapte repository/queries.
-     */
-    // @Column(name = "deleted", nullable = false)
-    // private Boolean deleted = Boolean.FALSE;
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
-    @Version
-    @Column(name = "version", nullable = false)
-    private Long version;
-
     // ---------- Domain helpers ----------
 
-    /**
-     * Atualiza campos permitidos da entidade.
-     * Mantém referências consistentes e evita atribuições nulas indevidas.
-     */
     public void updateFrom(Obra source) {
         if (source == null) return;
         if (source.getProjeto() != null) this.setProjeto(source.getProjeto());
@@ -91,11 +63,11 @@ public class Obra implements Serializable {
         if (source.getDataInicio() != null) this.setDataInicio(source.getDataInicio());
         this.setDataFim(source.getDataFim());
     }
+
     public static Obra ofId(Integer id) {
         if (id == null) return null;
         Obra obra = new Obra();
         obra.setId(id);
         return obra;
     }
-
 }
