@@ -5,16 +5,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(
@@ -24,15 +20,14 @@ import java.util.Date;
                 columnList = "projeto_id,status"
         )
 )
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class Orcamento implements Serializable {
+public class Orcamento extends AuditableEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -76,16 +71,4 @@ public class Orcamento implements Serializable {
     @Column(name = "status", length = 15, nullable = false)
     @ToString.Include
     private StatusOrcamento status;
-
-    @Version
-    @Column(name = "version", nullable = false)
-    private Long version;
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
 }
