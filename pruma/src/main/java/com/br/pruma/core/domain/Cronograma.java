@@ -3,21 +3,21 @@ package com.br.pruma.core.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.experimental.SuperBuilder;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(
         name = "cronograma",
         indexes = {
-                @Index(name = "idx_cronograma_projeto",        columnList = "projeto_id"),
-                @Index(name = "idx_cronograma_periodo",        columnList = "data_inicio, data_fim")
+                @Index(name = "idx_cronograma_projeto", columnList = "projeto_id"),
+                @Index(name = "idx_cronograma_periodo", columnList = "data_inicio, data_fim")
         },
         uniqueConstraints = {
                 @UniqueConstraint(
@@ -26,53 +26,45 @@ import java.time.LocalDateTime;
                 )
         }
 )
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-@ToString(exclude = "projeto")
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder(builderClassName = "CronogramaBuilder")
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
+public class Cronograma extends AuditableEntity implements Serializable {
 
-public class Cronograma {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cronograma_id", nullable = false, updatable = false)
     @EqualsAndHashCode.Include
+    @ToString.Include
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "projeto_id", nullable = false)
-    @NotNull
-    private Projeto projeto;
-
-    @Column(name = "data_inicio", nullable = false)
-    @NotNull
-    @FutureOrPresent
-    private LocalDate dataInicio;
-
-    @Column(name = "data_fim", nullable = false)
-    @NotNull
-    @Future
-    private LocalDate dataFim;
-
-    @Version
-    @Column(name = "version")
-    private Integer version;
-
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
+    @NotBlank(message = "Nome é obrigatório")
     @Column(name = "nome", nullable = false)
+    @ToString.Include
     private String nome;
 
+    @NotNull(message = "Projeto é obrigatório")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "projeto_id", nullable = false)
+    @ToString.Exclude
+    private Projeto projeto;
+
+    @NotNull
+    @FutureOrPresent
+    @Column(name = "data_inicio", nullable = false)
+    private LocalDate dataInicio;
+
+    @NotNull
+    @Future
+    @Column(name = "data_fim", nullable = false)
+    private LocalDate dataFim;
 
     @PrePersist
     @PreUpdate
