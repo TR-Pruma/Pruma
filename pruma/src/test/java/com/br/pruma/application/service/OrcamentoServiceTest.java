@@ -106,7 +106,6 @@ class OrcamentoServiceTest {
     @DisplayName("update: lanca EntityNotFoundException quando nao existe")
     void update_naoEncontrado() {
         var updateDTO = mock(OrcamentoUpdateDTO.class);
-        when(updateDTO.getProjetoId()).thenReturn(null);
         when(orcamentoRepository.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.update(99, updateDTO))

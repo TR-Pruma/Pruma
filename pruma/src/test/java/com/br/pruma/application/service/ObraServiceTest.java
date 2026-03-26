@@ -100,7 +100,6 @@ class ObraServiceTest {
     @DisplayName("update: lanca EntityNotFoundException quando nao existe")
     void update_naoEncontrado() {
         var updateDTO = mock(ObraUpdateDTO.class);
-        when(updateDTO.getProjetoId()).thenReturn(null);
         when(obraRepository.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.update(99, updateDTO))
