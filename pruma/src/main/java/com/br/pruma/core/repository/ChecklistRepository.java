@@ -11,14 +11,16 @@ public interface ChecklistRepository extends JpaRepository<Checklist, Integer> {
 
     /**
      * Busca todos os checklists de um projeto, carregando itens associados.
+     * Nota: o filtro de ativo é gerenciado pelo @SQLRestriction da AuditableEntity.
      */
-    @Query("SELECT c FROM Checklist c LEFT JOIN FETCH c.itens WHERE c.projeto.id = :projetoId AND c.ativo = true")
+    @Query("SELECT c FROM Checklist c LEFT JOIN FETCH c.itens WHERE c.projeto.id = :projetoId")
     List<Checklist> findByProjetoIdWithItens(@Param("projetoId") Integer projetoId);
 
     /**
      * Busca checklist por id, carregando itens associados.
+     * Nota: o filtro de ativo é gerenciado pelo @SQLRestriction da AuditableEntity.
      */
-    @Query("SELECT c FROM Checklist c LEFT JOIN FETCH c.itens WHERE c.id = :id AND c.ativo = true")
+    @Query("SELECT c FROM Checklist c LEFT JOIN FETCH c.itens WHERE c.id = :id")
     Optional<Checklist> findByIdWithItens(@Param("id") Integer id);
 
     /**
@@ -38,4 +40,3 @@ public interface ChecklistRepository extends JpaRepository<Checklist, Integer> {
      */
     boolean existsByNomeAndProjetoIdAndIdNot(String nome, Integer projetoId, Integer id);
 }
-

@@ -1,14 +1,14 @@
 package com.br.pruma.core.repository;
 
 import com.br.pruma.core.domain.Projeto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface ProjetoRepository extends JpaRepository<Projeto, Integer> {
 
     /**
@@ -27,17 +27,18 @@ public interface ProjetoRepository extends JpaRepository<Projeto, Integer> {
     boolean existsByNome(String nome);
 
     /**
-     * Lista projetos cuja data de criação esteja entre as datas informadas (inclusive).
+     * Lista projetos cuja data de criação esteja entre as datas informadas (inclusive), com paginação.
      */
-    List<Projeto> findAllByDataCriacaoBetween(LocalDate start, LocalDate end);
+    Page<Projeto> findAllByDataCriacaoBetween(LocalDate start, LocalDate end, Pageable pageable);
 
     /**
-     * Lista projetos com data de criação igual à informada.
+     * Lista projetos com data de criação igual à informada, com paginação.
      */
-    List<Projeto> findAllByDataCriacao(LocalDate date);
+    Page<Projeto> findAllByDataCriacao(LocalDate date, Pageable pageable);
 
-    Optional<Object> findByIdAndAtivoTrue(Integer projetoId);
+    // @SQLRestriction("ativo = true") da AuditableEntity já filtra automaticamente;
+    // o sufixo AndAtivoTrue é redundante mas mantido para semântica explícita no Service.
+    Optional<Projeto> findByIdAndAtivoTrue(Integer projetoId);
 
     boolean existsByIdAndAtivoTrue(Integer projetoId);
 }
-
