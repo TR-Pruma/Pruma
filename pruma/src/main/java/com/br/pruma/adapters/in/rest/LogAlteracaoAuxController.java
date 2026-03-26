@@ -1,0 +1,79 @@
+package com.br.pruma.adapters.in.rest;
+
+import com.br.pruma.application.dto.request.LogAlteracaoAuxRequestDTO;
+import com.br.pruma.application.dto.response.LogAlteracaoAuxResponseDTO;
+import com.br.pruma.application.service.LogAlteracaoAuxService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+
+@RestController
+@RequestMapping("/pruma/v1/log-alteracoes/{logId}/aux")
+@Tag(name = "LogAlteracaoAux", description = "Gerencia o tipo auxiliar de cada log de alteração")
+@RequiredArgsConstructor
+public class LogAlteracaoAuxController {
+
+    private final LogAlteracaoAuxService service;
+
+    @Operation(summary = "Cria ou substitui o registro auxiliar para um log de alteração")
+    @PostMapping
+    public ResponseEntity<LogAlteracaoAuxResponseDTO> create(
+            @PathVariable Integer logId,
+            @Valid @RequestBody LogAlteracaoAuxRequestDTO requestBody
+    ) {
+        // Sobrescreve o logId vindo do body com o da URL
+        var dto = LogAlteracaoAuxRequestDTO.builder()
+                .logId(logId)
+                .tipoAlteracao(requestBody.getTipoAlteracao())
+                .build();
+
+        LogAlteracaoAuxResponseDTO response = service.create(dto);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .build()
+                .toUri();
+
+        return ResponseEntity
+                .created(location)
+                .body(response);
+    }
+
+    @Operation(summary = "Consulta o registro auxiliar de um log de alteração")
+    @GetMapping
+    public ResponseEntity<LogAlteracaoAuxResponseDTO> getByLog(
+            @PathVariable Integer logId
+    ) {
+        LogAlteracaoAuxResponseDTO response = service.getById(logId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Atualiza o tipo de alteração do registro auxiliar")
+    @PutMapping
+    public ResponseEntity<LogAlteracaoAuxResponseDTO> update(
+            @PathVariable Integer logId,
+            @Valid @RequestBody LogAlteracaoAuxRequestDTO requestBody
+    ) {
+        var dto = LogAlteracaoAuxRequestDTO.builder()
+                .logId(logId)
+                .tipoAlteracao(requestBody.getTipoAlteracao())
+                .build();
+
+        LogAlteracaoAuxResponseDTO response = service.update(logId, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Remove o registro auxiliar de um log de alteração")
+    @DeleteMapping
+    public ResponseEntity<Void> delete(
+            @PathVariable Integer logId
+    ) {
+        service.delete(logId);
+        return ResponseEntity.noContent().build();
+    }
+}
