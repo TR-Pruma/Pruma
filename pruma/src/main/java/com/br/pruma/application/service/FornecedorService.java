@@ -2,59 +2,68 @@ package com.br.pruma.application.service;
 
 import com.br.pruma.application.dto.request.FornecedorRequestDTO;
 import com.br.pruma.application.dto.response.FornecedorResponseDTO;
+import com.br.pruma.application.dto.update.FornecedorUpdateDTO;
 import com.br.pruma.application.mapper.FornecedorMapper;
 import com.br.pruma.core.domain.Fornecedor;
 import com.br.pruma.core.repository.FornecedorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class FornecedorService {
+
     private final FornecedorRepository repository;
     private final FornecedorMapper mapper;
 
-    public FornecedorResponseDTO salvar(FornecedorRequestDTO requestDTO) {
-        if (repository.existsByCnpj(requestDTO.getCnpj())) {
-            throw new IllegalArgumentException("CNPJ já cadastrado.");
-        }
-        Fornecedor fornecedor = mapper.toEntity(requestDTO);
-        return mapper.toResponse(repository.save(fornecedor));
+    public FornecedorResponseDTO create(FornecedorRequestDTO dto) {
+        Fornecedor entity = mapper.toEntity(dto);
+        return mapper.toResponse(repository.save(entity));
     }
 
-    public List<FornecedorResponseDTO> listarTodos() {
-        return mapper.toResponseList(repository.findAll());
+    @Transactional(readOnly = true)
+    public FornecedorResponseDTO getById(Integer id) {
+        return mapper.toResponse(repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado: " + id)));
     }
 
-    public FornecedorResponseDTO buscarPorId(Integer id) {
-        Fornecedor fornecedor = repository.findById(id)
+    @Transactional(readOnly = true)
+    public List<FornecedorResponseDTO> listAll() {
+        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FornecedorResponseDTO> list(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toResponse);
+    }
+
+    public FornecedorResponseDTO update(Integer id, FornecedorUpdateDTO dto) {
+        Fornecedor entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado: " + id));
-        return mapper.toResponse(fornecedor);
+        mapper.updateFromDto(dto, entity);
+        return mapper.toResponse(repository.save(entity));
     }
 
-    public void deletar(Integer id) {
+    public FornecedorResponseDTO replace(Integer id, FornecedorRequestDTO dto) {
+        repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado: " + id));
+        Fornecedor entity = mapper.toEntity(dto);
+        entity.setId(id);
+        return mapper.toResponse(repository.save(entity));
+    }
+
+    public void delete(Integer id) {
         if (!repository.existsById(id)) {
             throw new EntityNotFoundException("Fornecedor não encontrado: " + id);
         }
         repository.deleteById(id);
-    }
-
-    public FornecedorResponseDTO atualizar(Integer id, FornecedorRequestDTO requestDTO) {
-        Fornecedor fornecedor = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado: " + id));
-
-        if (!fornecedor.getCnpj().equals(requestDTO.getCnpj()) &&
-                repository.existsByCnpj(requestDTO.getCnpj())) {
-            throw new IllegalArgumentException("CNPJ já cadastrado.");
-        }
-
-        fornecedor.setNome(requestDTO.getNome());
-        fornecedor.setCnpj(requestDTO.getCnpj());
-        fornecedor.setContato(requestDTO.getContato());
-
-        return mapper.toResponse(repository.save(fornecedor));
     }
 }

@@ -2,11 +2,16 @@ package com.br.pruma.application.service;
 
 import com.br.pruma.application.dto.request.CronogramaRequestDTO;
 import com.br.pruma.application.dto.response.CronogramaResponseDTO;
+import com.br.pruma.application.dto.update.CronogramaUpdateDTO;
 import com.br.pruma.application.mapper.CronogramaMapper;
-import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.Cronograma;
+import com.br.pruma.core.domain.Projeto;
 import com.br.pruma.core.repository.CronogramaRepository;
+import com.br.pruma.core.repository.ProjetoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,69 +20,69 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CronogramaService {
 
     private final CronogramaRepository repository;
+    private final ProjetoRepository projetoRepository;
     private final CronogramaMapper mapper;
 
-    @Transactional
     public CronogramaResponseDTO create(CronogramaRequestDTO dto) {
+        Projeto projeto = projetoRepository.findById(dto.getProjetoId())
+                .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.getProjetoId()));
         Cronograma entity = mapper.toEntity(dto);
-        Cronograma saved = repository.save(entity);
-        return mapper.toResponse(saved);
+        entity.setProjeto(projeto);
+        return mapper.toResponse(repository.save(entity));
     }
 
     @Transactional(readOnly = true)
     public CronogramaResponseDTO getById(Integer id) {
-        Cronograma entity = findOrThrow(id);
-        return mapper.toResponse(entity);
+        return mapper.toResponse(repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Cronograma não encontrado: " + id)));
     }
 
     @Transactional(readOnly = true)
-    public List<CronogramaResponseDTO> getAll() {
-        return repository.findAll()
-                .stream()
-                .map(mapper::toResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public CronogramaResponseDTO update(Integer id, Integer integer, CronogramaRequestDTO dto) {
-        Cronograma entity = findOrThrow(id);
-        mapper.updateEntityFromDto(dto, entity);
-        Cronograma updated = repository.save(entity);
-        return mapper.toResponse(updated);
-    }
-
-    @Transactional
-    public void delete(Integer id, Integer integer) {
-        Cronograma entity = findOrThrow(id);
-        repository.delete(entity);
-    }
-
-    private Cronograma findOrThrow(Integer id) {
-        return repository.findById(id)
-                .orElseThrow(() ->
-                        new RecursoNaoEncontradoException("Cronograma não encontrado com id " + id));
+    public List<CronogramaResponseDTO> listAll() {
+        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public CronogramaResponseDTO getByIdAndProjeto(Integer projetoId, Integer id) {
-        Cronograma entity = repository
-                .findByIdAndProjetoId(id, projetoId)
-                .orElseThrow(() ->
-                        new RecursoNaoEncontradoException(
-                                "Cronograma não encontrado (id=" + id + ", projetoId=" + projetoId + ")"
-                        )
-                );
-        return mapper.toResponse(entity);
+    public Page<CronogramaResponseDTO> list(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toResponse);
     }
 
     @Transactional(readOnly = true)
-    public List<CronogramaResponseDTO> getAllByProjeto(Integer projetoId) {
-        return repository.findAllByProjetoId(projetoId)
-                .stream()
-                .map(mapper::toResponse)
-                .collect(Collectors.toList());
+    public List<CronogramaResponseDTO> listByProjeto(Integer projetoId) {
+        return repository.findAllByProjeto_Id(projetoId).stream().map(mapper::toResponse).collect(Collectors.toList());
+    }
+
+    public CronogramaResponseDTO update(Integer id, CronogramaUpdateDTO dto) {
+        Cronograma entity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Cronograma não encontrado: " + id));
+        if (dto.getProjetoId() != null) {
+            Projeto projeto = projetoRepository.findById(dto.getProjetoId())
+                    .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.getProjetoId()));
+            entity.setProjeto(projeto);
+        }
+        mapper.updateFromDto(dto, entity);
+        return mapper.toResponse(repository.save(entity));
+    }
+
+    public CronogramaResponseDTO replace(Integer id, CronogramaRequestDTO dto) {
+        repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Cronograma não encontrado: " + id));
+        Projeto projeto = projetoRepository.findById(dto.getProjetoId())
+                .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.getProjetoId()));
+        Cronograma entity = mapper.toEntity(dto);
+        entity.setId(id);
+        entity.setProjeto(projeto);
+        return mapper.toResponse(repository.save(entity));
+    }
+
+    public void delete(Integer id) {
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Cronograma não encontrado: " + id);
+        }
+        repository.deleteById(id);
     }
 }

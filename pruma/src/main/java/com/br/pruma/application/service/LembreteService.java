@@ -4,15 +4,14 @@ import com.br.pruma.application.dto.request.LembreteRequestDTO;
 import com.br.pruma.application.dto.response.LembreteResponseDTO;
 import com.br.pruma.application.dto.update.LembreteUpdateDTO;
 import com.br.pruma.application.mapper.LembreteMapper;
-import com.br.pruma.core.domain.Cliente;
 import com.br.pruma.core.domain.Lembrete;
-import com.br.pruma.core.domain.TipoUsuario;
-import com.br.pruma.core.repository.ClienteRepository;
+import com.br.pruma.core.domain.Projeto;
 import com.br.pruma.core.repository.LembreteRepository;
-import com.br.pruma.core.repository.TipoUsuarioRepository;
+import com.br.pruma.core.repository.ProjetoRepository;
 import jakarta.persistence.EntityNotFoundException;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,96 +23,66 @@ import java.util.stream.Collectors;
 @Transactional
 public class LembreteService {
 
-    private final LembreteRepository lembreteRepo;
-    private final ClienteRepository clienteRepo;
-    private final TipoUsuarioRepository tipoUsuarioRepo;
+    private final LembreteRepository repository;
+    private final ProjetoRepository projetoRepository;
     private final LembreteMapper mapper;
 
-    /**
-     * Cria um novo lembrete para um cliente e um tipo de usuário existentes.
-     */
     public LembreteResponseDTO create(LembreteRequestDTO dto) {
-        Cliente cliente = clienteRepo.findById(Integer.valueOf(dto.getClienteCpf()))
-                .orElseThrow(() ->
-                        new EntityNotFoundException("Cliente não encontrado: " + dto.getClienteCpf())
-                );
-        TipoUsuario tipoUsuario = tipoUsuarioRepo.findById(dto.getTipoUsuarioId())
-                .orElseThrow(() ->
-                        new EntityNotFoundException("Tipo de usuário não encontrado: " + dto.getTipoUsuarioId())
-                );
-
+        Projeto projeto = projetoRepository.findById(dto.getProjetoId())
+                .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.getProjetoId()));
         Lembrete entity = mapper.toEntity(dto);
-        entity.setCliente(cliente);
-        entity.setTipoUsuario(tipoUsuario);
-
-        Lembrete saved = lembreteRepo.save(entity);
-        return mapper.toResponse(saved);
+        entity.setProjeto(projeto);
+        return mapper.toResponse(repository.save(entity));
     }
 
-    /**
-     * Busca um lembrete por seu ID.
-     */
     @Transactional(readOnly = true)
     public LembreteResponseDTO getById(Integer id) {
-        Lembrete entity = lembreteRepo.findById(id)
-                .orElseThrow(() ->
-                        new EntityNotFoundException("Lembrete não encontrado: " + id)
-                );
-        return mapper.toResponse(entity);
+        return mapper.toResponse(repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Lembrete não encontrado: " + id)));
     }
 
-    /**
-     * Lista todos os lembretes.
-     */
     @Transactional(readOnly = true)
     public List<LembreteResponseDTO> listAll() {
-        return lembreteRepo.findAll().stream()
-                .map(mapper::toResponse)
-                .collect(Collectors.toList());
+        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
     }
 
-    /**
-     * Lista lembretes de um cliente específico.
-     */
     @Transactional(readOnly = true)
-    public List<LembreteResponseDTO> listByCliente(String clienteCpf) {
-        return lembreteRepo.findByCliente_CpfOrderByDataHora(clienteCpf).stream()
-                .map(mapper::toResponse)
-                .collect(Collectors.toList());
+    public Page<LembreteResponseDTO> list(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toResponse);
     }
 
-    /**
-     * Lista lembretes para um determinado tipo de usuário.
-     */
     @Transactional(readOnly = true)
-    public List<LembreteResponseDTO> listByTipoUsuario(Integer tipoUsuarioId) {
-        return lembreteRepo.findByTipoUsuario_IdOrderByDataHora(tipoUsuarioId).stream()
-                .map(mapper::toResponse)
-                .collect(Collectors.toList());
+    public List<LembreteResponseDTO> listByProjeto(Integer projetoId) {
+        return repository.findAllByProjeto_Id(projetoId).stream().map(mapper::toResponse).collect(Collectors.toList());
     }
 
-    /**
-     * Atualiza parcialmente um lembrete existente.
-     */
     public LembreteResponseDTO update(Integer id, LembreteUpdateDTO dto) {
-        Lembrete entity = lembreteRepo.findById(id)
-                .orElseThrow(() ->
-                        new EntityNotFoundException("Lembrete não encontrado: " + id)
-                );
+        Lembrete entity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Lembrete não encontrado: " + id));
+        if (dto.getProjetoId() != null) {
+            Projeto projeto = projetoRepository.findById(dto.getProjetoId())
+                    .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.getProjetoId()));
+            entity.setProjeto(projeto);
+        }
         mapper.updateFromDto(dto, entity);
-        Lembrete updated = lembreteRepo.save(entity);
-        return mapper.toResponse(updated);
+        return mapper.toResponse(repository.save(entity));
     }
 
-    /**
-     * Remove fisicamente um lembrete pelo ID.
-     */
+    public LembreteResponseDTO replace(Integer id, LembreteRequestDTO dto) {
+        repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Lembrete não encontrado: " + id));
+        Projeto projeto = projetoRepository.findById(dto.getProjetoId())
+                .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.getProjetoId()));
+        Lembrete entity = mapper.toEntity(dto);
+        entity.setId(id);
+        entity.setProjeto(projeto);
+        return mapper.toResponse(repository.save(entity));
+    }
+
     public void delete(Integer id) {
-        if (!lembreteRepo.existsById(id)) {
+        if (!repository.existsById(id)) {
             throw new EntityNotFoundException("Lembrete não encontrado: " + id);
         }
-        lembreteRepo.deleteById(id);
+        repository.deleteById(id);
     }
-
-
 }
