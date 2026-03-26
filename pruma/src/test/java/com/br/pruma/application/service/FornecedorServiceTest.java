@@ -2,7 +2,6 @@ package com.br.pruma.application.service;
 
 import com.br.pruma.application.dto.request.FornecedorRequestDTO;
 import com.br.pruma.application.dto.response.FornecedorResponseDTO;
-import com.br.pruma.application.dto.update.FornecedorUpdateDTO;
 import com.br.pruma.application.mapper.FornecedorMapper;
 import com.br.pruma.core.domain.Fornecedor;
 import com.br.pruma.core.repository.FornecedorRepository;
@@ -41,78 +40,90 @@ class FornecedorServiceTest {
     }
 
     @Test
-    @DisplayName("create: salva e retorna DTO")
-    void create_sucesso() {
+    @DisplayName("salvar: salva e retorna DTO")
+    void salvar_sucesso() {
+        when(requestDTO.getCnpj()).thenReturn("00000000000000");
+        when(repository.existsByCnpj("00000000000000")).thenReturn(false);
         when(mapper.toEntity(requestDTO)).thenReturn(fornecedor);
         when(repository.save(fornecedor)).thenReturn(fornecedor);
         when(mapper.toResponse(fornecedor)).thenReturn(responseDTO);
 
-        assertThat(service.create(requestDTO)).isEqualTo(responseDTO);
+        assertThat(service.salvar(requestDTO)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("getById: retorna DTO quando existe")
-    void getById_encontrado() {
-        when(repository.findById(1L)).thenReturn(Optional.of(fornecedor));
+    @DisplayName("salvar: lanca excecao quando CNPJ ja existe")
+    void salvar_cnpjDuplicado() {
+        when(requestDTO.getCnpj()).thenReturn("00000000000000");
+        when(repository.existsByCnpj("00000000000000")).thenReturn(true);
+
+        assertThatThrownBy(() -> service.salvar(requestDTO))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("buscarPorId: retorna DTO quando existe")
+    void buscarPorId_encontrado() {
+        when(repository.findById(1)).thenReturn(Optional.of(fornecedor));
         when(mapper.toResponse(fornecedor)).thenReturn(responseDTO);
 
-        assertThat(service.getById(1L)).isEqualTo(responseDTO);
+        assertThat(service.buscarPorId(1)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("getById: lanca EntityNotFoundException quando nao existe")
-    void getById_naoEncontrado() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("buscarPorId: lanca EntityNotFoundException quando nao existe")
+    void buscarPorId_naoEncontrado() {
+        when(repository.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.getById(99L))
+        assertThatThrownBy(() -> service.buscarPorId(99))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("99");
     }
 
     @Test
-    @DisplayName("listAll: retorna lista mapeada")
-    void listAll() {
+    @DisplayName("listarTodos: retorna lista mapeada")
+    void listarTodos() {
         when(repository.findAll()).thenReturn(List.of(fornecedor));
-        when(mapper.toResponse(fornecedor)).thenReturn(responseDTO);
+        when(mapper.toResponseList(List.of(fornecedor))).thenReturn(List.of(responseDTO));
 
-        assertThat(service.listAll()).containsExactly(responseDTO);
+        assertThat(service.listarTodos()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("update: atualiza quando existe")
-    void update_sucesso() {
-        var updateDTO = mock(FornecedorUpdateDTO.class);
-        when(repository.findById(1L)).thenReturn(Optional.of(fornecedor));
+    @DisplayName("atualizar: atualiza quando existe")
+    void atualizar_sucesso() {
+        when(repository.findById(1)).thenReturn(Optional.of(fornecedor));
+        when(fornecedor.getCnpj()).thenReturn("00000000000000");
+        when(requestDTO.getCnpj()).thenReturn("00000000000000");
         when(repository.save(fornecedor)).thenReturn(fornecedor);
         when(mapper.toResponse(fornecedor)).thenReturn(responseDTO);
 
-        assertThat(service.update(1L, updateDTO)).isEqualTo(responseDTO);
-        verify(mapper).updateFromDto(updateDTO, fornecedor);
+        assertThat(service.atualizar(1, requestDTO)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("update: lanca EntityNotFoundException quando nao existe")
-    void update_naoEncontrado() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("atualizar: lanca EntityNotFoundException quando nao existe")
+    void atualizar_naoEncontrado() {
+        when(repository.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.update(99L, mock(FornecedorUpdateDTO.class)))
+        assertThatThrownBy(() -> service.atualizar(99, requestDTO))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    @DisplayName("delete: deleta quando existe")
-    void delete_sucesso() {
-        when(repository.existsById(1L)).thenReturn(true);
-        service.delete(1L);
-        verify(repository).deleteById(1L);
+    @DisplayName("deletar: deleta quando existe")
+    void deletar_sucesso() {
+        when(repository.existsById(1)).thenReturn(true);
+        service.deletar(1);
+        verify(repository).deleteById(1);
     }
 
     @Test
-    @DisplayName("delete: lanca EntityNotFoundException quando nao existe")
-    void delete_naoEncontrado() {
-        when(repository.existsById(99L)).thenReturn(false);
+    @DisplayName("deletar: lanca EntityNotFoundException quando nao existe")
+    void deletar_naoEncontrado() {
+        when(repository.existsById(99)).thenReturn(false);
 
-        assertThatThrownBy(() -> service.delete(99L))
+        assertThatThrownBy(() -> service.deletar(99))
                 .isInstanceOf(EntityNotFoundException.class);
         verify(repository, never()).deleteById(any());
     }

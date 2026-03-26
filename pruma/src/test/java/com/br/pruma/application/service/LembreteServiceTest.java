@@ -4,8 +4,12 @@ import com.br.pruma.application.dto.request.LembreteRequestDTO;
 import com.br.pruma.application.dto.response.LembreteResponseDTO;
 import com.br.pruma.application.dto.update.LembreteUpdateDTO;
 import com.br.pruma.application.mapper.LembreteMapper;
+import com.br.pruma.core.domain.Cliente;
 import com.br.pruma.core.domain.Lembrete;
+import com.br.pruma.core.domain.TipoUsuario;
+import com.br.pruma.core.repository.ClienteRepository;
 import com.br.pruma.core.repository.LembreteRepository;
+import com.br.pruma.core.repository.TipoUsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +29,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class LembreteServiceTest {
 
-    @Mock LembreteRepository repository;
+    @Mock LembreteRepository lembreteRepo;
+    @Mock ClienteRepository clienteRepo;
+    @Mock TipoUsuarioRepository tipoUsuarioRepo;
     @Mock LembreteMapper mapper;
     @InjectMocks LembreteService service;
 
@@ -41,79 +47,83 @@ class LembreteServiceTest {
     }
 
     @Test
-    @DisplayName("criar: salva e retorna DTO")
-    void criar_sucesso() {
+    @DisplayName("create: salva e retorna DTO")
+    void create_sucesso() {
+        when(requestDTO.getClienteCpf()).thenReturn("1");
+        when(requestDTO.getTipoUsuarioId()).thenReturn(1);
+        when(clienteRepo.findById(1)).thenReturn(Optional.of(mock(Cliente.class)));
+        when(tipoUsuarioRepo.findById(1)).thenReturn(Optional.of(mock(TipoUsuario.class)));
         when(mapper.toEntity(requestDTO)).thenReturn(lembrete);
-        when(repository.save(lembrete)).thenReturn(lembrete);
+        when(lembreteRepo.save(lembrete)).thenReturn(lembrete);
         when(mapper.toResponse(lembrete)).thenReturn(responseDTO);
 
-        assertThat(service.criar(requestDTO)).isEqualTo(responseDTO);
+        assertThat(service.create(requestDTO)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("buscarPorId: retorna DTO quando existe")
-    void buscarPorId_encontrado() {
-        when(repository.findById(1L)).thenReturn(Optional.of(lembrete));
+    @DisplayName("getById: retorna DTO quando existe")
+    void getById_encontrado() {
+        when(lembreteRepo.findById(1)).thenReturn(Optional.of(lembrete));
         when(mapper.toResponse(lembrete)).thenReturn(responseDTO);
 
-        assertThat(service.buscarPorId(1L)).isEqualTo(responseDTO);
+        assertThat(service.getById(1)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("buscarPorId: lanca EntityNotFoundException quando nao existe")
-    void buscarPorId_naoEncontrado() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("getById: lanca EntityNotFoundException quando nao existe")
+    void getById_naoEncontrado() {
+        when(lembreteRepo.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.buscarPorId(99L))
+        assertThatThrownBy(() -> service.getById(99))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("99");
     }
 
     @Test
-    @DisplayName("listarTodos: retorna lista mapeada")
-    void listarTodos() {
-        when(repository.findAll()).thenReturn(List.of(lembrete));
+    @DisplayName("listAll: retorna lista mapeada")
+    void listAll() {
+        when(lembreteRepo.findAll()).thenReturn(List.of(lembrete));
         when(mapper.toResponse(lembrete)).thenReturn(responseDTO);
 
-        assertThat(service.listarTodos()).containsExactly(responseDTO);
+        assertThat(service.listAll()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("atualizar: atualiza quando existe")
-    void atualizar_sucesso() {
+    @DisplayName("update: atualiza quando existe")
+    void update_sucesso() {
         var updateDTO = mock(LembreteUpdateDTO.class);
-        when(repository.findById(1L)).thenReturn(Optional.of(lembrete));
-        when(repository.save(lembrete)).thenReturn(lembrete);
+        when(lembreteRepo.findById(1)).thenReturn(Optional.of(lembrete));
+        when(lembreteRepo.save(lembrete)).thenReturn(lembrete);
         when(mapper.toResponse(lembrete)).thenReturn(responseDTO);
 
-        assertThat(service.atualizar(1L, updateDTO)).isEqualTo(responseDTO);
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
         verify(mapper).updateFromDto(updateDTO, lembrete);
     }
 
     @Test
-    @DisplayName("atualizar: lanca EntityNotFoundException quando nao existe")
-    void atualizar_naoEncontrado() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("update: lanca EntityNotFoundException quando nao existe")
+    void update_naoEncontrado() {
+        when(lembreteRepo.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.atualizar(99L, mock(LembreteUpdateDTO.class)))
+        assertThatThrownBy(() -> service.update(99, mock(LembreteUpdateDTO.class)))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    @DisplayName("deletar: deleta quando existe")
-    void deletar_sucesso() {
-        when(repository.existsById(1L)).thenReturn(true);
-        service.deletar(1L);
-        verify(repository).deleteById(1L);
+    @DisplayName("delete: deleta quando existe")
+    void delete_sucesso() {
+        when(lembreteRepo.existsById(1)).thenReturn(true);
+        service.delete(1);
+        verify(lembreteRepo).deleteById(1);
     }
 
     @Test
-    @DisplayName("deletar: lanca EntityNotFoundException quando nao existe")
-    void deletar_naoEncontrado() {
-        when(repository.existsById(99L)).thenReturn(false);
+    @DisplayName("delete: lanca EntityNotFoundException quando nao existe")
+    void delete_naoEncontrado() {
+        when(lembreteRepo.existsById(99)).thenReturn(false);
 
-        assertThatThrownBy(() -> service.deletar(99L))
+        assertThatThrownBy(() -> service.delete(99))
                 .isInstanceOf(EntityNotFoundException.class);
-        verify(repository, never()).deleteById(any());
+        verify(lembreteRepo, never()).deleteById(any());
     }
 }
