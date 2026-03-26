@@ -1,26 +1,24 @@
 package com.br.pruma.core.repository;
 
 import com.br.pruma.core.domain.LogAlteracao;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-@Repository
 public interface LogAlteracaoRepository extends JpaRepository<LogAlteracao, Integer> {
 
     /**
-     * Retorna todos os logs de um projeto, ordenados do mais recente para o mais antigo.
+     * Retorna logs de um projeto paginados, do mais recente para o mais antigo.
      */
-    List<LogAlteracao> findByProjeto_IdOrderByDataHoraDesc(Integer projetoId);
+    Page<LogAlteracao> findByProjeto_IdOrderByDataHoraDesc(Integer projetoId, Pageable pageable);
 
     /**
-     * Retorna todos os logs de um cliente, ordenados do mais recente para o mais antigo.
+     * Retorna logs de um cliente paginados, do mais recente para o mais antigo.
      */
-    List<LogAlteracao> findByCliente_CpfOrderByDataHoraDesc(String clienteCpf);
+    Page<LogAlteracao> findByCliente_CpfOrderByDataHoraDesc(String clienteCpf, Pageable pageable);
 
     /**
-     * Retorna todos os logs de um tipo de usuário, ordenados do mais recente para o mais antigo.
+     * Retorna logs de um tipo de usuário paginados, do mais recente para o mais antigo.
      */
-    List<LogAlteracao> findByTipoUsuario_IdOrderByDataHoraDesc(Integer tipoUsuarioId);
+    Page<LogAlteracao> findByTipoUsuario_IdOrderByDataHoraDesc(Integer tipoUsuarioId, Pageable pageable);
 }

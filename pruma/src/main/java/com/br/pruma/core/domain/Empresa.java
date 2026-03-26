@@ -1,47 +1,69 @@
 package com.br.pruma.core.domain;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
 
 @Getter
 @Setter
-@Builder
+@SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "empresa")
-public class Empresa {
+public class Empresa extends AuditableEntity implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "empresa_cnpj", length = 14, nullable = false, unique = true)
+    @EqualsAndHashCode.Include
+    @ToString.Include
+    @NotBlank(message = "CNPJ é obrigatório")
     private String cnpj;
 
     @Column(name = "razao_social", length = 50, nullable = false)
+    @NotBlank(message = "Razão social é obrigatória")
     private String razaoSocial;
 
     @Column(name = "nome_fantasia", length = 50, nullable = false)
+    @NotBlank(message = "Nome fantasia é obrigatório")
     private String nomeFantasia;
 
-    @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Endereco> enderecos;
+    @OneToMany(
+            mappedBy = "empresa",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @Builder.Default
+    @ToString.Exclude
+    private List<Endereco> enderecos = new ArrayList<>();
 
-    @Version
-    private Long version;
+    // ---------- Métodos de domínio ----------
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Empresa)) return false;
-        Empresa empresa = (Empresa) o;
-        return Objects.equals(cnpj, empresa.cnpj);
+    public void addEndereco(Endereco endereco) {
+        if (endereco == null) return;
+        enderecos.add(endereco);
+        endereco.setEmpresa(this);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(cnpj);
+    public void removeEndereco(Endereco endereco) {
+        if (endereco == null) return;
+        enderecos.remove(endereco);
+        endereco.setEmpresa(null);
+    }
+
+    public static Empresa ofCnpj(String cnpj) {
+        if (cnpj == null || cnpj.isBlank()) return null;
+        return Empresa.builder().cnpj(cnpj).build();
     }
 }

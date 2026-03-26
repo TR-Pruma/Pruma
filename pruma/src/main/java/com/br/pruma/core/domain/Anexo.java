@@ -1,21 +1,15 @@
 package com.br.pruma.core.domain;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-
-import java.io.Serializable;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.experimental.SuperBuilder;
+
 import java.io.Serial;
-import java.time.LocalDateTime;
+import java.io.Serializable;
 
 @Entity
 @Table(
@@ -27,13 +21,13 @@ import java.time.LocalDateTime;
 )
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 @Schema(description = "Representa um anexo associado a um projeto")
-public class Anexo implements Serializable {
+public class Anexo extends AuditableEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -46,6 +40,7 @@ public class Anexo implements Serializable {
     @Schema(description = "Identificador único do anexo", example = "1")
     private Integer id;
 
+    @NotNull(message = "Projeto é obrigatório")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "projeto_id", nullable = false)
     @ToString.Exclude
@@ -77,21 +72,6 @@ public class Anexo implements Serializable {
     @Column(name = "tamanho_bytes")
     @Schema(description = "Tamanho do arquivo em bytes", example = "102400")
     private Long tamanhoBytes;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    @Schema(description = "Timestamp de criação (ISO 8601)", example = "2025-09-24T21:58:00")
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    @Schema(description = "Timestamp da última atualização (ISO 8601)", example = "2025-09-25T10:30:00")
-    private LocalDateTime updatedAt;
-
-    @Version
-    @Column(name = "version", nullable = false)
-    @Schema(description = "Versão para controle otimista", example = "1")
-    private Long version;
 
     // ====== Métodos de domínio ======
 

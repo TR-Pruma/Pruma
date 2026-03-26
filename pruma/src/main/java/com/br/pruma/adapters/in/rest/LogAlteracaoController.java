@@ -7,18 +7,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/pruma/v1/log-alteracoes")
 @Tag(name = "LogAlteracao", description = "Gerencia registros de log de alterações")
 @RequiredArgsConstructor
-
 public class LogAlteracaoController {
 
     private final LogAlteracaoService service;
@@ -26,65 +27,55 @@ public class LogAlteracaoController {
     @Operation(summary = "Cria um novo registro de log de alteração")
     @PostMapping
     public ResponseEntity<LogAlteracaoResponseDTO> create(
-            @Valid @RequestBody LogAlteracaoRequestDTO request
-    ) {
+            @Valid @RequestBody LogAlteracaoRequestDTO request) {
         LogAlteracaoResponseDTO response = service.create(request);
-
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(response.getId())
                 .toUri();
-
         return ResponseEntity.created(location).body(response);
     }
 
-    @Operation(summary = "Lista todos os registros de log de alteração")
+    @Operation(summary = "Lista todos os registros de log de alteração (paginado)")
     @GetMapping
-    public ResponseEntity<List<LogAlteracaoResponseDTO>> listAll() {
-        List<LogAlteracaoResponseDTO> logs = service.listAll();
-        return ResponseEntity.ok(logs);
+    public ResponseEntity<Page<LogAlteracaoResponseDTO>> listAll(
+            @PageableDefault(size = 20, sort = "dataHora") Pageable pageable) {
+        return ResponseEntity.ok(service.listAll(pageable));
     }
 
     @Operation(summary = "Busca um registro de log de alteração pelo ID")
     @GetMapping("/{id}")
-    public ResponseEntity<LogAlteracaoResponseDTO> getById(
-            @PathVariable Integer id
-    ) {
-        LogAlteracaoResponseDTO response = service.getById(id);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<LogAlteracaoResponseDTO> getById(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.getById(id));
     }
-    @Operation(summary = "Lista logs de alteração filtrados por projeto")
+
+    @Operation(summary = "Lista logs de alteração filtrados por projeto (paginado)")
     @GetMapping("/projetos/{projetoId}")
-    public ResponseEntity<List<LogAlteracaoResponseDTO>> listByProjeto(
-            @PathVariable Integer projetoId
-    ) {
-        List<LogAlteracaoResponseDTO> logs = service.listByProjeto(projetoId);
-        return ResponseEntity.ok(logs);
+    public ResponseEntity<Page<LogAlteracaoResponseDTO>> listByProjeto(
+            @PathVariable Integer projetoId,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(service.listByProjeto(projetoId, pageable));
     }
 
-    @Operation(summary = "Lista logs de alteração filtrados por cliente (CPF)")
+    @Operation(summary = "Lista logs de alteração filtrados por cliente (CPF) (paginado)")
     @GetMapping("/clientes/{clienteCpf}")
-    public ResponseEntity<List<LogAlteracaoResponseDTO>> listByCliente(
-            @PathVariable String clienteCpf
-    ) {
-        List<LogAlteracaoResponseDTO> logs = service.listByCliente(clienteCpf);
-        return ResponseEntity.ok(logs);
+    public ResponseEntity<Page<LogAlteracaoResponseDTO>> listByCliente(
+            @PathVariable String clienteCpf,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(service.listByCliente(clienteCpf, pageable));
     }
 
-    @Operation(summary = "Lista logs de alteração filtrados por tipo de usuário")
+    @Operation(summary = "Lista logs de alteração filtrados por tipo de usuário (paginado)")
     @GetMapping("/tipo-usuarios/{tipoUsuarioId}")
-    public ResponseEntity<List<LogAlteracaoResponseDTO>> listByTipoUsuario(
-            @PathVariable Integer tipoUsuarioId
-    ) {
-        List<LogAlteracaoResponseDTO> logs = service.listByTipoUsuario(tipoUsuarioId);
-        return ResponseEntity.ok(logs);
+    public ResponseEntity<Page<LogAlteracaoResponseDTO>> listByTipoUsuario(
+            @PathVariable Integer tipoUsuarioId,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(service.listByTipoUsuario(tipoUsuarioId, pageable));
     }
 
     @Operation(summary = "Remove um registro de log de alteração")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
-            @PathVariable Integer id
-    ) {
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
