@@ -2,93 +2,77 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.ClienteRequestDTO;
 import com.br.pruma.application.dto.response.ClienteResponseDTO;
+import com.br.pruma.application.dto.update.ClienteUpdateDTO;
 import com.br.pruma.application.service.ClienteService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/pruma/v1/clientes")
-@Validated
+@Tag(name = "Cliente", description = "Gerencia clientes")
 @RequiredArgsConstructor
-
 public class ClienteController {
 
-    private final ClienteService clienteService;
+    private final ClienteService service;
 
     @Operation(summary = "Cria um novo cliente")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Cliente criado",
-                    content = @Content(schema = @Schema(implementation = ClienteResponseDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos")
-    })
     @PostMapping
-    public ResponseEntity<ClienteResponseDTO> create(
-            @Valid @RequestBody ClienteRequestDTO request) {
-
-        ClienteResponseDTO created = clienteService.create(request);
-        URI location = URI.create("/pruma/v1/clientes/" + created.id());
-        return ResponseEntity.created(location).body(created);
-    }
-
-    @Operation(summary = "Atualiza um cliente existente")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Cliente atualizado",
-                    content = @Content(schema = @Schema(implementation = ClienteResponseDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos")
-    })
-    @PutMapping("/{id}")
-    public ResponseEntity<ClienteResponseDTO> update(
-            @Parameter(description = "ID do cliente") @PathVariable Integer id,
-            @Valid @RequestBody ClienteRequestDTO request) {
-        ClienteResponseDTO updated = clienteService.update(id, request);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<ClienteResponseDTO> create(@Valid @RequestBody ClienteRequestDTO request) {
+        ClienteResponseDTO response = service.create(request);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(response.getId()).toUri();
+        return ResponseEntity.created(location).body(response);
     }
 
     @Operation(summary = "Lista todos os clientes")
-    @ApiResponse(responseCode = "200", description = "Lista de clientes",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClienteResponseDTO.class))))
     @GetMapping
-    public ResponseEntity<List<ClienteResponseDTO>> findAll() {
-        return ResponseEntity.ok(clienteService.findAll());
+    public ResponseEntity<List<ClienteResponseDTO>> listAll() {
+        return ResponseEntity.ok(service.listAll());
     }
 
     @Operation(summary = "Busca cliente por ID")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Cliente encontrado",
-                    content = @Content(schema = @Schema(implementation = ClienteResponseDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
-    })
     @GetMapping("/{id}")
-    public ResponseEntity<ClienteResponseDTO> findById(
-            @Parameter(description = "ID do cliente") @PathVariable Integer id) {
-        return ResponseEntity.ok(clienteService.findById(id));
+    public ResponseEntity<ClienteResponseDTO> getById(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.getById(id));
     }
 
-    @Operation(summary = "Remove um cliente")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Cliente excluído"),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
-    })
+    @Operation(summary = "Lista clientes com paginação")
+    @GetMapping("/page")
+    public ResponseEntity<Page<ClienteResponseDTO>> list(@PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(service.list(pageable));
+    }
+
+    @Operation(summary = "Atualiza parcialmente um cliente")
+    @PatchMapping("/{id}")
+    public ResponseEntity<ClienteResponseDTO> update(
+            @PathVariable Integer id,
+            @Valid @RequestBody ClienteUpdateDTO request) {
+        return ResponseEntity.ok(service.update(id, request));
+    }
+
+    @Operation(summary = "Substitui completamente um cliente (PUT)")
+    @PutMapping("/{id}")
+    public ResponseEntity<ClienteResponseDTO> replace(
+            @PathVariable Integer id,
+            @Valid @RequestBody ClienteRequestDTO request) {
+        return ResponseEntity.ok(service.replace(id, request));
+    }
+
+    @Operation(summary = "Exclui permanentemente um cliente")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
-            @Parameter(description = "ID do cliente") @PathVariable Integer id) {
-        clienteService.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

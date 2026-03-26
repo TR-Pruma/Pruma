@@ -1,13 +1,16 @@
 package com.br.pruma.adapters.in.rest;
 
-
 import com.br.pruma.application.dto.request.SubContratoRequestDTO;
 import com.br.pruma.application.dto.response.SubContratoResponseDTO;
+import com.br.pruma.application.dto.update.SubContratoUpdateDTO;
 import com.br.pruma.application.service.SubContratoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -17,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/pruma/v1/subcontratos")
-@Tag(name = "Subcontrato", description = "Gerencia subcontratos de projetos")
+@Tag(name = "SubContrato", description = "Gerencia subcontratos")
 @RequiredArgsConstructor
 public class SubContratoController {
 
@@ -28,9 +31,7 @@ public class SubContratoController {
     public ResponseEntity<SubContratoResponseDTO> create(@Valid @RequestBody SubContratoRequestDTO request) {
         SubContratoResponseDTO response = service.create(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.id())
-                .toUri();
+                .path("/{id}").buildAndExpand(response.getId()).toUri();
         return ResponseEntity.created(location).body(response);
     }
 
@@ -40,39 +41,32 @@ public class SubContratoController {
         return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Lista subcontratos de um cliente específico")
-    @GetMapping("/cliente/{clienteCpf}")
-    public ResponseEntity<List<SubContratoResponseDTO>> listByClienteCpf(@PathVariable String clienteCpf) {
-        return ResponseEntity.ok(service.listByClienteCpf(clienteCpf));
-    }
-
-    @Operation(summary = "Lista subcontratos de um projeto específico")
-    @GetMapping("/projeto/{projetoId}")
-    public ResponseEntity<List<SubContratoResponseDTO>> listByProjeto(@PathVariable Integer projetoId) {
-        return ResponseEntity.ok(service.listByProjetoId(projetoId));
-    }
-
-    @Operation(summary = "Lista subcontratos de um cliente em um projeto específico")
-    @GetMapping("/cliente/{clienteCpf}/projeto/{projetoId}")
-    public ResponseEntity<List<SubContratoResponseDTO>> listByClienteCpfAndProjetoId(
-            @PathVariable String clienteCpf,
-            @PathVariable Integer projetoId) {
-        return ResponseEntity.ok(service.listByClienteCpfAndProjetoId(clienteCpf, projetoId));
-    }
-
-    @Operation(summary = "Obtém um subcontrato por ID")
+    @Operation(summary = "Busca subcontrato por ID")
     @GetMapping("/{id}")
     public ResponseEntity<SubContratoResponseDTO> getById(@PathVariable Integer id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
-    @Operation(summary = "Atualiza um subcontrato")
-    @PutMapping("/{id}")
+    @Operation(summary = "Lista subcontratos com paginação")
+    @GetMapping("/page")
+    public ResponseEntity<Page<SubContratoResponseDTO>> list(@PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(service.list(pageable));
+    }
+
+    @Operation(summary = "Atualiza parcialmente um subcontrato")
+    @PatchMapping("/{id}")
     public ResponseEntity<SubContratoResponseDTO> update(
             @PathVariable Integer id,
-            @Valid @RequestBody SubContratoRequestDTO request
-    ) {
+            @Valid @RequestBody SubContratoUpdateDTO request) {
         return ResponseEntity.ok(service.update(id, request));
+    }
+
+    @Operation(summary = "Substitui completamente um subcontrato (PUT)")
+    @PutMapping("/{id}")
+    public ResponseEntity<SubContratoResponseDTO> replace(
+            @PathVariable Integer id,
+            @Valid @RequestBody SubContratoRequestDTO request) {
+        return ResponseEntity.ok(service.replace(id, request));
     }
 
     @Operation(summary = "Exclui permanentemente um subcontrato")
