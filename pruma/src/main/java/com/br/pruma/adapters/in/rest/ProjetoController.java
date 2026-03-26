@@ -90,15 +90,15 @@ public class ProjetoController {
     }
 
     @Operation(summary = "Atualiza parcialmente um projeto")
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<ProjetoResponseDTO> update(
             @PathVariable Integer id,
             @Valid @RequestBody ProjetoUpdateDTO request) {
         return ResponseEntity.ok(service.update(id, request));
     }
 
-    @Operation(summary = "Substitui os campos permitidos de um projeto (PUT semantics)")
-    @PostMapping("/{id}/replace")
+    @Operation(summary = "Substitui completamente um projeto (PUT)")
+    @PutMapping("/{id}")
     public ResponseEntity<ProjetoResponseDTO> replace(
             @PathVariable Integer id,
             @Valid @RequestBody ProjetoRequestDTO request) {
