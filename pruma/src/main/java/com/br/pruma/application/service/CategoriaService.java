@@ -8,6 +8,8 @@ import com.br.pruma.core.domain.Categoria;
 import com.br.pruma.core.repository.CategoriaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,15 +26,13 @@ public class CategoriaService {
 
     public CategoriaResponseDTO create(CategoriaRequestDTO dto) {
         Categoria entity = mapper.toEntity(dto);
-        Categoria saved = repository.save(entity);
-        return mapper.toResponse(saved);
+        return mapper.toResponse(repository.save(entity));
     }
 
     @Transactional(readOnly = true)
     public CategoriaResponseDTO getById(Integer id) {
-        Categoria entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada: " + id));
-        return mapper.toResponse(entity);
+        return mapper.toResponse(repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada: " + id)));
     }
 
     @Transactional(readOnly = true)
@@ -40,12 +40,24 @@ public class CategoriaService {
         return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public Page<CategoriaResponseDTO> list(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toResponse);
+    }
+
     public CategoriaResponseDTO update(Integer id, CategoriaUpdateDTO dto) {
         Categoria entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada: " + id));
         mapper.updateFromDto(dto, entity);
-        Categoria updated = repository.save(entity);
-        return mapper.toResponse(updated);
+        return mapper.toResponse(repository.save(entity));
+    }
+
+    public CategoriaResponseDTO replace(Integer id, CategoriaRequestDTO dto) {
+        repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada: " + id));
+        Categoria entity = mapper.toEntity(dto);
+        entity.setId(id);
+        return mapper.toResponse(repository.save(entity));
     }
 
     public void delete(Integer id) {

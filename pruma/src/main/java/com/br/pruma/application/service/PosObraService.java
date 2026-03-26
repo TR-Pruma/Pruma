@@ -10,6 +10,8 @@ import com.br.pruma.core.repository.ObraRepository;
 import com.br.pruma.core.repository.PosObraRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,80 +23,66 @@ import java.util.stream.Collectors;
 @Transactional
 public class PosObraService {
 
-    private final PosObraRepository posObraRepository;
+    private final PosObraRepository repository;
     private final ObraRepository obraRepository;
     private final PosObraMapper mapper;
 
-    /**
-     * Cria um novo registro de Pós-Obra.
-     */
     public PosObraResponseDTO create(PosObraRequestDTO dto) {
-        Obra obra = obraRepository.findById(Math.toIntExact(dto.getObraId()))
+        Obra obra = obraRepository.findById(dto.getObraId())
                 .orElseThrow(() -> new EntityNotFoundException("Obra não encontrada: " + dto.getObraId()));
-
         PosObra entity = mapper.toEntity(dto);
         entity.setObra(obra);
-
-        PosObra saved = posObraRepository.save(entity);
-        return mapper.toResponse(saved);
+        return mapper.toResponse(repository.save(entity));
     }
 
-    /**
-     * Recupera um registro de Pós-Obra por id.
-     */
     @Transactional(readOnly = true)
-    public PosObraResponseDTO getById(Long id) {
-        PosObra entity = posObraRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("PosObra não encontrado: " + id));
-        return mapper.toResponse(entity);
+    public PosObraResponseDTO getById(Integer id) {
+        return mapper.toResponse(repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pós-Obra não encontrada: " + id)));
     }
 
-    /**
-     * Lista todos os registros de Pós-Obra.
-     */
     @Transactional(readOnly = true)
     public List<PosObraResponseDTO> listAll() {
-        return posObraRepository.findAll().stream()
-                .map(mapper::toResponse)
-                .collect(Collectors.toList());
+        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
     }
 
-    /**
-     * Lista todos os registros de Pós-Obra associados a uma obra.
-     */
     @Transactional(readOnly = true)
-    public List<PosObraResponseDTO> listByObra(Long obraId) {
-        return posObraRepository.findAllByObra_Id(obraId).stream()
-                .map(mapper::toResponse)
-                .collect(Collectors.toList());
+    public Page<PosObraResponseDTO> list(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toResponse);
     }
 
-    /**
-     * Atualiza parcialmente um registro de Pós-Obra.
-     */
-    public PosObraResponseDTO update(Long id, PosObraUpdateDTO dto) {
-        PosObra entity = posObraRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("PosObra não encontrado: " + id));
+    @Transactional(readOnly = true)
+    public List<PosObraResponseDTO> listByObra(Integer obraId) {
+        return repository.findAllByObra_Id(obraId).stream().map(mapper::toResponse).collect(Collectors.toList());
+    }
 
+    public PosObraResponseDTO update(Integer id, PosObraUpdateDTO dto) {
+        PosObra entity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pós-Obra não encontrada: " + id));
         if (dto.getObraId() != null) {
-            Obra obra = obraRepository.findById(Math.toIntExact(dto.getObraId()))
+            Obra obra = obraRepository.findById(dto.getObraId())
                     .orElseThrow(() -> new EntityNotFoundException("Obra não encontrada: " + dto.getObraId()));
             entity.setObra(obra);
         }
-
         mapper.updateFromDto(dto, entity);
-        PosObra updated = posObraRepository.save(entity);
-        return mapper.toResponse(updated);
+        return mapper.toResponse(repository.save(entity));
     }
 
-    /**
-     * Remove permanentemente um registro de Pós-Obra.
-     * Se desejar soft-delete, adapte para marcar um flag em vez de deletar.
-     */
-    public void delete(Long id) {
-        if (!posObraRepository.existsById(id)) {
-            throw new EntityNotFoundException("Pós Obra não encontrado: " + id);
+    public PosObraResponseDTO replace(Integer id, PosObraRequestDTO dto) {
+        repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pós-Obra não encontrada: " + id));
+        Obra obra = obraRepository.findById(dto.getObraId())
+                .orElseThrow(() -> new EntityNotFoundException("Obra não encontrada: " + dto.getObraId()));
+        PosObra entity = mapper.toEntity(dto);
+        entity.setId(id);
+        entity.setObra(obra);
+        return mapper.toResponse(repository.save(entity));
+    }
+
+    public void delete(Integer id) {
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Pós-Obra não encontrada: " + id);
         }
-        posObraRepository.deleteById(id);
+        repository.deleteById(id);
     }
 }

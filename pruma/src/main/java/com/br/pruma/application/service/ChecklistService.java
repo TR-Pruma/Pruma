@@ -2,111 +2,87 @@ package com.br.pruma.application.service;
 
 import com.br.pruma.application.dto.request.ChecklistRequestDTO;
 import com.br.pruma.application.dto.response.ChecklistResponseDTO;
+import com.br.pruma.application.dto.update.ChecklistUpdateDTO;
 import com.br.pruma.application.mapper.ChecklistMapper;
-import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.Checklist;
+import com.br.pruma.core.domain.Obra;
 import com.br.pruma.core.repository.ChecklistRepository;
-import com.br.pruma.core.repository.ProjetoRepository;
-import jakarta.validation.Valid;
+import com.br.pruma.core.repository.ObraRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Session;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.EntityManager;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ChecklistService {
 
-    private final ChecklistRepository checklistRepository;
-    private final ProjetoRepository projetoRepository;
-    private final ChecklistMapper checklistMapper;
-    private final EntityManager entityManager;
+    private final ChecklistRepository repository;
+    private final ObraRepository obraRepository;
+    private final ChecklistMapper mapper;
 
-    @Transactional(readOnly = true)
-    public List<ChecklistResponseDTO> findByProjeto(Integer projetoId) {
-        if (!projetoRepository.existsById(projetoId)) {
-            throw new RecursoNaoEncontradoException("Projeto não encontrado");
-        }
-        return checklistRepository.findByProjetoIdWithItens(projetoId).stream()
-                .map(checklistMapper::toResponseDTO)
-                .toList();
+    public ChecklistResponseDTO create(ChecklistRequestDTO dto) {
+        Obra obra = obraRepository.findById(dto.getObraId())
+                .orElseThrow(() -> new EntityNotFoundException("Obra não encontrada: " + dto.getObraId()));
+        Checklist entity = mapper.toEntity(dto);
+        entity.setObra(obra);
+        return mapper.toResponse(repository.save(entity));
     }
 
     @Transactional(readOnly = true)
-    public ChecklistResponseDTO findById(Integer id) {
-        return checklistRepository.findByIdWithItens(id)
-                .map(checklistMapper::toResponseDTO)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Checklist não encontrado"));
+    public ChecklistResponseDTO getById(Integer id) {
+        return mapper.toResponse(repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Checklist não encontrado: " + id)));
     }
 
-    @Transactional
-    public ChecklistResponseDTO create(@Valid ChecklistRequestDTO dto) {
-        validarProjeto(dto.getProjetoId());
-        validarNomeUnico(dto.getNome(), dto.getProjetoId(), null);
-
-        Checklist checklist = checklistMapper.toEntity(dto);
-        checklist = checklistRepository.save(checklist);
-
-        // Ativa o filtro de registros ativos
-        Session session = entityManager.unwrap(Session.class);
-        session.enableFilter("ativoFilter").setParameter("ativo", true);
-
-        return checklistMapper.toResponseDTO(checklist);
+    @Transactional(readOnly = true)
+    public List<ChecklistResponseDTO> listAll() {
+        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
     }
 
-    @Transactional
-    public ChecklistResponseDTO update(Integer id, @Valid ChecklistRequestDTO dto) {
-        Checklist checklist = checklistRepository.findByIdWithItens(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Checklist não encontrado"));
+    @Transactional(readOnly = true)
+    public Page<ChecklistResponseDTO> list(Pageable pageable) {
+        return repository.findAll(pageable).map(mapper::toResponse);
+    }
 
-        validarProjeto(dto.getProjetoId());
-        validarNomeUnico(dto.getNome(), dto.getProjetoId(), id);
+    @Transactional(readOnly = true)
+    public List<ChecklistResponseDTO> listByObra(Integer obraId) {
+        return repository.findAllByObra_Id(obraId).stream().map(mapper::toResponse).collect(Collectors.toList());
+    }
 
-        if (!checklist.getProjeto().getId().equals(dto.getProjetoId())) {
-            throw new IllegalArgumentException("Não é permitido alterar o projeto do checklist");
+    public ChecklistResponseDTO update(Integer id, ChecklistUpdateDTO dto) {
+        Checklist entity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Checklist não encontrado: " + id));
+        if (dto.getObraId() != null) {
+            Obra obra = obraRepository.findById(dto.getObraId())
+                    .orElseThrow(() -> new EntityNotFoundException("Obra não encontrada: " + dto.getObraId()));
+            entity.setObra(obra);
         }
-
-        checklistMapper.updateEntity(checklist, dto);
-        checklist = checklistRepository.save(checklist);
-
-        return checklistMapper.toResponseDTO(checklist);
+        mapper.updateFromDto(dto, entity);
+        return mapper.toResponse(repository.save(entity));
     }
 
-    @Transactional
+    public ChecklistResponseDTO replace(Integer id, ChecklistRequestDTO dto) {
+        repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Checklist não encontrado: " + id));
+        Obra obra = obraRepository.findById(dto.getObraId())
+                .orElseThrow(() -> new EntityNotFoundException("Obra não encontrada: " + dto.getObraId()));
+        Checklist entity = mapper.toEntity(dto);
+        entity.setId(id);
+        entity.setObra(obra);
+        return mapper.toResponse(repository.save(entity));
+    }
+
     public void delete(Integer id) {
-        Checklist checklist = checklistRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Checklist não encontrado"));
-
-        checklistRepository.softDelete(id);
-    }
-
-    private void validarProjeto(Integer projetoId) {
-        if (!projetoRepository.existsById(projetoId)) {
-            throw new RecursoNaoEncontradoException("Projeto não encontrado");
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Checklist não encontrado: " + id);
         }
+        repository.deleteById(id);
     }
-
-    private void validarNomeUnico(String nome, Integer projetoId, Integer checklistId) {
-        if (checklistId == null) {
-            if (checklistRepository.existsByNomeAndProjetoIdAndAtivoTrue(nome, projetoId)) {
-                throw new IllegalArgumentException("Já existe um checklist com este nome no projeto");
-            }
-        } else {
-            if (checklistRepository.existsByNomeAndProjetoIdAndIdNot(nome, projetoId, checklistId)) {
-                throw new IllegalArgumentException("Já existe um checklist com este nome no projeto");
-            }
-        }
-    }
-
-
-    @Transactional(readOnly = true)
-    public List<ChecklistResponseDTO> findAll() {
-        return checklistRepository.findAll().stream()
-                .map(checklistMapper::toResponseDTO)
-                .toList();
-    }
-
 }
