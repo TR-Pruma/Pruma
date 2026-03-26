@@ -31,20 +31,20 @@ public class FornecedorService {
 
     public FornecedorResponseDTO buscarPorId(Integer id) {
         Fornecedor fornecedor = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado: " + id));
         return mapper.toResponse(fornecedor);
     }
 
     public void deletar(Integer id) {
         if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Fornecedor não encontrado");
+            throw new EntityNotFoundException("Fornecedor não encontrado: " + id);
         }
         repository.deleteById(id);
     }
+
     public FornecedorResponseDTO atualizar(Integer id, FornecedorRequestDTO requestDTO) {
         Fornecedor fornecedor = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado"));
-
+                .orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado: " + id));
 
         if (!fornecedor.getCnpj().equals(requestDTO.getCnpj()) &&
                 repository.existsByCnpj(requestDTO.getCnpj())) {
@@ -57,5 +57,4 @@ public class FornecedorService {
 
         return mapper.toResponse(repository.save(fornecedor));
     }
-
 }
