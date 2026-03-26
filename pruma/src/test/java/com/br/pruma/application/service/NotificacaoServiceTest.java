@@ -48,7 +48,7 @@ class NotificacaoServiceTest {
     @Test
     @DisplayName("create: salva e retorna DTO")
     void create_sucesso() {
-        when(requestDTO.getClienteCpf()).thenReturn("12345678900");
+        when(requestDTO.getClienteCpf()).thenReturn(12345678900L);
         when(requestDTO.getTipoUsuarioId()).thenReturn(1);
         when(clienteRepository.findByCpf("12345678900")).thenReturn(Optional.of(mock(Cliente.class)));
         when(tipoUsuarioRepository.findById(1)).thenReturn(Optional.of(mock(TipoUsuario.class)));
