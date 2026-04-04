@@ -11,11 +11,13 @@ import com.br.pruma.core.repository.ClienteRepository;
 import com.br.pruma.core.repository.EnderecoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ClienteServiceImpl implements ClienteService {
 
     private final ClienteRepository clienteRepository;
@@ -44,6 +46,7 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ClienteResponseDTO findById(Integer id) {
         return clienteRepository.findById(id)
                 .map(clienteMapper::toDto)
@@ -52,6 +55,7 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ClienteResponseDTO> findAll() {
         return clienteRepository.findAll().stream()
                 .map(clienteMapper::toDto)
