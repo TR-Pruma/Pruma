@@ -3,19 +3,18 @@ package com.br.pruma.application.mapper;
 import com.br.pruma.application.dto.request.ClienteRequestDTO;
 import com.br.pruma.core.domain.Cliente;
 import com.br.pruma.core.domain.Endereco;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 
-@Component
 public abstract class ClienteMapperDecorator implements ClienteMapper {
 
-    private final PasswordEncoder passwordEncoder;
-    private final ClienteMapper delegate;
+    @Autowired
+    @Qualifier("delegate")
+    private ClienteMapper delegate;
 
-    public ClienteMapperDecorator(PasswordEncoder passwordEncoder, ClienteMapper delegate) {
-        this.passwordEncoder = passwordEncoder;
-        this.delegate = delegate;
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public Cliente toEntity(ClienteRequestDTO dto, Endereco endereco) {
