@@ -1,12 +1,14 @@
 package com.br.pruma.application.dto.update;
 
-import lombok.Data;
+import com.br.pruma.core.enums.TipoUsuarioEnum;
+import jakarta.validation.constraints.Size;
 
-@Data
-public class UsuarioUpdateDTO {
+public record UsuarioUpdateDTO(
 
-    private String nome;
-    private String email;
-    private String telefone;
-    private Integer tipoUsuarioId;
-}
+        @Size(min = 6, message = "Senha deve ter no mínimo 6 caracteres")
+        String senha,
+
+        TipoUsuarioEnum tipo,
+
+        Boolean ativo
+) {}
