@@ -2,7 +2,6 @@ package com.br.pruma.application.service;
 
 import com.br.pruma.application.dto.request.SubContratoRequestDTO;
 import com.br.pruma.application.dto.response.SubContratoResponseDTO;
-import com.br.pruma.application.dto.update.SubContratoUpdateDTO;
 import com.br.pruma.application.mapper.SubContratoMapper;
 import com.br.pruma.core.domain.Obra;
 import com.br.pruma.core.domain.SubContrato;
