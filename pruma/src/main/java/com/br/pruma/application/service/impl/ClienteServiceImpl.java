@@ -41,7 +41,7 @@ public class ClienteServiceImpl implements ClienteService {
         Endereco endereco = enderecoRepository.findById(dto.enderecoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Endereço com ID " + dto.enderecoId() + " não encontrado."));
-        clienteMapper.updateEntity(cliente, dto, endereco);
+        clienteMapper.updateFromDto(dto, endereco, cliente);
         return clienteMapper.toDto(clienteRepository.save(cliente));
     }
 
