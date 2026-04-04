@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +39,9 @@ public class AnexoServiceImpl implements AnexoService {
     @Override
     @Transactional(readOnly = true)
     public List<AnexoResponseDTO> listAll() {
-        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
+        return repository.findAll().stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -59,9 +60,8 @@ public class AnexoServiceImpl implements AnexoService {
 
     @Override
     public void delete(Integer id) {
-        if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Anexo não encontrado: " + id);
-        }
-        repository.deleteById(id);
+        Anexo entity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Anexo não encontrado: " + id));
+        repository.delete(entity);
     }
 }

@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +40,9 @@ public class CategoriaServiceImpl implements CategoriaService {
     @Override
     @Transactional(readOnly = true)
     public List<CategoriaResponseDTO> listAll() {
-        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
+        return repository.findAll().stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -69,9 +70,8 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     public void delete(Integer id) {
-        if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Categoria não encontrada: " + id);
-        }
-        repository.deleteById(id);
+        Categoria entity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada: " + id));
+        repository.delete(entity);
     }
 }

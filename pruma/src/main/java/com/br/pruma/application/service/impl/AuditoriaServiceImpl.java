@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +40,9 @@ public class AuditoriaServiceImpl implements AuditoriaService {
     @Override
     @Transactional(readOnly = true)
     public List<AuditoriaResponseDTO> listAll() {
-        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
+        return repository.findAll().stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -60,9 +61,8 @@ public class AuditoriaServiceImpl implements AuditoriaService {
 
     @Override
     public void delete(Integer id) {
-        if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Auditoria não encontrada: " + id);
-        }
-        repository.deleteById(id);
+        Auditoria entity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Auditoria não encontrada: " + id));
+        repository.delete(entity);
     }
 }
