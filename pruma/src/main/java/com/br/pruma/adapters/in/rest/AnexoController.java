@@ -25,19 +25,19 @@ public class AnexoController {
     @Operation(summary = "Lista todos os anexos")
     @GetMapping
     public ResponseEntity<List<AnexoResponseDTO>> listarTodos() {
-        return ResponseEntity.ok(service.listarTodos());
+        return ResponseEntity.ok(service.listAll());
     }
 
     @Operation(summary = "Busca anexo por ID")
     @GetMapping("/{id}")
     public ResponseEntity<AnexoResponseDTO> buscarPorId(@PathVariable Integer id) {
-        return ResponseEntity.ok(service.buscarPorId(id));
+        return ResponseEntity.ok(service.getById(id));
     }
 
     @Operation(summary = "Cria novo anexo")
     @PostMapping
     public ResponseEntity<AnexoResponseDTO> criar(@RequestBody @Valid AnexoRequestDTO dto) {
-        AnexoResponseDTO salvo = service.salvar(dto);
+        AnexoResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(salvo.id()).toUri();
         return ResponseEntity.created(location).body(salvo);
@@ -46,7 +46,7 @@ public class AnexoController {
     @Operation(summary = "Deleta anexo por ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
-        service.deletar(id);
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
