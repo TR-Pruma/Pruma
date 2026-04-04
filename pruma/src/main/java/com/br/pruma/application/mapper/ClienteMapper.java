@@ -20,6 +20,11 @@ public interface ClienteMapper {
 
     ClienteResponseDTO toDto(Cliente cliente);
 
+    /**
+     * Atualiza parcialmente uma entidade Cliente.
+     * Campos nulos no DTO são ignorados (PATCH semântico).
+     * Padrão do projeto: @MappingTarget sempre no último parâmetro.
+     */
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "dto.cpf",      target = "cpf")
     @Mapping(source = "dto.nome",     target = "nome")
@@ -28,5 +33,5 @@ public interface ClienteMapper {
     @Mapping(source = "dto.senha",    target = "senha")
     @Mapping(source = "dto.ativo",    target = "ativo")
     @Mapping(source = "endereco",     target = "endereco")
-    void updateEntity(@MappingTarget Cliente entity, ClienteRequestDTO dto, Endereco endereco);
+    void updateFromDto(ClienteRequestDTO dto, Endereco endereco, @MappingTarget Cliente entity);
 }
