@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +40,9 @@ public class ProjetoServiceImpl implements ProjetoService {
     @Override
     @Transactional(readOnly = true)
     public List<ProjetoResponseDTO> listAll() {
-        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
+        return repository.findAll().stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -53,7 +54,9 @@ public class ProjetoServiceImpl implements ProjetoService {
     @Override
     @Transactional(readOnly = true)
     public List<ProjetoResponseDTO> listByCliente(Integer clienteId) {
-        return repository.findAllByCliente_Id(clienteId).stream().map(mapper::toResponse).collect(Collectors.toList());
+        return repository.findAllByCliente_Id(clienteId).stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -75,9 +78,8 @@ public class ProjetoServiceImpl implements ProjetoService {
 
     @Override
     public void delete(Integer id) {
-        if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Projeto não encontrado: " + id);
-        }
-        repository.deleteById(id);
+        Projeto entity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + id));
+        repository.delete(entity);
     }
 }
