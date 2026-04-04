@@ -1,42 +1,54 @@
 package com.br.pruma.application.service;
 
-import com.br.pruma.core.domain.Auditoria;
+import com.br.pruma.application.dto.request.AuditoriaRequestDTO;
+import com.br.pruma.application.dto.response.AuditoriaResponseDTO;
+import com.br.pruma.application.mapper.AuditoriaMapper;
+import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.repository.AuditoriaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class AuditoriaService {
 
     private final AuditoriaRepository repository;
+    private final AuditoriaMapper mapper;
 
-    public AuditoriaService(AuditoriaRepository repository) {
-        this.repository = repository;
+    @Transactional(readOnly = true)
+    public List<AuditoriaResponseDTO> listarTodos() {
+        return repository.findAll().stream()
+                .map(mapper::toResponseDTO)
+                .toList();
     }
 
-    public List<Auditoria> listarTodos() {
-        return repository.findAll();
+    @Transactional(readOnly = true)
+    public Optional<AuditoriaResponseDTO> buscarPorId(UUID id) {
+        return repository.findById(id).map(mapper::toResponseDTO);
     }
 
-    public Optional<Auditoria> buscarPorId(UUID id) {
-        return repository.findById(id);
+    public AuditoriaResponseDTO criar(AuditoriaRequestDTO dto) {
+        return mapper.toResponseDTO(repository.save(mapper.toEntity(dto)));
     }
 
-    public Auditoria salvar(Auditoria auditoria) {
-        return repository.save(auditoria);
-    }
-
-    public Optional<Auditoria> atualizar(UUID id, Auditoria dadosNovos) {
+    public Optional<AuditoriaResponseDTO> atualizar(UUID id, AuditoriaRequestDTO dto) {
         return repository.findById(id).map(existente -> {
-            dadosNovos.setId(id);
-            return repository.save(dadosNovos);
+            var atualizado = mapper.toEntity(dto);
+            atualizado.setId(id);
+            return mapper.toResponseDTO(repository.save(atualizado));
         });
     }
 
     public void deletar(UUID id) {
+        if (!repository.existsById(id)) {
+            throw new RecursoNaoEncontradoException("Auditoria com ID " + id + " não encontrada.");
+        }
         repository.deleteById(id);
     }
 }
