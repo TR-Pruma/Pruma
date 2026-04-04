@@ -7,6 +7,7 @@ import com.br.pruma.core.domain.Endereco;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
+@DecoratedWith(ClienteMapperDecorator.class)
 public interface ClienteMapper {
 
     @Mapping(source = "dto.cpf",      target = "cpf")
