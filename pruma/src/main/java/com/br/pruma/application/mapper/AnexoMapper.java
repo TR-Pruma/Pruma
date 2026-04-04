@@ -23,7 +23,18 @@ public interface AnexoMapper {
     @Mapping(target = "projetoId", source = "projeto.id")
     @Mapping(target = "tipoAnexo", source = "tipoAnexo")
     @Mapping(target = "caminhoArquivo", source = "caminhoArquivo")
-    AnexoResponseDTO toResponseDTO(Anexo entity);
+    AnexoResponseDTO toResponse(Anexo entity);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "projeto", source = "projetoId", qualifiedByName = "mapProjetoById")
+    @Mapping(target = "nomeArquivo", ignore = true)
+    @Mapping(target = "contentType", ignore = true)
+    @Mapping(target = "tamanhoBytes", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    void updateFromRequest(AnexoRequestDTO dto, @MappingTarget Anexo entity);
 
     @Named("mapProjetoById")
     default Projeto mapProjetoById(Integer projetoId) {
