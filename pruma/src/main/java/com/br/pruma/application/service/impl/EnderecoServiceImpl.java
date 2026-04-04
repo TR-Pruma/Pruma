@@ -9,11 +9,13 @@ import com.br.pruma.core.domain.Endereco;
 import com.br.pruma.core.repository.EnderecoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class EnderecoServiceImpl implements EnderecoService {
 
     private final EnderecoRepository repository;
@@ -26,13 +28,16 @@ public class EnderecoServiceImpl implements EnderecoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public EnderecoResponseDTO buscarPorId(Integer id) {
         return repository.findById(id)
                 .map(mapper::toResponseDTO)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Endereço com ID " + id + " não encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Endereço com ID " + id + " não encontrado."));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<EnderecoResponseDTO> listarTodos() {
         return repository.findAll().stream()
                 .map(mapper::toResponseDTO)
@@ -42,17 +47,17 @@ public class EnderecoServiceImpl implements EnderecoService {
     @Override
     public EnderecoResponseDTO atualizar(Integer id, EnderecoRequestDTO dto) {
         Endereco existente = repository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Endereço com ID " + id + " não encontrado."));
-        Endereco atualizado = mapper.toEntity(dto);
-        atualizado.setId(existente.getId());
-        return mapper.toResponseDTO(repository.save(atualizado));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Endereço com ID " + id + " não encontrado."));
+        mapper.updateFromDto(dto, existente);
+        return mapper.toResponseDTO(repository.save(existente));
     }
 
     @Override
     public void deletar(Integer id) {
-        if (!repository.existsById(id)) {
-            throw new RecursoNaoEncontradoException("Não é possível deletar. Endereço com ID " + id + " não existe.");
-        }
-        repository.deleteById(id);
+        Endereco entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Endereço com ID " + id + " não encontrado."));
+        repository.delete(entity);
     }
 }

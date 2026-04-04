@@ -73,10 +73,9 @@ public class ComunicacaoAuxServiceImpl implements ComunicacaoAuxService {
 
     @Override
     public void deletar(Integer id) {
-        if (!repository.existsById(id)) {
-            throw new RecursoNaoEncontradoException(
-                    "Não é possível deletar. Comunicação auxiliar com ID " + id + " não existe.");
-        }
-        repository.deleteById(id);
+        ComunicacaoAux entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Comunicação auxiliar com ID " + id + " não encontrada."));
+        repository.delete(entity);
     }
 }

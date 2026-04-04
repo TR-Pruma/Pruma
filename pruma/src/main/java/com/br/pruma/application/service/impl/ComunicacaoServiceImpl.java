@@ -88,10 +88,9 @@ public class ComunicacaoServiceImpl implements ComunicacaoService {
 
     @Override
     public void deletar(Integer id) {
-        if (!comunicacaoRepository.existsById(id)) {
-            throw new RecursoNaoEncontradoException(
-                    "Não é possível deletar. Comunicação com ID " + id + " não existe.");
-        }
-        comunicacaoRepository.deleteById(id);
+        Comunicacao entity = comunicacaoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Comunicação com ID " + id + " não encontrada."));
+        comunicacaoRepository.delete(entity);
     }
 }

@@ -64,10 +64,9 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Override
     public void delete(Integer id) {
-        if (!clienteRepository.existsById(id)) {
-            throw new RecursoNaoEncontradoException(
-                    "Não é possível deletar. Cliente com ID " + id + " não existe.");
-        }
-        clienteRepository.deleteById(id);
+        Cliente entity = clienteRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Cliente com ID " + id + " não encontrado."));
+        clienteRepository.delete(entity);
     }
 }
