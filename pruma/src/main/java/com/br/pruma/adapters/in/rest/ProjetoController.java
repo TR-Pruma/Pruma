@@ -2,6 +2,7 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.ProjetoRequestDTO;
 import com.br.pruma.application.dto.response.ProjetoResponseDTO;
+import com.br.pruma.application.dto.update.ProjetoUpdateDTO;
 import com.br.pruma.application.service.ProjetoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -57,11 +58,18 @@ public class ProjetoController {
         return ResponseEntity.created(location).body(salvo);
     }
 
-    @Operation(summary = "Atualiza projeto por ID")
-    @PutMapping("/{id}")
+    @Operation(summary = "Atualiza parcialmente projeto por ID (PATCH semântico)")
+    @PatchMapping("/{id}")
     public ResponseEntity<ProjetoResponseDTO> atualizar(@PathVariable Integer id,
-                                                        @RequestBody @Valid ProjetoRequestDTO dto) {
+                                                        @RequestBody @Valid ProjetoUpdateDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
+    }
+
+    @Operation(summary = "Substitui completamente projeto por ID (PUT semântico)")
+    @PutMapping("/{id}")
+    public ResponseEntity<ProjetoResponseDTO> substituir(@PathVariable Integer id,
+                                                         @RequestBody @Valid ProjetoRequestDTO dto) {
+        return ResponseEntity.ok(service.replace(id, dto));
     }
 
     @Operation(summary = "Deleta projeto por ID")
