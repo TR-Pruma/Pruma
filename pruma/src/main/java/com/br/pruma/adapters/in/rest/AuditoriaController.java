@@ -16,6 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/pruma/v1/auditorias")
@@ -33,7 +34,7 @@ public class AuditoriaController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar auditoria por ID")
-    public ResponseEntity<AuditoriaResponseDTO> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<AuditoriaResponseDTO> buscarPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(auditoriaService.getById(id));
     }
 
@@ -49,7 +50,7 @@ public class AuditoriaController {
     @PatchMapping("/{id}")
     @Operation(summary = "Atualizar auditoria existente")
     public ResponseEntity<AuditoriaResponseDTO> atualizar(
-            @PathVariable Integer id,
+            @PathVariable UUID id,
             @Valid @RequestBody AuditoriaUpdateDTO dto) {
         return ResponseEntity.ok(auditoriaService.update(id, dto));
     }
@@ -62,7 +63,7 @@ public class AuditoriaController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Deletar auditoria por ID")
-    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
+    public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         auditoriaService.delete(id);
         return ResponseEntity.noContent().build();
     }
