@@ -5,9 +5,9 @@ import com.br.pruma.application.dto.response.FeedbackResponseDTO;
 import com.br.pruma.application.dto.update.FeedbackUpdateDTO;
 import com.br.pruma.application.mapper.FeedbackMapper;
 import com.br.pruma.application.service.FeedbackService;
+import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.Feedback;
 import com.br.pruma.core.repository.FeedbackRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,13 +34,16 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Transactional(readOnly = true)
     public FeedbackResponseDTO getById(Integer id) {
         return mapper.toResponse(repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Feedback não encontrado: " + id)));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Feedback com ID " + id + " não encontrado.")));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<FeedbackResponseDTO> listAll() {
-        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
+        return repository.findAll().stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -53,16 +55,17 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     public FeedbackResponseDTO update(Integer id, FeedbackUpdateDTO dto) {
         Feedback entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Feedback não encontrado: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Feedback com ID " + id + " não encontrado."));
         mapper.updateFromDto(dto, entity);
         return mapper.toResponse(repository.save(entity));
     }
 
     @Override
     public void delete(Integer id) {
-        if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Feedback não encontrado: " + id);
-        }
-        repository.deleteById(id);
+        Feedback entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Feedback com ID " + id + " não encontrado."));
+        repository.delete(entity);
     }
 }

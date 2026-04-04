@@ -5,11 +5,11 @@ import com.br.pruma.application.dto.response.ChecklistResponseDTO;
 import com.br.pruma.application.dto.update.ChecklistUpdateDTO;
 import com.br.pruma.application.mapper.ChecklistMapper;
 import com.br.pruma.application.service.ChecklistService;
+import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.Checklist;
 import com.br.pruma.core.domain.Projeto;
 import com.br.pruma.core.repository.ChecklistRepository;
 import com.br.pruma.core.repository.ProjetoRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +30,8 @@ public class ChecklistServiceImpl implements ChecklistService {
     @Override
     public ChecklistResponseDTO create(ChecklistRequestDTO dto) {
         Projeto projeto = projetoRepository.findById(dto.getProjetoId())
-                .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.getProjetoId()));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Projeto com ID " + dto.getProjetoId() + " não encontrado."));
         Checklist entity = mapper.toEntity(dto);
         entity.setProjeto(projeto);
         return mapper.toResponse(repository.save(entity));
@@ -41,13 +41,16 @@ public class ChecklistServiceImpl implements ChecklistService {
     @Transactional(readOnly = true)
     public ChecklistResponseDTO getById(Integer id) {
         return mapper.toResponse(repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Checklist não encontrado: " + id)));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Checklist com ID " + id + " não encontrado.")));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ChecklistResponseDTO> listAll() {
-        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
+        return repository.findAll().stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -59,16 +62,20 @@ public class ChecklistServiceImpl implements ChecklistService {
     @Override
     @Transactional(readOnly = true)
     public List<ChecklistResponseDTO> listByProjeto(Integer projetoId) {
-        return repository.findAllByProjeto_Id(projetoId).stream().map(mapper::toResponse).collect(Collectors.toList());
+        return repository.findAllByProjeto_Id(projetoId).stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
     public ChecklistResponseDTO update(Integer id, ChecklistUpdateDTO dto) {
         Checklist entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Checklist não encontrado: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Checklist com ID " + id + " não encontrado."));
         if (dto.getProjetoId() != null) {
             Projeto projeto = projetoRepository.findById(dto.getProjetoId())
-                    .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.getProjetoId()));
+                    .orElseThrow(() -> new RecursoNaoEncontradoException(
+                            "Projeto com ID " + dto.getProjetoId() + " não encontrado."));
             entity.setProjeto(projeto);
         }
         mapper.updateFromDto(dto, entity);
@@ -78,9 +85,11 @@ public class ChecklistServiceImpl implements ChecklistService {
     @Override
     public ChecklistResponseDTO replace(Integer id, ChecklistRequestDTO dto) {
         repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Checklist não encontrado: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Checklist com ID " + id + " não encontrado."));
         Projeto projeto = projetoRepository.findById(dto.getProjetoId())
-                .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.getProjetoId()));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Projeto com ID " + dto.getProjetoId() + " não encontrado."));
         Checklist entity = mapper.toEntity(dto);
         entity.setId(id);
         entity.setProjeto(projeto);
@@ -89,9 +98,9 @@ public class ChecklistServiceImpl implements ChecklistService {
 
     @Override
     public void delete(Integer id) {
-        if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Checklist não encontrado: " + id);
-        }
-        repository.deleteById(id);
+        Checklist entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Checklist com ID " + id + " não encontrado."));
+        repository.delete(entity);
     }
 }

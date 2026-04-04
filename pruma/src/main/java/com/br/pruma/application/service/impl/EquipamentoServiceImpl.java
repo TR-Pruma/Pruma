@@ -5,9 +5,9 @@ import com.br.pruma.application.dto.response.EquipamentoResponseDTO;
 import com.br.pruma.application.dto.update.EquipamentoUpdateDTO;
 import com.br.pruma.application.mapper.EquipamentoMapper;
 import com.br.pruma.application.service.EquipamentoService;
+import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.Equipamento;
 import com.br.pruma.core.repository.EquipamentoRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,13 +34,16 @@ public class EquipamentoServiceImpl implements EquipamentoService {
     @Transactional(readOnly = true)
     public EquipamentoResponseDTO getById(Integer id) {
         return mapper.toResponse(repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Equipamento não encontrado: " + id)));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Equipamento com ID " + id + " não encontrado.")));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<EquipamentoResponseDTO> listAll() {
-        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
+        return repository.findAll().stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -53,7 +55,8 @@ public class EquipamentoServiceImpl implements EquipamentoService {
     @Override
     public EquipamentoResponseDTO update(Integer id, EquipamentoUpdateDTO dto) {
         Equipamento entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Equipamento não encontrado: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Equipamento com ID " + id + " não encontrado."));
         mapper.updateFromDto(dto, entity);
         return mapper.toResponse(repository.save(entity));
     }
@@ -61,7 +64,8 @@ public class EquipamentoServiceImpl implements EquipamentoService {
     @Override
     public EquipamentoResponseDTO replace(Integer id, EquipamentoRequestDTO dto) {
         repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Equipamento não encontrado: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Equipamento com ID " + id + " não encontrado."));
         Equipamento entity = mapper.toEntity(dto);
         entity.setId(id);
         return mapper.toResponse(repository.save(entity));
@@ -69,9 +73,9 @@ public class EquipamentoServiceImpl implements EquipamentoService {
 
     @Override
     public void delete(Integer id) {
-        if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Equipamento não encontrado: " + id);
-        }
-        repository.deleteById(id);
+        Equipamento entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Equipamento com ID " + id + " não encontrado."));
+        repository.delete(entity);
     }
 }

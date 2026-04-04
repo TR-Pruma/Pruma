@@ -5,9 +5,9 @@ import com.br.pruma.application.dto.response.FornecedorResponseDTO;
 import com.br.pruma.application.dto.update.FornecedorUpdateDTO;
 import com.br.pruma.application.mapper.FornecedorMapper;
 import com.br.pruma.application.service.FornecedorService;
+import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.Fornecedor;
 import com.br.pruma.core.repository.FornecedorRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,13 +34,16 @@ public class FornecedorServiceImpl implements FornecedorService {
     @Transactional(readOnly = true)
     public FornecedorResponseDTO getById(Integer id) {
         return mapper.toResponse(repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado: " + id)));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Fornecedor com ID " + id + " não encontrado.")));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<FornecedorResponseDTO> listAll() {
-        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
+        return repository.findAll().stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -53,7 +55,8 @@ public class FornecedorServiceImpl implements FornecedorService {
     @Override
     public FornecedorResponseDTO update(Integer id, FornecedorUpdateDTO dto) {
         Fornecedor entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Fornecedor com ID " + id + " não encontrado."));
         mapper.updateFromDto(dto, entity);
         return mapper.toResponse(repository.save(entity));
     }
@@ -61,7 +64,8 @@ public class FornecedorServiceImpl implements FornecedorService {
     @Override
     public FornecedorResponseDTO replace(Integer id, FornecedorRequestDTO dto) {
         repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Fornecedor não encontrado: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Fornecedor com ID " + id + " não encontrado."));
         Fornecedor entity = mapper.toEntity(dto);
         entity.setId(id);
         return mapper.toResponse(repository.save(entity));
@@ -69,9 +73,9 @@ public class FornecedorServiceImpl implements FornecedorService {
 
     @Override
     public void delete(Integer id) {
-        if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Fornecedor não encontrado: " + id);
-        }
-        repository.deleteById(id);
+        Fornecedor entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Fornecedor com ID " + id + " não encontrado."));
+        repository.delete(entity);
     }
 }
