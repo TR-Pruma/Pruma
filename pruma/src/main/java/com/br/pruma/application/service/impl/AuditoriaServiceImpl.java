@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +33,7 @@ public class AuditoriaServiceImpl implements AuditoriaService {
 
     @Override
     @Transactional(readOnly = true)
-    public AuditoriaResponseDTO getById(Integer id) {
+    public AuditoriaResponseDTO getById(UUID id) {
         return mapper.toResponse(repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Auditoria não encontrada: " + id)));
     }
@@ -52,7 +53,7 @@ public class AuditoriaServiceImpl implements AuditoriaService {
     }
 
     @Override
-    public AuditoriaResponseDTO update(Integer id, AuditoriaUpdateDTO dto) {
+    public AuditoriaResponseDTO update(UUID id, AuditoriaUpdateDTO dto) {
         Auditoria entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Auditoria não encontrada: " + id));
         mapper.updateFromDto(dto, entity);
@@ -60,7 +61,7 @@ public class AuditoriaServiceImpl implements AuditoriaService {
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(UUID id) {
         Auditoria entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Auditoria não encontrada: " + id));
         repository.delete(entity);
