@@ -43,7 +43,7 @@ public class AuditoriaController {
     public ResponseEntity<AuditoriaResponseDTO> criar(@Valid @RequestBody AuditoriaRequestDTO dto) {
         AuditoriaResponseDTO salva = auditoriaService.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salva.id()).toUri();
+                .path("/{id}").buildAndExpand(salva.getId()).toUri();
         return ResponseEntity.created(location).body(salva);
     }
 
