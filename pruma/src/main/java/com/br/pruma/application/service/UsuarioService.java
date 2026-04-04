@@ -1,47 +1,18 @@
 package com.br.pruma.application.service;
 
-import com.br.pruma.application.dto.request.CadastroRequestDTO;
-import com.br.pruma.application.dto.request.LoginRequestDTO;
-import com.br.pruma.application.dto.response.TokenResponseDTO;
-import com.br.pruma.config.JwtService;
-import com.br.pruma.core.domain.Usuario;
-import com.br.pruma.core.repository.UsuarioRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import com.br.pruma.application.dto.request.UsuarioRequestDTO;
+import com.br.pruma.application.dto.response.UsuarioResponseDTO;
+import com.br.pruma.application.dto.update.UsuarioUpdateDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-@Service
-@RequiredArgsConstructor
-public class UsuarioService {
+import java.util.List;
 
-    private final AuthenticationManager authManager;
-    private final JwtService jwtService;
-    private final UsuarioRepository usuarioRepository;
-    private final PasswordEncoder passwordEncoder;
-
-    public TokenResponseDTO autenticar(LoginRequestDTO dto) {
-        authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(dto.getCpf(), dto.getSenha())
-        );
-        Usuario usuario = usuarioRepository.findByCpf(dto.getCpf())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-        String role = usuario.getTipo().name();
-        String token = jwtService.gerarToken(usuario.getId(), role);
-        return new TokenResponseDTO(token, "Bearer", usuario.getId(), role);
-    }
-
-    public void cadastrar(CadastroRequestDTO dto) {
-        if (usuarioRepository.existsByCpf(dto.getCpf())) {
-            throw new RuntimeException("CPF já cadastrado");
-        }
-        Usuario novo = Usuario.builder()
-                .cpf(dto.getCpf())
-                .senha(passwordEncoder.encode(dto.getSenha()))
-                .tipo(dto.getTipo())
-                .build();
-        usuarioRepository.save(novo);
-    }
+public interface UsuarioService {
+    UsuarioResponseDTO create(UsuarioRequestDTO dto);
+    UsuarioResponseDTO getById(Integer id);
+    List<UsuarioResponseDTO> listAll();
+    Page<UsuarioResponseDTO> list(Pageable pageable);
+    UsuarioResponseDTO update(Integer id, UsuarioUpdateDTO dto);
+    void delete(Integer id);
 }
