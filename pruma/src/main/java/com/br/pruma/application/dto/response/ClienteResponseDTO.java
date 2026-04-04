@@ -1,11 +1,8 @@
 package com.br.pruma.application.dto.response;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
-public record ClienteResponseDTO (
+public record ClienteResponseDTO(
         Integer id,
         String cpf,
         String nome,
@@ -17,6 +14,3 @@ public record ClienteResponseDTO (
         Long versao,
         Boolean ativo
 ) {}
-
-
-
