@@ -14,53 +14,46 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+@Tag(name = "ProjetoCategoria", description = "Operações relacionadas a categorias de projeto")
 @RestController
-@RequestMapping("/pruma/v1/projeto-categorias")
-@Tag(name = "ProjetoCategoria", description = "Gerencia categorias de projeto")
+@RequestMapping("/pruma/v1/projetos-categoria")
 @RequiredArgsConstructor
 public class ProjetoCategoriaController {
 
     private final ProjetoCategoriaService service;
 
-    @Operation(summary = "Cria uma nova categoria de projeto")
-    @PostMapping
-    public ResponseEntity<ProjetoCategoriaResponseDTO> create(
-            @Valid @RequestBody ProjetoCategoriaRequestDTO request
-    ) {
-        ProjetoCategoriaResponseDTO response = service.create(request);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.id()) // se seu DTO usar getId(), troque para getId()
-                .toUri();
-        return ResponseEntity.created(location).body(response);
-    }
-
-    @Operation(summary = "Lista todas as categorias de projeto")
+    @Operation(summary = "Lista todas as categorias")
     @GetMapping
-    public ResponseEntity<List<ProjetoCategoriaResponseDTO>> listAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<List<ProjetoCategoriaResponseDTO>> listarTodos() {
+        return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Obtém uma categoria por ID")
+    @Operation(summary = "Busca categoria por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<ProjetoCategoriaResponseDTO> getById(@PathVariable Integer id) {
-        return ResponseEntity.ok(service.findById(id));
+    public ResponseEntity<ProjetoCategoriaResponseDTO> buscarPorId(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.getById(id));
     }
 
-    @Operation(summary = "Atualiza parcialmente uma categoria de projeto")
+    @Operation(summary = "Cria nova categoria")
+    @PostMapping
+    public ResponseEntity<ProjetoCategoriaResponseDTO> criar(@RequestBody @Valid ProjetoCategoriaRequestDTO dto) {
+        ProjetoCategoriaResponseDTO salvo = service.create(dto);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(salvo.id()).toUri();
+        return ResponseEntity.created(location).body(salvo);
+    }
+
+    @Operation(summary = "Atualiza categoria por ID")
     @PutMapping("/{id}")
-    public ResponseEntity<ProjetoCategoriaResponseDTO> update(
-            @PathVariable Integer id,
-            @Valid @RequestBody ProjetoCategoriaRequestDTO request
-    ) {
-        return ResponseEntity.ok(service.update(id, request));
+    public ResponseEntity<ProjetoCategoriaResponseDTO> atualizar(@PathVariable Integer id,
+                                                                  @RequestBody @Valid ProjetoCategoriaRequestDTO dto) {
+        return ResponseEntity.ok(service.update(id, dto));
     }
 
-    @Operation(summary = "Exclui permanentemente uma categoria de projeto")
+    @Operation(summary = "Deleta categoria por ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
-

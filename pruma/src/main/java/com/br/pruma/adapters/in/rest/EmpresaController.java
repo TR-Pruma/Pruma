@@ -3,38 +3,57 @@ package com.br.pruma.adapters.in.rest;
 import com.br.pruma.application.dto.request.EmpresaRequestDTO;
 import com.br.pruma.application.dto.response.EmpresaResponseDTO;
 import com.br.pruma.application.service.EmpresaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
+@Tag(name = "Empresa", description = "Operações relacionadas a empresas")
 @RestController
-@RequestMapping("/empresas")
+@RequestMapping("/pruma/v1/empresas")
 @RequiredArgsConstructor
 public class EmpresaController {
 
     private final EmpresaService service;
 
-    @PostMapping
-    public ResponseEntity<EmpresaResponseDTO> criar(@Valid @RequestBody EmpresaRequestDTO dto) {
-        EmpresaResponseDTO response = service.salvar(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-    @GetMapping("/{cnpj}")
-    public ResponseEntity<EmpresaResponseDTO> buscar(@PathVariable String cnpj) {
-        return ResponseEntity.ok(service.buscarPorCnpj(cnpj));
-    }
+    @Operation(summary = "Lista todas as empresas")
     @GetMapping
-    public ResponseEntity<List<EmpresaResponseDTO>> listar() {
-        return ResponseEntity.ok(service.listarTodas());
-    }
-    @DeleteMapping("/{cnpj}")
-    public ResponseEntity<Void> deletar(@PathVariable String cnpj) {
-        service.deletar(cnpj);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<List<EmpresaResponseDTO>> listarTodas() {
+        return ResponseEntity.ok(service.listAll());
     }
 
+    @Operation(summary = "Busca empresa por ID")
+    @GetMapping("/{id}")
+    public ResponseEntity<EmpresaResponseDTO> buscarPorId(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.getById(id));
+    }
+
+    @Operation(summary = "Cria nova empresa")
+    @PostMapping
+    public ResponseEntity<EmpresaResponseDTO> criar(@RequestBody @Valid EmpresaRequestDTO dto) {
+        EmpresaResponseDTO salvo = service.create(dto);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(salvo.id()).toUri();
+        return ResponseEntity.created(location).body(salvo);
+    }
+
+    @Operation(summary = "Atualiza empresa por ID")
+    @PutMapping("/{id}")
+    public ResponseEntity<EmpresaResponseDTO> atualizar(@PathVariable Integer id,
+                                                        @RequestBody @Valid EmpresaRequestDTO dto) {
+        return ResponseEntity.ok(service.update(id, dto));
+    }
+
+    @Operation(summary = "Deleta empresa por ID")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }
