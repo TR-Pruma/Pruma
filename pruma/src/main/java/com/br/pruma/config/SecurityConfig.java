@@ -1,5 +1,6 @@
 package com.br.pruma.config;
 
+import com.br.pruma.adapters.security.SecurityFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +24,6 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // Remove o permitAll() do Swagger — agora delegado ao SwaggerSecurityConfig
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/usuario/login", "/usuario/cadastro").permitAll()
                         .anyRequest().authenticated()
