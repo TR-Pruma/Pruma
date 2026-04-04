@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public abstract class ClienteMapperDecorator implements ClienteMapper {
+
     private final PasswordEncoder passwordEncoder;
     private final ClienteMapper delegate;
 
@@ -19,12 +20,9 @@ public abstract class ClienteMapperDecorator implements ClienteMapper {
     @Override
     public Cliente toEntity(ClienteRequestDTO dto, Endereco endereco) {
         Cliente entity = delegate.toEntity(dto, endereco);
-        // Criptografa a senha sempre na criação
         if (dto != null && notBlank(dto.senha())) {
             entity.setSenha(passwordEncoder.encode(dto.senha()));
         }
-
-        // Garante regra padrão de negócio
         if (entity.getAtivo() == null) {
             entity.setAtivo(true);
         }
@@ -32,18 +30,14 @@ public abstract class ClienteMapperDecorator implements ClienteMapper {
     }
 
     @Override
-    public void updateEntity(Cliente entity, ClienteRequestDTO dto, Endereco endereco) {
-        delegate.updateEntity(entity, dto, endereco);
-        // Só reencode se senha informada (evita sobrescrever com vazio)
+    public void updateFromDto(ClienteRequestDTO dto, Endereco endereco, Cliente entity) {
+        delegate.updateFromDto(dto, endereco, entity);
         if (dto != null && notBlank(dto.senha())) {
             entity.setSenha(passwordEncoder.encode(dto.senha()));
         }
-
     }
 
     private boolean notBlank(String s) {
         return s != null && !s.trim().isEmpty();
     }
-
-
 }
