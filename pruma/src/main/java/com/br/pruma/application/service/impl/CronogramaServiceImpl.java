@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +46,9 @@ public class CronogramaServiceImpl implements CronogramaService {
     @Override
     @Transactional(readOnly = true)
     public List<CronogramaResponseDTO> listAll() {
-        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
+        return repository.findAll().stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -59,7 +60,9 @@ public class CronogramaServiceImpl implements CronogramaService {
     @Override
     @Transactional(readOnly = true)
     public List<CronogramaResponseDTO> listByProjeto(Integer projetoId) {
-        return repository.findAllByProjeto_Id(projetoId).stream().map(mapper::toResponse).collect(Collectors.toList());
+        return repository.findAllByProjeto_Id(projetoId).stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -89,9 +92,8 @@ public class CronogramaServiceImpl implements CronogramaService {
 
     @Override
     public void delete(Integer id) {
-        if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Cronograma não encontrado: " + id);
-        }
-        repository.deleteById(id);
+        Cronograma entity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Cronograma não encontrado: " + id));
+        repository.delete(entity);
     }
 }

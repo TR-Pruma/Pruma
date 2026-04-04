@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,15 +38,16 @@ public class ObraServiceImpl implements ObraService {
     @Override
     @Transactional(readOnly = true)
     public ObraResponseDTO getById(Integer id) {
-        Obra entity = obraRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Obra não encontrada: " + id));
-        return mapper.toResponse(entity);
+        return mapper.toResponse(obraRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Obra não encontrada: " + id)));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ObraResponseDTO> listAll() {
-        return obraRepository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
+        return obraRepository.findAll().stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -59,7 +59,9 @@ public class ObraServiceImpl implements ObraService {
     @Override
     @Transactional(readOnly = true)
     public List<ObraResponseDTO> listByProjeto(Integer projetoId) {
-        return obraRepository.findAllByProjeto_Id(projetoId).stream().map(mapper::toResponse).collect(Collectors.toList());
+        return obraRepository.findAllByProjeto_Id(projetoId).stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -77,12 +79,12 @@ public class ObraServiceImpl implements ObraService {
 
     @Override
     public ObraResponseDTO replace(Integer id, ObraRequestDTO dto) {
-        Obra existing = obraRepository.findById(id)
+        obraRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Obra não encontrada: " + id));
         Projeto projeto = projetoRepository.findById(dto.getProjetoId())
                 .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.getProjetoId()));
         Obra updated = mapper.toEntity(dto);
-        updated.setId(existing.getId());
+        updated.setId(id);
         updated.setProjeto(projeto);
         return mapper.toResponse(obraRepository.save(updated));
     }
@@ -93,15 +95,16 @@ public class ObraServiceImpl implements ObraService {
         List<Obra> found = obraRepository.findAllByDescricaoContainingIgnoreCase(descricao);
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), found.size());
-        List<ObraResponseDTO> content = found.subList(start, end).stream().map(mapper::toResponse).collect(Collectors.toList());
+        List<ObraResponseDTO> content = found.subList(start, end).stream()
+                .map(mapper::toResponse)
+                .toList();
         return new PageImpl<>(content, pageable, found.size());
     }
 
     @Override
     public void delete(Integer id) {
-        if (!obraRepository.existsById(id)) {
-            throw new EntityNotFoundException("Obra não encontrada: " + id);
-        }
-        obraRepository.deleteById(id);
+        Obra entity = obraRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Obra não encontrada: " + id));
+        obraRepository.delete(entity);
     }
 }

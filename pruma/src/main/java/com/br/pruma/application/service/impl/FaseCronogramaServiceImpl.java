@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +46,9 @@ public class FaseCronogramaServiceImpl implements FaseCronogramaService {
     @Override
     @Transactional(readOnly = true)
     public List<FaseCronogramaResponseDTO> listAll() {
-        return repository.findAll().stream().map(mapper::toResponse).collect(Collectors.toList());
+        return repository.findAll().stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -59,7 +60,9 @@ public class FaseCronogramaServiceImpl implements FaseCronogramaService {
     @Override
     @Transactional(readOnly = true)
     public List<FaseCronogramaResponseDTO> listByCronograma(Integer cronogramaId) {
-        return repository.findAllByCronograma_Id(cronogramaId).stream().map(mapper::toResponse).collect(Collectors.toList());
+        return repository.findAllByCronograma_Id(cronogramaId).stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
@@ -89,9 +92,8 @@ public class FaseCronogramaServiceImpl implements FaseCronogramaService {
 
     @Override
     public void delete(Integer id) {
-        if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("FaseCronograma não encontrada: " + id);
-        }
-        repository.deleteById(id);
+        FaseCronograma entity = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("FaseCronograma não encontrada: " + id));
+        repository.delete(entity);
     }
 }
