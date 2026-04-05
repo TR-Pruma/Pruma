@@ -2,10 +2,12 @@ package com.br.pruma.application.service;
 
 import com.br.pruma.application.dto.request.EmpresaRequestDTO;
 import com.br.pruma.application.dto.response.EmpresaResponseDTO;
+import com.br.pruma.application.dto.update.EmpresaUpdateDTO;
 import com.br.pruma.application.mapper.EmpresaMapper;
+import com.br.pruma.application.service.impl.EmpresaServiceImpl;
 import com.br.pruma.core.domain.Empresa;
 import com.br.pruma.core.repository.EmpresaRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.br.pruma.config.RecursoNaoEncontradoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +27,7 @@ class EmpresaServiceTest {
 
     @Mock EmpresaRepository repository;
     @Mock EmpresaMapper mapper;
-    @InjectMocks EmpresaService service;
+    @InjectMocks EmpresaServiceImpl service;
 
     Empresa empresa;
     EmpresaRequestDTO requestDTO;
@@ -39,59 +41,59 @@ class EmpresaServiceTest {
     }
 
     @Test
-    @DisplayName("salvar: persiste e retorna DTO")
-    void salvar_sucesso() {
+    @DisplayName("create: persiste e retorna DTO")
+    void create_sucesso() {
         when(mapper.toEntity(requestDTO)).thenReturn(empresa);
         when(repository.save(empresa)).thenReturn(empresa);
         when(mapper.toResponseDto(empresa)).thenReturn(responseDTO);
 
-        assertThat(service.salvar(requestDTO)).isEqualTo(responseDTO);
+        assertThat(service.create(requestDTO)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("buscarPorCnpj: retorna DTO quando CNPJ existe")
-    void buscarPorCnpj_encontrado() {
+    @DisplayName("getById: retorna DTO quando CNPJ existe")
+    void getById_encontrado() {
         when(repository.findByCnpj("00.000.000/0001-00")).thenReturn(Optional.of(empresa));
         when(mapper.toResponseDto(empresa)).thenReturn(responseDTO);
 
-        assertThat(service.buscarPorCnpj("00.000.000/0001-00")).isEqualTo(responseDTO);
+        assertThat(service.getById("00.000.000/0001-00")).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("buscarPorCnpj: lanca EntityNotFoundException quando CNPJ nao existe")
-    void buscarPorCnpj_naoEncontrado() {
+    @DisplayName("getById: lanca RecursoNaoEncontradoException quando CNPJ nao existe")
+    void getById_naoEncontrado() {
         when(repository.findByCnpj("99.999.999/9999-99")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.buscarPorCnpj("99.999.999/9999-99"))
-                .isInstanceOf(EntityNotFoundException.class)
+        assertThatThrownBy(() -> service.getById("99.999.999/9999-99"))
+                .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining("99.999.999/9999-99");
     }
 
     @Test
-    @DisplayName("listarTodas: retorna lista mapeada")
-    void listarTodas() {
+    @DisplayName("listAll: retorna lista mapeada")
+    void listAll() {
         when(repository.findAll()).thenReturn(List.of(empresa));
         when(mapper.toResponseDto(empresa)).thenReturn(responseDTO);
 
-        assertThat(service.listarTodas()).containsExactly(responseDTO);
+        assertThat(service.listAll()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("deletar: remove quando CNPJ existe")
-    void deletar_sucesso() {
+    @DisplayName("delete: remove quando CNPJ existe")
+    void delete_sucesso() {
         when(repository.findByCnpj("00.000.000/0001-00")).thenReturn(Optional.of(empresa));
 
-        service.deletar("00.000.000/0001-00");
+        service.delete("00.000.000/0001-00");
 
-        verify(repository).delete(empresa);
+        verify(repository).deleteByCnpj("00.000.000/0001-00");
     }
 
     @Test
-    @DisplayName("deletar: lanca EntityNotFoundException quando CNPJ nao existe")
-    void deletar_naoEncontrado() {
+    @DisplayName("delete: lanca RecursoNaoEncontradoException quando CNPJ nao existe")
+    void delete_naoEncontrado() {
         when(repository.findByCnpj("99.999.999/9999-99")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.deletar("99.999.999/9999-99"))
-                .isInstanceOf(EntityNotFoundException.class);
+        assertThatThrownBy(() -> service.delete("99.999.999/9999-99"))
+                .isInstanceOf(RecursoNaoEncontradoException.class);
     }
 }
