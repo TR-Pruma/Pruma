@@ -46,7 +46,7 @@ public class ImagemProjetoController {
     public ResponseEntity<ImagemProjetoResponseDTO> criar(@RequestBody @Valid ImagemProjetoRequestDTO dto) {
         ImagemProjetoResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
+                .path("/{id}").buildAndExpand(salvo.id()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 
