@@ -34,7 +34,7 @@ public class ComunicacaoAuxController {
             @Valid @RequestBody ComunicacaoAuxRequestDTO requestDTO) {
         var entity = comunicacaoAuxService.criar(requestDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(entity.id()).toUri();
+                .path("/{id}").buildAndExpand(entity.comunicacaoId()).toUri();
         return ResponseEntity.created(location).body(entity);
     }
 
