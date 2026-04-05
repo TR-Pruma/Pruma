@@ -5,12 +5,8 @@ import com.br.pruma.application.dto.response.OrcamentoResponseDTO;
 import com.br.pruma.application.dto.update.OrcamentoUpdateDTO;
 import com.br.pruma.application.mapper.OrcamentoMapper;
 import com.br.pruma.application.service.OrcamentoService;
-import com.br.pruma.core.domain.Empresa;
 import com.br.pruma.core.domain.Orcamento;
-import com.br.pruma.core.domain.Projeto;
-import com.br.pruma.core.repository.EmpresaRepository;
 import com.br.pruma.core.repository.OrcamentoRepository;
-import com.br.pruma.core.repository.ProjetoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,19 +22,11 @@ import java.util.List;
 public class OrcamentoServiceImpl implements OrcamentoService {
 
     private final OrcamentoRepository orcamentoRepository;
-    private final ProjetoRepository projetoRepository;
-    private final EmpresaRepository empresaRepository;
     private final OrcamentoMapper mapper;
 
     @Override
     public OrcamentoResponseDTO create(OrcamentoRequestDTO dto) {
-        Projeto projeto = projetoRepository.findById(dto.getProjetoId())
-                .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.getProjetoId()));
-        Empresa empresa = empresaRepository.findById(dto.getEmpresaCnpj())
-                .orElseThrow(() -> new EntityNotFoundException("Empresa não encontrada: " + dto.getEmpresaCnpj()));
         Orcamento entity = mapper.toEntity(dto);
-        entity.setProjeto(projeto);
-        entity.setEmpresa(empresa);
         return mapper.toResponse(orcamentoRepository.save(entity));
     }
 
@@ -46,7 +34,7 @@ public class OrcamentoServiceImpl implements OrcamentoService {
     @Transactional(readOnly = true)
     public OrcamentoResponseDTO getById(Integer id) {
         return mapper.toResponse(orcamentoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Orcamento não encontrado: " + id)));
+                .orElseThrow(() -> new EntityNotFoundException("Orcamento n\u00e3o encontrado: " + id)));
     }
 
     @Override
@@ -75,17 +63,7 @@ public class OrcamentoServiceImpl implements OrcamentoService {
     @Override
     public OrcamentoResponseDTO update(Integer id, OrcamentoUpdateDTO dto) {
         Orcamento entity = orcamentoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Orcamento não encontrado: " + id));
-        if (dto.getProjetoId() != null) {
-            Projeto projeto = projetoRepository.findById(dto.getProjetoId())
-                    .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.getProjetoId()));
-            entity.setProjeto(projeto);
-        }
-        if (dto.getEmpresaCnpj() != null) {
-            Empresa empresa = empresaRepository.findById(dto.getEmpresaCnpj())
-                    .orElseThrow(() -> new EntityNotFoundException("Empresa não encontrada: " + dto.getEmpresaCnpj()));
-            entity.setEmpresa(empresa);
-        }
+                .orElseThrow(() -> new EntityNotFoundException("Orcamento n\u00e3o encontrado: " + id));
         mapper.updateFromDto(dto, entity);
         return mapper.toResponse(orcamentoRepository.save(entity));
     }
@@ -93,22 +71,16 @@ public class OrcamentoServiceImpl implements OrcamentoService {
     @Override
     public OrcamentoResponseDTO replace(Integer id, OrcamentoRequestDTO dto) {
         orcamentoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Orcamento não encontrado: " + id));
-        Projeto projeto = projetoRepository.findById(dto.getProjetoId())
-                .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.getProjetoId()));
-        Empresa empresa = empresaRepository.findById(dto.getEmpresaCnpj())
-                .orElseThrow(() -> new EntityNotFoundException("Empresa não encontrada: " + dto.getEmpresaCnpj()));
+                .orElseThrow(() -> new EntityNotFoundException("Orcamento n\u00e3o encontrado: " + id));
         Orcamento updated = mapper.toEntity(dto);
         updated.setId(id);
-        updated.setProjeto(projeto);
-        updated.setEmpresa(empresa);
         return mapper.toResponse(orcamentoRepository.save(updated));
     }
 
     @Override
     public void delete(Integer id) {
         Orcamento entity = orcamentoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Orcamento não encontrado: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Orcamento n\u00e3o encontrado: " + id));
         orcamentoRepository.delete(entity);
     }
 }
