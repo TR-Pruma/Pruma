@@ -34,13 +34,13 @@ public class InspecaoServiceImpl implements InspecaoService {
                         "Projeto com ID " + dto.getProjetoId() + " não encontrado."));
         Inspecao entity = mapper.toEntity(dto);
         entity.setProjeto(projeto);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDTO(repository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
     public InspecaoResponseDTO getById(Integer id) {
-        return mapper.toResponse(repository.findById(id)
+        return mapper.toResponseDTO(repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Inspeção com ID " + id + " não encontrada.")));
     }
@@ -49,21 +49,21 @@ public class InspecaoServiceImpl implements InspecaoService {
     @Transactional(readOnly = true)
     public List<InspecaoResponseDTO> listAll() {
         return repository.findAll().stream()
-                .map(mapper::toResponse)
+                .map(mapper::toResponseDTO)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<InspecaoResponseDTO> list(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toResponse);
+        return repository.findAll(pageable).map(mapper::toResponseDTO);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<InspecaoResponseDTO> listByProjeto(Integer projetoId) {
         return repository.findAllByProjeto_Id(projetoId).stream()
-                .map(mapper::toResponse)
+                .map(mapper::toResponseDTO)
                 .toList();
     }
 
@@ -79,7 +79,7 @@ public class InspecaoServiceImpl implements InspecaoService {
             entity.setProjeto(projeto);
         }
         mapper.updateFromDto(dto, entity);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDTO(repository.save(entity));
     }
 
     @Override
@@ -93,7 +93,7 @@ public class InspecaoServiceImpl implements InspecaoService {
         Inspecao entity = mapper.toEntity(dto);
         entity.setId(id);
         entity.setProjeto(projeto);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDTO(repository.save(entity));
     }
 
     @Override

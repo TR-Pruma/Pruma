@@ -1,6 +1,9 @@
 package com.br.pruma.application.service.impl;
 
+import com.br.pruma.application.dto.request.CadastroRequestDTO;
+import com.br.pruma.application.dto.request.LoginRequestDTO;
 import com.br.pruma.application.dto.request.UsuarioRequestDTO;
+import com.br.pruma.application.dto.response.TokenResponseDTO;
 import com.br.pruma.application.dto.response.UsuarioResponseDTO;
 import com.br.pruma.application.dto.update.UsuarioUpdateDTO;
 import com.br.pruma.application.mapper.UsuarioMapper;
@@ -24,6 +27,16 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository repository;
     private final UsuarioMapper mapper;
+
+    @Override
+    public TokenResponseDTO autenticar(LoginRequestDTO dto) {
+        return null;
+    }
+
+    @Override
+    public void cadastrar(CadastroRequestDTO dto) {
+
+    }
 
     @Override
     public UsuarioResponseDTO create(UsuarioRequestDTO dto) {

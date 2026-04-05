@@ -33,13 +33,13 @@ public class FaseCronogramaServiceImpl implements FaseCronogramaService {
                 .orElseThrow(() -> new EntityNotFoundException("Cronograma não encontrado: " + dto.getCronogramaId()));
         FaseCronograma entity = mapper.toEntity(dto);
         entity.setCronograma(cronograma);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDTO(repository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
     public FaseCronogramaResponseDTO getById(Integer id) {
-        return mapper.toResponse(repository.findById(id)
+        return mapper.toResponseDTO(repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("FaseCronograma não encontrada: " + id)));
     }
 
@@ -47,21 +47,21 @@ public class FaseCronogramaServiceImpl implements FaseCronogramaService {
     @Transactional(readOnly = true)
     public List<FaseCronogramaResponseDTO> listAll() {
         return repository.findAll().stream()
-                .map(mapper::toResponse)
+                .map(mapper::toResponseDTO)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<FaseCronogramaResponseDTO> list(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toResponse);
+        return repository.findAll(pageable).map(mapper::toResponseDTO);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<FaseCronogramaResponseDTO> listByCronograma(Integer cronogramaId) {
         return repository.findAllByCronograma_Id(cronogramaId).stream()
-                .map(mapper::toResponse)
+                .map(mapper::toResponseDTO)
                 .toList();
     }
 
@@ -75,7 +75,7 @@ public class FaseCronogramaServiceImpl implements FaseCronogramaService {
             entity.setCronograma(cronograma);
         }
         mapper.updateFromDto(dto, entity);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDTO(repository.save(entity));
     }
 
     @Override
@@ -87,7 +87,7 @@ public class FaseCronogramaServiceImpl implements FaseCronogramaService {
         FaseCronograma entity = mapper.toEntity(dto);
         entity.setId(id);
         entity.setCronograma(cronograma);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDTO(repository.save(entity));
     }
 
     @Override

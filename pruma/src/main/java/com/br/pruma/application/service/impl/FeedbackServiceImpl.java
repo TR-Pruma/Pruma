@@ -27,13 +27,13 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     public FeedbackResponseDTO create(FeedbackRequestDTO dto) {
         Feedback entity = mapper.toEntity(dto);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDTODTO(repository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
     public FeedbackResponseDTO getById(Integer id) {
-        return mapper.toResponse(repository.findById(id)
+        return mapper.toResponseDTO(repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Feedback com ID " + id + " não encontrado.")));
     }
@@ -42,14 +42,14 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Transactional(readOnly = true)
     public List<FeedbackResponseDTO> listAll() {
         return repository.findAll().stream()
-                .map(mapper::toResponse)
+                .map(mapper::toResponseDTO)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<FeedbackResponseDTO> list(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toResponse);
+        return repository.findAll(pageable).map(mapper::toResponseDTO);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class FeedbackServiceImpl implements FeedbackService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Feedback com ID " + id + " não encontrado."));
         mapper.updateFromDto(dto, entity);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDTO(repository.save(entity));
     }
 
     @Override

@@ -34,13 +34,13 @@ public class ImagemProjetoServiceImpl implements ImagemProjetoService {
                         "Projeto com ID " + dto.getProjetoId() + " não encontrado."));
         ImagemProjeto entity = mapper.toEntity(dto);
         entity.setProjeto(projeto);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDTO(repository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
     public ImagemProjetoResponseDTO getById(Integer id) {
-        return mapper.toResponse(repository.findById(id)
+        return mapper.toResponseDTO(repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "ImagemProjeto com ID " + id + " não encontrada.")));
     }
@@ -49,21 +49,21 @@ public class ImagemProjetoServiceImpl implements ImagemProjetoService {
     @Transactional(readOnly = true)
     public List<ImagemProjetoResponseDTO> listAll() {
         return repository.findAll().stream()
-                .map(mapper::toResponse)
+                .map(mapper::toResponseDTO)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<ImagemProjetoResponseDTO> list(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toResponse);
+        return repository.findAll(pageable).map(mapper::toResponseDTO);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ImagemProjetoResponseDTO> listByProjeto(Integer projetoId) {
         return repository.findAllByProjeto_Id(projetoId).stream()
-                .map(mapper::toResponse)
+                .map(mapper::toResponseDTO)
                 .toList();
     }
 
@@ -73,7 +73,7 @@ public class ImagemProjetoServiceImpl implements ImagemProjetoService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "ImagemProjeto com ID " + id + " não encontrada."));
         mapper.updateFromDto(dto, entity);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDTO(repository.save(entity));
     }
 
     @Override
