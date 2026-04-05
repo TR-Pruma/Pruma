@@ -29,9 +29,9 @@ public class ImagemProjetoServiceImpl implements ImagemProjetoService {
 
     @Override
     public ImagemProjetoResponseDTO create(ImagemProjetoRequestDTO dto) {
-        Projeto projeto = projetoRepository.findById(dto.getProjetoId())
+        Projeto projeto = projetoRepository.findById(dto.projetoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
-                        "Projeto com ID " + dto.getProjetoId() + " não encontrado."));
+                        "Projeto com ID " + dto.projetoId() + " não encontrado."));
         ImagemProjeto entity = mapper.toEntity(dto);
         entity.setProjeto(projeto);
         return mapper.toResponseDTO(repository.save(entity));
