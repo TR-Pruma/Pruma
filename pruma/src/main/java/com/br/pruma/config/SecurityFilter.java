@@ -1,5 +1,6 @@
 package com.br.pruma.config;
 
+import com.br.pruma.adapters.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
