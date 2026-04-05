@@ -39,7 +39,7 @@ public class MensagemInstantaneaAuxController {
     public ResponseEntity<MensagemInstantaneaAuxResponseDTO> criar(@RequestBody @Valid MensagemInstantaneaAuxRequestDTO dto) {
         MensagemInstantaneaAuxResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
+                .path("/{mensagemId}").buildAndExpand(salvo.getMensagemId()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 

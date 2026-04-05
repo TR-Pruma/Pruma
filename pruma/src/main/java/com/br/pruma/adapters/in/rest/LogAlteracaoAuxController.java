@@ -28,12 +28,9 @@ public class LogAlteracaoAuxController {
             @PathVariable Integer logId,
             @Valid @RequestBody LogAlteracaoAuxRequestDTO requestBody
     ) {
-        var dto = LogAlteracaoAuxRequestDTO.builder()
-                .logId(logId)
-                .tipoAlteracao(requestBody.getTipoAlteracao())
-                .build();
+        requestBody.setLogId(logId);
 
-        LogAlteracaoAuxResponseDTO response = service.create(dto);
+        LogAlteracaoAuxResponseDTO response = service.create(requestBody);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .build()
