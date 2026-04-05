@@ -29,10 +29,10 @@ public class NotificacaoController {
         return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Lista notificações por usuário")
-    @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<NotificacaoResponseDTO>> listarPorUsuario(@PathVariable Integer usuarioId) {
-        return ResponseEntity.ok(service.listByUsuario(usuarioId));
+    @Operation(summary = "Lista notificações por CPF do cliente")
+    @GetMapping("/cliente/{clienteCpf}")
+    public ResponseEntity<List<NotificacaoResponseDTO>> listarPorCliente(@PathVariable String clienteCpf) {
+        return ResponseEntity.ok(service.listByCliente(clienteCpf));
     }
 
     @Operation(summary = "Busca notificação por ID")

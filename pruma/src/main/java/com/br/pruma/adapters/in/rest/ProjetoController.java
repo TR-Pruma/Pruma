@@ -31,10 +31,10 @@ public class ProjetoController {
         return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Lista projetos por cliente")
-    @GetMapping("/cliente/{clienteId}")
-    public ResponseEntity<List<ProjetoResponseDTO>> listarPorCliente(@PathVariable Integer clienteId) {
-        return ResponseEntity.ok(service.listByCliente(clienteId));
+    @Operation(summary = "Busca projetos pelo nome (parcial, case-insensitive)")
+    @GetMapping("/buscar")
+    public ResponseEntity<List<ProjetoResponseDTO>> buscarPorNome(@RequestParam String nome) {
+        return ResponseEntity.ok(service.listByNome(nome));
     }
 
     @Operation(summary = "Lista projetos paginado")
