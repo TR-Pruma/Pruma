@@ -62,7 +62,7 @@ public class ChecklistServiceImpl implements ChecklistService {
     @Override
     @Transactional(readOnly = true)
     public List<ChecklistResponseDTO> listByProjeto(Integer projetoId) {
-        return repository.findAllByProjeto_Id(projetoId).stream()
+        return repository.findByProjetoIdWithItens(projetoId).stream()
                 .map(mapper::toResponse)
                 .toList();
     }
