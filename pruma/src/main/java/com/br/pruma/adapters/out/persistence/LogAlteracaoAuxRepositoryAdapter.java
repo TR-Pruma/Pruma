@@ -5,6 +5,8 @@ import com.br.pruma.core.enums.TipoAlteracao;
 import com.br.pruma.core.repository.LogAlteracaoAuxRepository;
 import com.br.pruma.core.repository.port.LogAlteracaoAuxRepositoryPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -36,8 +38,18 @@ public class LogAlteracaoAuxRepositoryAdapter implements LogAlteracaoAuxReposito
     }
 
     @Override
+    public Page<LogAlteracaoAux> findAll(Pageable pageable) {
+        return logAlteracaoAuxRepository.findAll(pageable);
+    }
+
+    @Override
     public List<LogAlteracaoAux> findByTipoAlteracao(TipoAlteracao tipoAlteracao) {
         return logAlteracaoAuxRepository.findByTipoAlteracao(tipoAlteracao);
+    }
+
+    @Override
+    public void deleteById(Integer id) {
+        logAlteracaoAuxRepository.deleteById(id);
     }
 
     @Override
