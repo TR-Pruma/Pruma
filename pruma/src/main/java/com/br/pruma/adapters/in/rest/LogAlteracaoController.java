@@ -32,7 +32,7 @@ public class LogAlteracaoController {
     @Operation(summary = "Lista logs de alteração por obra")
     @GetMapping("/obra/{obraId}")
     public ResponseEntity<List<LogAlteracaoResponseDTO>> listarPorObra(@PathVariable Integer obraId) {
-        return ResponseEntity.ok(service.listByObra(obraId));
+        return ResponseEntity.ok(service.listByProjeto(obraId));
     }
 
     @Operation(summary = "Busca log de alteração por ID")
