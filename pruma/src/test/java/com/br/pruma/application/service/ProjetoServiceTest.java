@@ -36,7 +36,7 @@ class ProjetoServiceTest {
 
     @BeforeEach
     void setUp() {
-        projeto     = new Projeto();
+        projeto     = mock(Projeto.class);
         requestDTO  = mock(ProjetoRequestDTO.class);
         responseDTO = mock(ProjetoResponseDTO.class);
     }
