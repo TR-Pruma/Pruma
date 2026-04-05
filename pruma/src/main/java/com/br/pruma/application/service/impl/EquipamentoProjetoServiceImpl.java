@@ -32,7 +32,7 @@ public class EquipamentoProjetoServiceImpl implements EquipamentoProjetoService 
 
     @Override
     @Transactional(readOnly = true)
-    public EquipamentoProjetoResponseDTO getById(Integer id) {
+    public EquipamentoProjetoResponseDTO getById(Long id) {
         return mapper.toResponse(repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "EquipamentoProjeto com ID " + id + " não encontrado.")));
@@ -53,15 +53,7 @@ public class EquipamentoProjetoServiceImpl implements EquipamentoProjetoService 
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<EquipamentoProjetoResponseDTO> listByProjeto(Integer projetoId) {
-        return repository.findAllByProjeto_Id(projetoId).stream()
-                .map(mapper::toResponse)
-                .toList();
-    }
-
-    @Override
-    public EquipamentoProjetoResponseDTO update(Integer id, EquipamentoProjetoUpdateDTO dto) {
+    public EquipamentoProjetoResponseDTO update(Long id, EquipamentoProjetoUpdateDTO dto) {
         EquipamentoProjeto entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "EquipamentoProjeto com ID " + id + " não encontrado."));
@@ -70,7 +62,7 @@ public class EquipamentoProjetoServiceImpl implements EquipamentoProjetoService 
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(Long id) {
         EquipamentoProjeto entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "EquipamentoProjeto com ID " + id + " não encontrado."));

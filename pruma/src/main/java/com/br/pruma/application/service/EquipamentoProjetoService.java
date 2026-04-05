@@ -10,10 +10,9 @@ import java.util.List;
 
 public interface EquipamentoProjetoService {
     EquipamentoProjetoResponseDTO create(EquipamentoProjetoRequestDTO dto);
-    EquipamentoProjetoResponseDTO getById(Integer id);
+    EquipamentoProjetoResponseDTO getById(Long id);
     List<EquipamentoProjetoResponseDTO> listAll();
     Page<EquipamentoProjetoResponseDTO> list(Pageable pageable);
-    List<EquipamentoProjetoResponseDTO> listByProjeto(Integer projetoId);
-    EquipamentoProjetoResponseDTO update(Integer id, EquipamentoProjetoUpdateDTO dto);
-    void delete(Integer id);
+    EquipamentoProjetoResponseDTO update(Long id, EquipamentoProjetoUpdateDTO dto);
+    void delete(Long id);
 }
