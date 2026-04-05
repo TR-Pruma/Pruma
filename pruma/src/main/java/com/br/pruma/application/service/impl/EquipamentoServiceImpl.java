@@ -27,13 +27,13 @@ public class EquipamentoServiceImpl implements EquipamentoService {
     @Override
     public EquipamentoResponseDTO create(EquipamentoRequestDTO dto) {
         Equipamento entity = mapper.toEntity(dto);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDto(repository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
     public EquipamentoResponseDTO getById(Integer id) {
-        return mapper.toResponse(repository.findById(id)
+        return mapper.toResponseDto(repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Equipamento com ID " + id + " não encontrado.")));
     }
@@ -42,14 +42,14 @@ public class EquipamentoServiceImpl implements EquipamentoService {
     @Transactional(readOnly = true)
     public List<EquipamentoResponseDTO> listAll() {
         return repository.findAll().stream()
-                .map(mapper::toResponse)
+                .map(mapper::toResponseDto)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<EquipamentoResponseDTO> list(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toResponse);
+        return repository.findAll(pageable).map(mapper::toResponseDto);
     }
 
     @Override
@@ -57,8 +57,8 @@ public class EquipamentoServiceImpl implements EquipamentoService {
         Equipamento entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Equipamento com ID " + id + " não encontrado."));
-        mapper.updateFromDto(dto, entity);
-        return mapper.toResponse(repository.save(entity));
+        mapper.updateEntityFromDto(dto, entity);
+        return mapper.toResponseDto(repository.save(entity));
     }
 
     @Override
@@ -68,7 +68,7 @@ public class EquipamentoServiceImpl implements EquipamentoService {
                         "Equipamento com ID " + id + " não encontrado."));
         Equipamento entity = mapper.toEntity(dto);
         entity.setId(id);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDto(repository.save(entity));
     }
 
     @Override
