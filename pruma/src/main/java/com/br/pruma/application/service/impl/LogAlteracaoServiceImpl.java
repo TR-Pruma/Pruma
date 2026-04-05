@@ -7,7 +7,7 @@ import com.br.pruma.application.service.LogAlteracaoService;
 import com.br.pruma.core.domain.LogAlteracao;
 import com.br.pruma.core.exception.NotFoundException;
 import com.br.pruma.core.mapper.LogAlteracaoMapper;
-import com.br.pruma.core.port.out.LogAlteracaoRepositoryPort;
+import com.br.pruma.core.repository.port.LogAlteracaoRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +43,14 @@ public class LogAlteracaoServiceImpl implements LogAlteracaoService {
     @Override
     public Page<LogAlteracaoResponseDTO> list(Pageable pageable) {
         return repositoryPort.findAll(pageable).map(mapper::toResponse);
+    }
+
+    @Override
+    public List<LogAlteracaoResponseDTO> listByProjeto(Integer projetoId) {
+        return repositoryPort.findByProjetoIdOrderByDataHoraDesc(projetoId, Pageable.unpaged())
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 
     @Override
