@@ -1,6 +1,5 @@
 package com.br.pruma.application.service;
 
-import com.br.pruma.application.dto.request.FornecedorRequestDTO;
 import com.br.pruma.application.dto.request.PermissaoUsuarioRequestDTO;
 import com.br.pruma.application.dto.response.PermissaoUsuarioResponseDTO;
 import com.br.pruma.application.dto.update.PermissaoUsuarioUpdateDTO;
@@ -36,17 +35,16 @@ class PermissaoUsuarioServiceTest {
     private PermissaoUsuarioServiceImpl service;
 
     private PermissaoUsuario permissao;
-    private FornecedorRequestDTO requestDTO;
-    private PermissaoUsuarioRequestDTO permissaoRequestDTO;
+    private PermissaoUsuarioRequestDTO requestDTO;
     private PermissaoUsuarioUpdateDTO updateDTO;
     private PermissaoUsuarioResponseDTO responseDTO;
 
     @BeforeEach
     void setUp() {
-        permissao          = mock(PermissaoUsuario.class);
-        permissaoRequestDTO = mock(PermissaoUsuarioRequestDTO.class);
-        updateDTO          = mock(PermissaoUsuarioUpdateDTO.class);
-        responseDTO        = mock(PermissaoUsuarioResponseDTO.class);
+        permissao   = mock(PermissaoUsuario.class);
+        requestDTO  = mock(PermissaoUsuarioRequestDTO.class);
+        updateDTO   = mock(PermissaoUsuarioUpdateDTO.class);
+        responseDTO = mock(PermissaoUsuarioResponseDTO.class);
     }
 
     // -----------------------------------------------------------------------
@@ -56,11 +54,11 @@ class PermissaoUsuarioServiceTest {
     @Test
     @DisplayName("create: deve salvar e retornar DTO")
     void create_sucesso() {
-        when(mapper.toEntity(permissaoRequestDTO)).thenReturn(permissao);
+        when(mapper.toEntity(requestDTO)).thenReturn(permissao);
         when(repository.save(permissao)).thenReturn(permissao);
         when(mapper.toResponse(permissao)).thenReturn(responseDTO);
 
-        PermissaoUsuarioResponseDTO result = service.create(permissaoRequestDTO);
+        PermissaoUsuarioResponseDTO result = service.create(requestDTO);
 
         assertThat(result).isNotNull();
         verify(repository).save(permissao);
