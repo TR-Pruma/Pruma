@@ -54,7 +54,7 @@ public class ComunicacaoServiceImpl implements ComunicacaoService {
     @Transactional(readOnly = true)
     public Page<ComunicacaoResponseDTO> listarPorProjeto(Integer projetoId, Pageable pageable) {
         return comunicacaoRepository
-                .findByProjetoIdAndAtivoTrueOrderByDataCriacaoDesc(projetoId, pageable)
+                .findByProjetoIdAndAtivoTrueOrderByCreatedAtDesc(projetoId, pageable)
                 .map(comunicacaoMapper::toDTO);
     }
 
@@ -62,7 +62,7 @@ public class ComunicacaoServiceImpl implements ComunicacaoService {
     @Transactional(readOnly = true)
     public List<ComunicacaoResponseDTO> listarPorCliente(Integer clienteId) {
         return comunicacaoRepository
-                .findByClienteIdAndAtivoTrueOrderByDataCriacaoDesc(clienteId)
+                .findByClienteIdAndAtivoTrueOrderByCreatedAtDesc(clienteId)
                 .stream()
                 .map(comunicacaoMapper::toDTO)
                 .toList();
@@ -73,7 +73,7 @@ public class ComunicacaoServiceImpl implements ComunicacaoService {
     public Page<ComunicacaoResponseDTO> listarPorProjetoECliente(
             Integer projetoId, Integer clienteId, Pageable pageable) {
         return comunicacaoRepository
-                .findByProjetoIdAndClienteIdAndAtivoTrueOrderByDataCriacaoDesc(projetoId, clienteId, pageable)
+                .findByProjetoIdAndClienteIdAndAtivoTrueOrderByCreatedAtDesc(projetoId, clienteId, pageable)
                 .map(comunicacaoMapper::toDTO);
     }
 
