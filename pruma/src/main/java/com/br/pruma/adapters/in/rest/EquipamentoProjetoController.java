@@ -31,7 +31,7 @@ public class EquipamentoProjetoController {
 
     @Operation(summary = "Busca equipamento-projeto por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<EquipamentoProjetoResponseDTO> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<EquipamentoProjetoResponseDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
@@ -47,14 +47,14 @@ public class EquipamentoProjetoController {
 
     @Operation(summary = "Atualiza equipamento-projeto por ID")
     @PatchMapping("/{id}")
-    public ResponseEntity<EquipamentoProjetoResponseDTO> atualizar(@PathVariable Integer id,
+    public ResponseEntity<EquipamentoProjetoResponseDTO> atualizar(@PathVariable Long id,
                                                                    @RequestBody @Valid EquipamentoProjetoUpdateDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
     @Operation(summary = "Deleta equipamento-projeto por ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

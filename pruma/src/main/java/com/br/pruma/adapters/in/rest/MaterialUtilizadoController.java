@@ -32,7 +32,7 @@ public class MaterialUtilizadoController {
     @Operation(summary = "Lista materiais utilizados por obra")
     @GetMapping("/obra/{obraId}")
     public ResponseEntity<List<MaterialUtilizadoResponseDTO>> listarPorObra(@PathVariable Integer obraId) {
-        return ResponseEntity.ok(service.listByObra(obraId));
+        return ResponseEntity.ok(service.listByProjeto(obraId));
     }
 
     @Operation(summary = "Busca material utilizado por ID")
