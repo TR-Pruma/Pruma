@@ -54,8 +54,8 @@ public class NotificacaoServiceImpl implements NotificacaoService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<NotificacaoResponseDTO> listByUsuario(Integer usuarioId) {
-        return repository.findAllByUsuario_Id(usuarioId).stream()
+    public List<NotificacaoResponseDTO> listByCliente(String clienteCpf) {
+        return repository.findAllByCliente_Cpf(clienteCpf).stream()
                 .map(mapper::toResponse)
                 .toList();
     }

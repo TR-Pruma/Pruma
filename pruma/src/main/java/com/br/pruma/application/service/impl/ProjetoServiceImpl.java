@@ -53,8 +53,8 @@ public class ProjetoServiceImpl implements ProjetoService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjetoResponseDTO> listByCliente(Integer clienteId) {
-        return repository.findAllByCliente_Id(clienteId).stream()
+    public List<ProjetoResponseDTO> listByNome(String nome) {
+        return repository.findAllByNomeContainingIgnoreCase(nome).stream()
                 .map(mapper::toResponse)
                 .toList();
     }

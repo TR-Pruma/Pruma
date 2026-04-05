@@ -9,11 +9,12 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface NotificacaoService {
+
     NotificacaoResponseDTO create(NotificacaoRequestDTO dto);
     NotificacaoResponseDTO getById(Integer id);
     List<NotificacaoResponseDTO> listAll();
     Page<NotificacaoResponseDTO> list(Pageable pageable);
-    List<NotificacaoResponseDTO> listByUsuario(Integer usuarioId);
+    List<NotificacaoResponseDTO> listByCliente(String clienteCpf);
     NotificacaoResponseDTO marcarComoLida(Integer id);
     NotificacaoResponseDTO update(Integer id, NotificacaoUpdateDTO dto);
     void delete(Integer id);

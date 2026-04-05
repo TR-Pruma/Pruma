@@ -9,11 +9,12 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface ProjetoService {
+
     ProjetoResponseDTO create(ProjetoRequestDTO dto);
     ProjetoResponseDTO getById(Integer id);
     List<ProjetoResponseDTO> listAll();
     Page<ProjetoResponseDTO> list(Pageable pageable);
-    List<ProjetoResponseDTO> listByCliente(Integer clienteId);
+    List<ProjetoResponseDTO> listByNome(String nome);
     ProjetoResponseDTO update(Integer id, ProjetoUpdateDTO dto);
     ProjetoResponseDTO replace(Integer id, ProjetoRequestDTO dto);
     void delete(Integer id);
