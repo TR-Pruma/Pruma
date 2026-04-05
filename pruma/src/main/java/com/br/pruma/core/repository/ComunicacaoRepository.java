@@ -13,16 +13,16 @@ import java.util.Optional;
 public interface ComunicacaoRepository extends JpaRepository<Comunicacao, Integer> {
     Optional<Comunicacao> findByIdAndAtivoTrue(Integer id);
 
-    Page<Comunicacao> findByProjetoIdAndAtivoTrueOrderByDataCriacaoDesc(
+    Page<Comunicacao> findByProjetoIdAndAtivoTrueOrderByCreatedAtDesc(
         Integer projetoId,
         Pageable pageable
     );
 
-    List<Comunicacao> findByClienteIdAndAtivoTrueOrderByDataCriacaoDesc(
+    List<Comunicacao> findByClienteIdAndAtivoTrueOrderByCreatedAtDesc(
         Integer clienteId
     );
 
-    Page<Comunicacao> findByProjetoIdAndClienteIdAndAtivoTrueOrderByDataCriacaoDesc(
+    Page<Comunicacao> findByProjetoIdAndClienteIdAndAtivoTrueOrderByCreatedAtDesc(
         Integer projetoId,
         Integer clienteId,
         Pageable pageable
