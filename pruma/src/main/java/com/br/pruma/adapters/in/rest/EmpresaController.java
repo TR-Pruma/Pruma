@@ -40,7 +40,7 @@ public class EmpresaController {
     public ResponseEntity<EmpresaResponseDTO> criar(@RequestBody @Valid EmpresaRequestDTO dto) {
         EmpresaResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
+                .path("/{cnpj}").buildAndExpand(salvo.cnpj()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 
