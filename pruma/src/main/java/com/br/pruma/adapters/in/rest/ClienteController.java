@@ -8,8 +8,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -29,35 +27,24 @@ public class ClienteController {
     public ResponseEntity<ClienteResponseDTO> criar(@RequestBody @Valid ClienteRequestDTO request) {
         ClienteResponseDTO response = service.create(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(response.getId()).toUri();
+                .path("/{id}").buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(location).body(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ClienteResponseDTO> buscarPorId(@PathVariable Integer id) {
-        return ResponseEntity.ok(service.getById(id));
+        return ResponseEntity.ok(service.findById(id));
     }
 
     @GetMapping
     public ResponseEntity<List<ClienteResponseDTO>> listarTodos() {
-        return ResponseEntity.ok(service.listAll());
-    }
-
-    @GetMapping("/paginado")
-    public ResponseEntity<Page<ClienteResponseDTO>> listarPaginado(Pageable pageable) {
-        return ResponseEntity.ok(service.list(pageable));
+        return ResponseEntity.ok(service.findAll());
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<ClienteResponseDTO> atualizar(@PathVariable Integer id,
                                                         @RequestBody @Valid ClienteUpdateDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ClienteResponseDTO> substituir(@PathVariable Integer id,
-                                                         @RequestBody @Valid ClienteRequestDTO dto) {
-        return ResponseEntity.ok(service.replace(id, dto));
     }
 
     @DeleteMapping("/{id}")
