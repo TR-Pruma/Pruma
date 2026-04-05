@@ -29,10 +29,10 @@ public class EmpresaController {
         return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Busca empresa por ID")
-    @GetMapping("/{id}")
-    public ResponseEntity<EmpresaResponseDTO> buscarPorId(@PathVariable Integer id) {
-        return ResponseEntity.ok(service.getById(id));
+    @Operation(summary = "Busca empresa por CNPJ")
+    @GetMapping("/{cnpj}")
+    public ResponseEntity<EmpresaResponseDTO> buscarPorCnpj(@PathVariable String cnpj) {
+        return ResponseEntity.ok(service.getById(cnpj));
     }
 
     @Operation(summary = "Cria nova empresa")
@@ -44,24 +44,24 @@ public class EmpresaController {
         return ResponseEntity.created(location).body(salvo);
     }
 
-    @Operation(summary = "Atualiza parcialmente empresa por ID (PATCH semântico)")
-    @PatchMapping("/{id}")
-    public ResponseEntity<EmpresaResponseDTO> atualizar(@PathVariable Integer id,
+    @Operation(summary = "Atualiza parcialmente empresa por CNPJ (PATCH semântico)")
+    @PatchMapping("/{cnpj}")
+    public ResponseEntity<EmpresaResponseDTO> atualizar(@PathVariable String cnpj,
                                                         @RequestBody @Valid EmpresaUpdateDTO dto) {
-        return ResponseEntity.ok(service.update(id, dto));
+        return ResponseEntity.ok(service.update(cnpj, dto));
     }
 
-    @Operation(summary = "Substitui completamente empresa por ID (PUT semântico)")
-    @PutMapping("/{id}")
-    public ResponseEntity<EmpresaResponseDTO> substituir(@PathVariable Integer id,
+    @Operation(summary = "Substitui completamente empresa por CNPJ (PUT semântico)")
+    @PutMapping("/{cnpj}")
+    public ResponseEntity<EmpresaResponseDTO> substituir(@PathVariable String cnpj,
                                                          @RequestBody @Valid EmpresaRequestDTO dto) {
-        return ResponseEntity.ok(service.replace(id, dto));
+        return ResponseEntity.ok(service.replace(cnpj, dto));
     }
 
-    @Operation(summary = "Deleta empresa por ID")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
-        service.delete(id);
+    @Operation(summary = "Deleta empresa por CNPJ")
+    @DeleteMapping("/{cnpj}")
+    public ResponseEntity<Void> deletar(@PathVariable String cnpj) {
+        service.delete(cnpj);
         return ResponseEntity.noContent().build();
     }
 }
