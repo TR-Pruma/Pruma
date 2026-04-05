@@ -71,10 +71,10 @@ class PermissaoUsuarioServiceTest {
     @Test
     @DisplayName("getById: deve retornar DTO quando permissao existe")
     void getById_encontrado() {
-        when(repository.findById(1)).thenReturn(Optional.of(permissao));
+        when(repository.findById(1L)).thenReturn(Optional.of(permissao));
         when(mapper.toResponse(permissao)).thenReturn(responseDTO);
 
-        PermissaoUsuarioResponseDTO result = service.getById(1);
+        PermissaoUsuarioResponseDTO result = service.getById(1L);
 
         assertThat(result).isNotNull();
     }
@@ -82,9 +82,9 @@ class PermissaoUsuarioServiceTest {
     @Test
     @DisplayName("getById: deve lancar RecursoNaoEncontradoException quando nao encontrar")
     void getById_naoEncontrado() {
-        when(repository.findById(99)).thenReturn(Optional.empty());
+        when(repository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.getById(99))
+        assertThatThrownBy(() -> service.getById(99L))
                 .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining("99");
     }
@@ -113,7 +113,7 @@ class PermissaoUsuarioServiceTest {
         when(repository.save(permissao)).thenReturn(permissao);
         when(mapper.toResponse(permissao)).thenReturn(responseDTO);
 
-        PermissaoUsuarioResponseDTO result = service.update(1, updateDTO);
+        PermissaoUsuarioResponseDTO result = service.update(1L, updateDTO);
 
         assertThat(result).isNotNull();
         verify(mapper).updateFromDto(updateDTO, permissao);
@@ -123,9 +123,9 @@ class PermissaoUsuarioServiceTest {
     @Test
     @DisplayName("update: deve lancar RecursoNaoEncontradoException quando nao existe")
     void update_naoEncontrado() {
-        when(repository.findById(99)).thenReturn(Optional.empty());
+        when(repository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.update(99, updateDTO))
+        assertThatThrownBy(() -> service.update(99L, updateDTO))
                 .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining("99");
     }
@@ -137,9 +137,9 @@ class PermissaoUsuarioServiceTest {
     @Test
     @DisplayName("delete: deve deletar permissao existente")
     void delete_sucesso() {
-        when(repository.findById(1)).thenReturn(Optional.of(permissao));
+        when(repository.findById(1L)).thenReturn(Optional.of(permissao));
 
-        service.delete(1);
+        service.delete(1L);
 
         verify(repository).delete(permissao);
     }
@@ -147,9 +147,9 @@ class PermissaoUsuarioServiceTest {
     @Test
     @DisplayName("delete: deve lancar RecursoNaoEncontradoException quando nao existe")
     void delete_naoEncontrado() {
-        when(repository.findById(99)).thenReturn(Optional.empty());
+        when(repository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.delete(99))
+        assertThatThrownBy(() -> service.delete(99L))
                 .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining("99");
         verify(repository, never()).delete(any(PermissaoUsuario.class));
