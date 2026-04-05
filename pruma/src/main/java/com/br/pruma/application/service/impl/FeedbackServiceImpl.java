@@ -27,7 +27,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     public FeedbackResponseDTO create(FeedbackRequestDTO dto) {
         Feedback entity = mapper.toEntity(dto);
-        return mapper.toResponseDTODTO(repository.save(entity));
+        return mapper.toResponseDTO(repository.save(entity));
     }
 
     @Override
