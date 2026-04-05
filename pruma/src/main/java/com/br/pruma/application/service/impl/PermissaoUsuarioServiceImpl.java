@@ -7,6 +7,7 @@ import com.br.pruma.application.mapper.PermissaoUsuarioMapper;
 import com.br.pruma.application.service.PermissaoUsuarioService;
 import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.PermissaoUsuario;
+import com.br.pruma.core.domain.TipoUsuario;
 import com.br.pruma.core.repository.PermissaoUsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,7 +33,7 @@ public class PermissaoUsuarioServiceImpl implements PermissaoUsuarioService {
 
     @Override
     @Transactional(readOnly = true)
-    public PermissaoUsuarioResponseDTO getById(Integer id) {
+    public PermissaoUsuarioResponseDTO getById(Long id) {
         return mapper.toResponseDTO(repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "PermissaoUsuario com ID " + id + " não encontrada.")));
@@ -54,23 +55,28 @@ public class PermissaoUsuarioServiceImpl implements PermissaoUsuarioService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PermissaoUsuarioResponseDTO> listByUsuario(Integer usuarioId) {
-        return repository.findAllByUsuario_Id(usuarioId).stream()
+    public List<PermissaoUsuarioResponseDTO> listByClienteCpf(String cpf) {
+        return repository.findByCliente_Cpf(cpf).stream()
                 .map(mapper::toResponseDTO)
                 .toList();
     }
 
     @Override
-    public PermissaoUsuarioResponseDTO update(Integer id, PermissaoUsuarioUpdateDTO dto) {
+    public PermissaoUsuarioResponseDTO update(Long id, PermissaoUsuarioUpdateDTO dto) {
         PermissaoUsuario entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "PermissaoUsuario com ID " + id + " não encontrada."));
-        mapper.updateFromDto(dto, entity);
+        if (dto.permissao() != null) {
+            entity.setPermissao(dto.permissao());
+        }
+        if (dto.tipoUsuarioId() != null) {
+            entity.setTipoUsuario(TipoUsuario.builder().id(dto.tipoUsuarioId()).build());
+        }
         return mapper.toResponseDTO(repository.save(entity));
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(Long id) {
         PermissaoUsuario entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "PermissaoUsuario com ID " + id + " não encontrada."));
