@@ -29,10 +29,10 @@ public class LembreteController {
         return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Lista lembretes por obra")
-    @GetMapping("/obra/{obraId}")
-    public ResponseEntity<List<LembreteResponseDTO>> listarPorObra(@PathVariable Integer obraId) {
-        return ResponseEntity.ok(service.listByObra(obraId));
+    @Operation(summary = "Lista lembretes por projeto")
+    @GetMapping("/projeto/{projetoId}")
+    public ResponseEntity<List<LembreteResponseDTO>> listarPorProjeto(@PathVariable Integer projetoId) {
+        return ResponseEntity.ok(service.listByProjeto(projetoId));
     }
 
     @Operation(summary = "Busca lembrete por ID")

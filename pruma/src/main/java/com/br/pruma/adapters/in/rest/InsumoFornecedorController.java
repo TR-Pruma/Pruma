@@ -52,7 +52,8 @@ public class InsumoFornecedorController {
     public ResponseEntity<InsumoFornecedorResponseDTO> criar(@RequestBody @Valid InsumoFornecedorRequestDTO dto) {
         InsumoFornecedorResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
+                .path("/{insumoId}/{fornecedorId}")
+                .buildAndExpand(salvo.getInsumoId(), salvo.getFornecedorId()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 

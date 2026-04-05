@@ -29,10 +29,10 @@ public class InspecaoController {
         return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Lista inspeções por obra")
-    @GetMapping("/obra/{obraId}")
-    public ResponseEntity<List<InspecaoResponseDTO>> listarPorObra(@PathVariable Integer obraId) {
-        return ResponseEntity.ok(service.listByObra(obraId));
+    @Operation(summary = "Lista inspeções por projeto")
+    @GetMapping("/projeto/{projetoId}")
+    public ResponseEntity<List<InspecaoResponseDTO>> listarPorProjeto(@PathVariable Integer projetoId) {
+        return ResponseEntity.ok(service.listByProjeto(projetoId));
     }
 
     @Operation(summary = "Busca inspeção por ID")
@@ -46,7 +46,7 @@ public class InspecaoController {
     public ResponseEntity<InspecaoResponseDTO> criar(@RequestBody @Valid InspecaoRequestDTO dto) {
         InspecaoResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
+                .path("/{id}").buildAndExpand(salvo.id()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 
