@@ -29,10 +29,10 @@ public class ImagemProjetoController {
         return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Lista imagens de projeto por obra")
-    @GetMapping("/obra/{obraId}")
-    public ResponseEntity<List<ImagemProjetoResponseDTO>> listarPorObra(@PathVariable Integer obraId) {
-        return ResponseEntity.ok(service.listByObra(obraId));
+    @Operation(summary = "Lista imagens por projeto")
+    @GetMapping("/projeto/{projetoId}")
+    public ResponseEntity<List<ImagemProjetoResponseDTO>> listarPorProjeto(@PathVariable Integer projetoId) {
+        return ResponseEntity.ok(service.listByProjeto(projetoId));
     }
 
     @Operation(summary = "Busca imagem de projeto por ID")
