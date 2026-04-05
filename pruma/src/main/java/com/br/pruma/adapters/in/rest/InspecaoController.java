@@ -2,6 +2,7 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.InspecaoRequestDTO;
 import com.br.pruma.application.dto.response.InspecaoResponseDTO;
+import com.br.pruma.application.dto.update.InspecaoUpdateDTO;
 import com.br.pruma.application.service.InspecaoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,10 +29,10 @@ public class InspecaoController {
         return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Lista inspeções por projeto")
-    @GetMapping("/projeto/{projetoId}")
-    public ResponseEntity<List<InspecaoResponseDTO>> listarPorProjeto(@PathVariable Integer projetoId) {
-        return ResponseEntity.ok(service.listByProjeto(projetoId));
+    @Operation(summary = "Lista inspeções por obra")
+    @GetMapping("/obra/{obraId}")
+    public ResponseEntity<List<InspecaoResponseDTO>> listarPorObra(@PathVariable Integer obraId) {
+        return ResponseEntity.ok(service.listByObra(obraId));
     }
 
     @Operation(summary = "Busca inspeção por ID")
@@ -45,14 +46,14 @@ public class InspecaoController {
     public ResponseEntity<InspecaoResponseDTO> criar(@RequestBody @Valid InspecaoRequestDTO dto) {
         InspecaoResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.id()).toUri();
+                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 
     @Operation(summary = "Atualiza inspeção por ID")
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<InspecaoResponseDTO> atualizar(@PathVariable Integer id,
-                                                         @RequestBody @Valid InspecaoRequestDTO dto) {
+                                                         @RequestBody @Valid InspecaoUpdateDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 

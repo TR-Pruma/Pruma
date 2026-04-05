@@ -2,6 +2,7 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.FornecedorRequestDTO;
 import com.br.pruma.application.dto.response.FornecedorResponseDTO;
+import com.br.pruma.application.dto.update.FornecedorUpdateDTO;
 import com.br.pruma.application.service.FornecedorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,14 +40,14 @@ public class FornecedorController {
     public ResponseEntity<FornecedorResponseDTO> criar(@RequestBody @Valid FornecedorRequestDTO dto) {
         FornecedorResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.id()).toUri();
+                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 
     @Operation(summary = "Atualiza fornecedor por ID")
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<FornecedorResponseDTO> atualizar(@PathVariable Integer id,
-                                                           @RequestBody @Valid FornecedorRequestDTO dto) {
+                                                           @RequestBody @Valid FornecedorUpdateDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 

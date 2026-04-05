@@ -48,7 +48,7 @@ public class CronogramaController {
     public ResponseEntity<CronogramaResponseDTO> criar(@RequestBody @Valid CronogramaRequestDTO dto) {
         CronogramaResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.id()).toUri();
+                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 

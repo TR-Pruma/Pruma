@@ -2,6 +2,7 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.FeedbackRequestDTO;
 import com.br.pruma.application.dto.response.FeedbackResponseDTO;
+import com.br.pruma.application.dto.update.FeedbackUpdateDTO;
 import com.br.pruma.application.service.FeedbackService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,14 +40,14 @@ public class FeedbackController {
     public ResponseEntity<FeedbackResponseDTO> criar(@RequestBody @Valid FeedbackRequestDTO dto) {
         FeedbackResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.id()).toUri();
+                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 
     @Operation(summary = "Atualiza feedback por ID")
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<FeedbackResponseDTO> atualizar(@PathVariable Integer id,
-                                                         @RequestBody @Valid FeedbackRequestDTO dto) {
+                                                         @RequestBody @Valid FeedbackUpdateDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
