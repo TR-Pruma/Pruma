@@ -40,7 +40,7 @@ public class ProjetoCategoriaController {
     public ResponseEntity<ProjetoCategoriaResponseDTO> criar(@RequestBody @Valid ProjetoCategoriaRequestDTO dto) {
         ProjetoCategoriaResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
+                .path("/{id}").buildAndExpand(salvo.id()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 

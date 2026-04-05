@@ -29,10 +29,10 @@ public class RequisicaoMaterialController {
         return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Lista requisições de material por obra")
-    @GetMapping("/obra/{obraId}")
-    public ResponseEntity<List<RequisicaoMaterialResponseDTO>> listarPorObra(@PathVariable Integer obraId) {
-        return ResponseEntity.ok(service.listByObra(obraId));
+    @Operation(summary = "Lista requisições de material por projeto")
+    @GetMapping("/projeto/{projetoId}")
+    public ResponseEntity<List<RequisicaoMaterialResponseDTO>> listarPorProjeto(@PathVariable Integer projetoId) {
+        return ResponseEntity.ok(service.listByProjeto(projetoId));
     }
 
     @Operation(summary = "Busca requisição de material por ID")
@@ -46,7 +46,7 @@ public class RequisicaoMaterialController {
     public ResponseEntity<RequisicaoMaterialResponseDTO> criar(@RequestBody @Valid RequisicaoMaterialRequestDTO dto) {
         RequisicaoMaterialResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
+                .path("/{id}").buildAndExpand(salvo.id()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 

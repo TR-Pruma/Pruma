@@ -30,7 +30,7 @@ public class RelatorioController {
         RelatorioResponseDTO response = service.create(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(response.getId())
+                .buildAndExpand(response.id())
                 .toUri();
         return ResponseEntity.created(location).body(response);
     }
