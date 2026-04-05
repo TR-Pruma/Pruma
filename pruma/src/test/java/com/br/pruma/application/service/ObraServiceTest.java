@@ -4,6 +4,7 @@ import com.br.pruma.application.dto.request.ObraRequestDTO;
 import com.br.pruma.application.dto.response.ObraResponseDTO;
 import com.br.pruma.application.dto.update.ObraUpdateDTO;
 import com.br.pruma.application.mapper.ObraMapper;
+import com.br.pruma.application.service.impl.ObraServiceImpl;
 import com.br.pruma.core.domain.Obra;
 import com.br.pruma.core.domain.Projeto;
 import com.br.pruma.core.repository.ObraRepository;
@@ -30,8 +31,9 @@ class ObraServiceTest {
     @Mock ObraRepository obraRepository;
     @Mock ProjetoRepository projetoRepository;
     @Mock ObraMapper mapper;
-    @InjectMocks ObraService service;
+    @InjectMocks ObraServiceImpl service;
 
+    // mock() bypass o @NoArgsConstructor(access = PROTECTED)
     Obra obra;
     ObraRequestDTO requestDTO;
     ObraResponseDTO responseDTO;
@@ -109,18 +111,20 @@ class ObraServiceTest {
     @Test
     @DisplayName("delete: deleta quando existe")
     void delete_sucesso() {
-        when(obraRepository.existsById(1)).thenReturn(true);
+        when(obraRepository.findById(1)).thenReturn(Optional.of(obra));
+
         service.delete(1);
-        verify(obraRepository).deleteById(1);
+
+        verify(obraRepository).delete(obra);
     }
 
     @Test
     @DisplayName("delete: lanca EntityNotFoundException quando nao existe")
     void delete_naoEncontrado() {
-        when(obraRepository.existsById(99)).thenReturn(false);
+        when(obraRepository.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.delete(99))
                 .isInstanceOf(EntityNotFoundException.class);
-        verify(obraRepository, never()).deleteById(any());
+        verify(obraRepository, never()).delete(any(Obra.class));
     }
 }

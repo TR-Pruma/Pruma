@@ -1,89 +1,66 @@
 package com.br.pruma.adapters.in.rest;
 
-
-
 import com.br.pruma.application.dto.request.PermissaoUsuarioRequestDTO;
 import com.br.pruma.application.dto.response.PermissaoUsuarioResponseDTO;
+import com.br.pruma.application.dto.update.PermissaoUsuarioUpdateDTO;
 import com.br.pruma.application.service.PermissaoUsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
+@Tag(name = "PermissaoUsuario", description = "Operações relacionadas a permissões de usuários")
 @RestController
-@RequestMapping("/pruma/v1/permissoes")
+@RequestMapping("/pruma/v1/permissoes-usuario")
 @RequiredArgsConstructor
-@Tag(name = "Permissões de Usuário", description = "API para gerenciamento de permissões de usuário")
 public class PermissaoUsuarioController {
 
     private final PermissaoUsuarioService service;
 
-    @Operation(summary = "Cria uma nova permissão de usuário", description = "Endpoint para associar uma permissão a um usuário.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Permissão criada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos")
-    })
-    @PostMapping
-    public ResponseEntity<PermissaoUsuarioResponseDTO> criar(@Valid @RequestBody PermissaoUsuarioRequestDTO dto) {
-        PermissaoUsuarioResponseDTO response = service.criar(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    @Operation(summary = "Lista todas as permissões de usuário")
+    @GetMapping
+    public ResponseEntity<List<PermissaoUsuarioResponseDTO>> listarTodos() {
+        return ResponseEntity.ok(service.listAll());
     }
 
+    @Operation(summary = "Lista permissões pelo CPF do cliente")
+    @GetMapping("/cliente/{cpf}")
+    public ResponseEntity<List<PermissaoUsuarioResponseDTO>> listarPorClienteCpf(@PathVariable String cpf) {
+        return ResponseEntity.ok(service.listByClienteCpf(cpf));
+    }
 
-    @Operation(summary = "Busca uma permissão por ID", description = "Retorna os detalhes de uma permissão específica.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Permissão encontrada"),
-            @ApiResponse(responseCode = "404", description = "Permissão não encontrada para o ID informado")
-    })
+    @Operation(summary = "Busca permissão de usuário por ID")
     @GetMapping("/{id}")
     public ResponseEntity<PermissaoUsuarioResponseDTO> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(service.buscarPorId(id));
+        return ResponseEntity.ok(service.getById(id));
     }
 
-    @Operation(summary = "Atualiza uma permissão existente", description = "Atualiza os dados de uma permissão com base no seu ID.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Permissão atualizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos"),
-            @ApiResponse(responseCode = "404", description = "Permissão não encontrada para o ID informado")
-    })
-    @PutMapping("/{id}")
-    public ResponseEntity<PermissaoUsuarioResponseDTO> atualizar(@PathVariable Long id, @Valid @RequestBody PermissaoUsuarioRequestDTO dto) {
-        return ResponseEntity.ok(service.atualizar(id, dto));
+    @Operation(summary = "Cria nova permissão de usuário")
+    @PostMapping
+    public ResponseEntity<PermissaoUsuarioResponseDTO> criar(@RequestBody @Valid PermissaoUsuarioRequestDTO dto) {
+        PermissaoUsuarioResponseDTO salvo = service.create(dto);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
+        return ResponseEntity.created(location).body(salvo);
     }
 
-    @Operation(summary = "Deleta uma permissão", description = "Remove uma permissão do sistema com base no seu ID.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Permissão deletada com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Permissão não encontrada para o ID informado")
-    })
+    @Operation(summary = "Atualiza permissão de usuário por ID")
+    @PatchMapping("/{id}")
+    public ResponseEntity<PermissaoUsuarioResponseDTO> atualizar(@PathVariable Long id,
+                                                                  @RequestBody @Valid PermissaoUsuarioUpdateDTO dto) {
+        return ResponseEntity.ok(service.update(id, dto));
+    }
+
+    @Operation(summary = "Deleta permissão de usuário por ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        service.deletar(id);
+        service.delete(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "Busca permissões por CPF do cliente", description = "Retorna uma lista de permissões associadas a um cliente específico pelo CPF.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Permissões encontradas"),
-    })
-    @GetMapping("/cliente/{clienteCpf}")
-    public ResponseEntity<List<PermissaoUsuarioResponseDTO>> buscarPorCliente(@PathVariable String clienteCpf) {
-        return ResponseEntity.ok(service.buscarPorCliente(clienteCpf));
-    }
-
-    @Operation(summary = "Busca permissões por ID do tipo de usuário", description = "Retorna uma lista de permissões associadas a um tipo de usuário.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Permissões encontradas"),
-    })
-    @GetMapping("/tipo/{tipoUsuarioId}")
-    public ResponseEntity<List<PermissaoUsuarioResponseDTO>> buscarPorTipoUsuario(@PathVariable Integer tipoUsuarioId) {
-        return ResponseEntity.ok(service.buscarPorTipoUsuario(tipoUsuarioId));
     }
 }

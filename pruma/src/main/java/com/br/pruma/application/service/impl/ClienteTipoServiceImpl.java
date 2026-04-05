@@ -11,11 +11,13 @@ import com.br.pruma.core.repository.ClienteTipoRepository;
 import com.br.pruma.core.repository.TipoUsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ClienteTipoServiceImpl implements ClienteTipoService {
 
     private final ClienteTipoRepository repository;
@@ -25,12 +27,14 @@ public class ClienteTipoServiceImpl implements ClienteTipoService {
     @Override
     public ClienteTipoResponseDTO criar(ClienteTipoRequestDTO request) {
         TipoUsuario tipoUsuario = tipoUsuarioRepository.findById(request.getTipoUsuarioId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("TipoUsuario com ID " + request.getTipoUsuarioId() + " não encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "TipoUsuario com ID " + request.getTipoUsuarioId() + " não encontrado."));
         ClienteTipo entity = mapper.toEntity(request, tipoUsuario);
         return mapper.toDTO(repository.save(entity));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ClienteTipoResponseDTO> listarTodos() {
         return repository.findAll().stream()
                 .map(mapper::toDTO)
@@ -38,18 +42,22 @@ public class ClienteTipoServiceImpl implements ClienteTipoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ClienteTipoResponseDTO buscarPorId(Integer id) {
         return repository.findById(id)
                 .map(mapper::toDTO)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("ClienteTipo com ID " + id + " não encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "ClienteTipo com ID " + id + " não encontrado."));
     }
 
     @Override
     public ClienteTipoResponseDTO atualizar(Integer id, ClienteTipoRequestDTO request) {
         repository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("ClienteTipo com ID " + id + " não encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "ClienteTipo com ID " + id + " não encontrado."));
         TipoUsuario tipoUsuario = tipoUsuarioRepository.findById(request.getTipoUsuarioId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("TipoUsuario com ID " + request.getTipoUsuarioId() + " não encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "TipoUsuario com ID " + request.getTipoUsuarioId() + " não encontrado."));
         ClienteTipo entity = mapper.toEntity(request, tipoUsuario);
         entity.setId(id);
         return mapper.toDTO(repository.save(entity));
@@ -57,9 +65,9 @@ public class ClienteTipoServiceImpl implements ClienteTipoService {
 
     @Override
     public void deletar(Integer id) {
-        if (!repository.existsById(id)) {
-            throw new RecursoNaoEncontradoException("Não é possível deletar. ClienteTipo com ID " + id + " não existe.");
-        }
-        repository.deleteById(id);
+        ClienteTipo entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "ClienteTipo com ID " + id + " não encontrado."));
+        repository.delete(entity);
     }
 }

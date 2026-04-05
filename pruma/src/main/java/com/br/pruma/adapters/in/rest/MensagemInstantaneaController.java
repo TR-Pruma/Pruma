@@ -15,79 +15,51 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+@Tag(name = "MensagemInstantanea", description = "Operações relacionadas a mensagens instantâneas")
 @RestController
-@RequestMapping("/pruma/v1/mensagem-instantanea")
-@Tag(name = "MensagemInstantanea", description = "Gerencia mensagens instantâneas")
+@RequestMapping("/pruma/v1/mensagens-instantaneas")
 @RequiredArgsConstructor
 public class MensagemInstantaneaController {
 
     private final MensagemInstantaneaService service;
 
-    @Operation(summary = "Cria uma nova mensagem instantânea")
-    @PostMapping
-    public ResponseEntity<MensagemInstantaneaResponseDTO> create(
-            @Valid @RequestBody MensagemInstantaneaRequestDTO request
-    ) {
-        MensagemInstantaneaResponseDTO response = service.create(request);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.getId())
-                .toUri();
-        return ResponseEntity.created(location).body(response);
-    }
-
     @Operation(summary = "Lista todas as mensagens instantâneas")
     @GetMapping
-    public ResponseEntity<List<MensagemInstantaneaResponseDTO>> listAll() {
+    public ResponseEntity<List<MensagemInstantaneaResponseDTO>> listarTodos() {
         return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Busca uma mensagem instantânea por ID")
+    @Operation(summary = "Lista mensagens instantâneas por remetente")
+    @GetMapping("/remetente/{remetenteId}")
+    public ResponseEntity<List<MensagemInstantaneaResponseDTO>> listarPorRemetente(@PathVariable Integer remetenteId) {
+        return ResponseEntity.ok(service.listByRemetente(remetenteId));
+    }
+
+    @Operation(summary = "Busca mensagem instantânea por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<MensagemInstantaneaResponseDTO> getById(
-            @PathVariable Integer id
-    ) {
+    public ResponseEntity<MensagemInstantaneaResponseDTO> buscarPorId(@PathVariable Integer id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
-    @Operation(summary = "Lista mensagens enviadas por cliente")
-    @GetMapping("/cliente/{clienteCpf}")
-    public ResponseEntity<List<MensagemInstantaneaResponseDTO>> listByCliente(
-            @PathVariable Long clienteCpf
-    ) {
-        return ResponseEntity.ok(service.listByCliente(clienteCpf));
+    @Operation(summary = "Cria nova mensagem instantânea")
+    @PostMapping
+    public ResponseEntity<MensagemInstantaneaResponseDTO> criar(@RequestBody @Valid MensagemInstantaneaRequestDTO dto) {
+        MensagemInstantaneaResponseDTO salvo = service.create(dto);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
+        return ResponseEntity.created(location).body(salvo);
     }
 
-    @Operation(summary = "Lista mensagens por tipo de usuário")
-    @GetMapping("/tipo-usuario/{tipoUsuarioId}")
-    public ResponseEntity<List<MensagemInstantaneaResponseDTO>> listByTipoUsuario(
-            @PathVariable Integer tipoUsuarioId
-    ) {
-        return ResponseEntity.ok(service.listByTipoUsuario(tipoUsuarioId));
+    @Operation(summary = "Atualiza mensagem instantânea por ID")
+    @PatchMapping("/{id}")
+    public ResponseEntity<MensagemInstantaneaResponseDTO> atualizar(@PathVariable Integer id,
+                                                                    @RequestBody @Valid MensagemInstantaneaUpdateDTO dto) {
+        return ResponseEntity.ok(service.update(id, dto));
     }
 
-    @Operation(summary = "Lista mensagens por destinatário")
-    @GetMapping("/destinatario/{destinatarioId}")
-    public ResponseEntity<List<MensagemInstantaneaResponseDTO>> listByDestinatario(
-            @PathVariable String destinatarioId
-    ) {
-        return ResponseEntity.ok(service.listByDestinatario(destinatarioId));
-    }
-
-    @Operation(summary = "Atualiza parcialmente uma mensagem instantânea existente")
-    @PutMapping("/{id}")
-    public ResponseEntity<MensagemInstantaneaResponseDTO> update(
-            @PathVariable Integer id,
-            @Valid @RequestBody MensagemInstantaneaUpdateDTO request
-    ) {
-        return ResponseEntity.ok(service.update(id, request));
-    }
-
-    @Operation(summary = "Exclui uma mensagem instantânea por ID")
+    @Operation(summary = "Deleta mensagem instantânea por ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
-            @PathVariable Integer id
-    ) {
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

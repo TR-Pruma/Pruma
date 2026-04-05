@@ -2,6 +2,7 @@ package com.br.pruma.application.mapper;
 
 import com.br.pruma.application.dto.request.AtividadeRequestDTO;
 import com.br.pruma.application.dto.response.AtividadeResponseDTO;
+import com.br.pruma.application.dto.update.AtividadeUpdateDTO;
 import com.br.pruma.core.domain.Atividade;
 import com.br.pruma.core.domain.Projeto;
 import com.br.pruma.core.enums.StatusAtividade;
@@ -12,7 +13,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface AtividadeMapper {
 
-    // ====== DTO → Entidade (create) ======
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "projeto", source = "projeto", qualifiedByName = "projetoIdToProjeto")
     @Mapping(target = "status", source = "status", qualifiedByName = "stringToStatus")
@@ -22,7 +22,6 @@ public interface AtividadeMapper {
     @Mapping(target = "materiaisUtilizados", ignore = true)
     Atividade toEntity(AtividadeRequestDTO dto);
 
-    // ====== DTO → Entidade (update parcial) ======
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "projeto", source = "projeto", qualifiedByName = "projetoIdToProjeto")
     @Mapping(target = "status", source = "status", qualifiedByName = "stringToStatus")
@@ -31,24 +30,22 @@ public interface AtividadeMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "materiaisUtilizados", ignore = true)
-    void updateFromDto(AtividadeRequestDTO dto, @MappingTarget Atividade entity);
+    void updateFromDto(AtividadeUpdateDTO dto, @MappingTarget Atividade entity);
 
-    // ====== Entidade → DTO (response) ======
     @Mapping(target = "id", source = "id")
     @Mapping(target = "projeto", source = "projeto.id")
     @Mapping(target = "descricao", source = "descricao")
     @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
     @Mapping(target = "dataInicio", source = "dataInicio")
     @Mapping(target = "dataFim", source = "dataFim")
-    AtividadeResponseDTO toResponseDTO(Atividade entity);
+    AtividadeResponseDTO toResponse(Atividade entity);
 
     List<AtividadeResponseDTO> toResponseList(List<Atividade> entities);
 
-    // ====== Conversores auxiliares ======
     @Named("projetoIdToProjeto")
     default Projeto projetoIdToProjeto(Integer projetoId) {
         if (projetoId == null) return null;
-        return Projeto.builder().id(projetoId).build();
+        return Projeto.ofId(projetoId);
     }
 
     @Named("stringToStatus")
@@ -66,4 +63,3 @@ public interface AtividadeMapper {
         return status == null ? null : status.name();
     }
 }
-

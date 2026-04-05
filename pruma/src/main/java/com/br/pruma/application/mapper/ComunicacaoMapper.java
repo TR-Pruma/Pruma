@@ -14,9 +14,9 @@ public interface ComunicacaoMapper {
     @Mapping(target = "projeto", source = "projeto")
     @Mapping(target = "cliente", source = "cliente")
     @Mapping(target = "ativo", constant = "true")
-    @Mapping(target = "dataCriacao", ignore = true)
-    @Mapping(target = "dataAtualizacao", ignore = true)
-    @Mapping(target = "versao", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "version", ignore = true)
     Comunicacao toEntity(ComunicacaoRequestDTO dto, Projeto projeto, Cliente cliente);
 
     @Mapping(target = "projetoId", source = "projeto.id")

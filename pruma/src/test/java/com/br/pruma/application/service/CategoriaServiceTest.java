@@ -4,6 +4,7 @@ import com.br.pruma.application.dto.request.CategoriaRequestDTO;
 import com.br.pruma.application.dto.response.CategoriaResponseDTO;
 import com.br.pruma.application.dto.update.CategoriaUpdateDTO;
 import com.br.pruma.application.mapper.CategoriaMapper;
+import com.br.pruma.application.service.impl.CategoriaServiceImpl;
 import com.br.pruma.core.domain.Categoria;
 import com.br.pruma.core.repository.CategoriaRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,8 +28,9 @@ class CategoriaServiceTest {
 
     @Mock CategoriaRepository repository;
     @Mock CategoriaMapper mapper;
-    @InjectMocks CategoriaService service;
+    @InjectMocks CategoriaServiceImpl service;
 
+    // mock() bypass o @NoArgsConstructor(access = PROTECTED)
     Categoria categoria;
     CategoriaRequestDTO requestDTO;
     CategoriaResponseDTO responseDTO;
@@ -103,18 +105,20 @@ class CategoriaServiceTest {
     @Test
     @DisplayName("delete: deleta quando existe")
     void delete_sucesso() {
-        when(repository.existsById(1)).thenReturn(true);
+        when(repository.findById(1)).thenReturn(Optional.of(categoria));
+
         service.delete(1);
-        verify(repository).deleteById(1);
+
+        verify(repository).delete(categoria);
     }
 
     @Test
     @DisplayName("delete: lanca EntityNotFoundException quando nao existe")
     void delete_naoEncontrado() {
-        when(repository.existsById(99)).thenReturn(false);
+        when(repository.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.delete(99))
                 .isInstanceOf(EntityNotFoundException.class);
-        verify(repository, never()).deleteById(any());
+        verify(repository, never()).delete(any(Categoria.class));
     }
 }

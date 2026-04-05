@@ -1,6 +1,5 @@
 package com.br.pruma.application.dto.request;
 
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -11,7 +10,7 @@ import java.time.LocalDate;
 public class FaseCronogramaRequestDTO {
 
     @NotNull
-    private Long cronogramaId;
+    private Integer cronogramaId;
 
     @NotBlank
     private String nome;

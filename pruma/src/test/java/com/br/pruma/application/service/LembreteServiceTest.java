@@ -4,6 +4,7 @@ import com.br.pruma.application.dto.request.LembreteRequestDTO;
 import com.br.pruma.application.dto.response.LembreteResponseDTO;
 import com.br.pruma.application.dto.update.LembreteUpdateDTO;
 import com.br.pruma.application.mapper.LembreteMapper;
+import com.br.pruma.application.service.impl.LembreteServiceImpl;
 import com.br.pruma.core.domain.Cliente;
 import com.br.pruma.core.domain.Lembrete;
 import com.br.pruma.core.domain.TipoUsuario;
@@ -33,7 +34,7 @@ class LembreteServiceTest {
     @Mock ClienteRepository clienteRepo;
     @Mock TipoUsuarioRepository tipoUsuarioRepo;
     @Mock LembreteMapper mapper;
-    @InjectMocks LembreteService service;
+    @InjectMocks LembreteServiceImpl service;
 
     Lembrete lembrete;
     LembreteRequestDTO requestDTO;
