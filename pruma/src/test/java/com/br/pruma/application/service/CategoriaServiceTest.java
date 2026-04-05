@@ -4,6 +4,7 @@ import com.br.pruma.application.dto.request.CategoriaRequestDTO;
 import com.br.pruma.application.dto.response.CategoriaResponseDTO;
 import com.br.pruma.application.dto.update.CategoriaUpdateDTO;
 import com.br.pruma.application.mapper.CategoriaMapper;
+import com.br.pruma.application.service.impl.CategoriaServiceImpl;
 import com.br.pruma.core.domain.Categoria;
 import com.br.pruma.core.repository.CategoriaRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,7 +28,7 @@ class CategoriaServiceTest {
 
     @Mock CategoriaRepository repository;
     @Mock CategoriaMapper mapper;
-    @InjectMocks CategoriaService service;
+    @InjectMocks CategoriaServiceImpl service;
 
     Categoria categoria;
     CategoriaRequestDTO requestDTO;

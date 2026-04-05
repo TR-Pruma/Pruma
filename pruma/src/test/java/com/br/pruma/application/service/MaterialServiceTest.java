@@ -4,6 +4,7 @@ import com.br.pruma.application.dto.request.MaterialRequestDTO;
 import com.br.pruma.application.dto.response.MaterialResponseDTO;
 import com.br.pruma.application.dto.update.MaterialUpdateDTO;
 import com.br.pruma.application.mapper.MaterialMapper;
+import com.br.pruma.application.service.impl.MaterialServiceImpl;
 import com.br.pruma.core.domain.Material;
 import com.br.pruma.core.repository.MaterialRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -33,7 +34,7 @@ class MaterialServiceTest {
     private MaterialMapper mapper;
 
     @InjectMocks
-    private MaterialService service;
+    private MaterialServiceImpl service;
 
     private Material material;
     private MaterialRequestDTO requestDTO;
@@ -47,7 +48,6 @@ class MaterialServiceTest {
                 .custoUnitario(new BigDecimal("32.50"))
                 .build();
 
-        // DTOs usam builder pois construtores são PROTECTED
         requestDTO = MaterialRequestDTO.builder()
                 .descricao("Cimento CP-II")
                 .quantidade(100)
@@ -61,12 +61,8 @@ class MaterialServiceTest {
                 .build();
     }
 
-    // -----------------------------------------------------------------------
-    // create
-    // -----------------------------------------------------------------------
-
     @Test
-    @DisplayName("create: deve salvar e retornar DTO quando descrição é única")
+    @DisplayName("create: deve salvar e retornar DTO quando descricao e unica")
     void create_sucesso() {
         when(repository.findByDescricao(requestDTO.getDescricao())).thenReturn(Optional.empty());
         when(mapper.toEntity(requestDTO)).thenReturn(material);
@@ -81,20 +77,16 @@ class MaterialServiceTest {
     }
 
     @Test
-    @DisplayName("create: deve lançar IllegalArgumentException quando descrição já existe")
+    @DisplayName("create: deve lancar IllegalArgumentException quando descricao ja existe")
     void create_descricaoDuplicada() {
         when(repository.findByDescricao(requestDTO.getDescricao())).thenReturn(Optional.of(material));
 
         assertThatThrownBy(() -> service.create(requestDTO))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Já existe material com essa descrição");
+                .hasMessageContaining("Ja existe material com essa descricao");
 
         verify(repository, never()).save(any());
     }
-
-    // -----------------------------------------------------------------------
-    // getById
-    // -----------------------------------------------------------------------
 
     @Test
     @DisplayName("getById: deve retornar DTO quando material existe")
@@ -109,7 +101,7 @@ class MaterialServiceTest {
     }
 
     @Test
-    @DisplayName("getById: deve lançar EntityNotFoundException quando material não existe")
+    @DisplayName("getById: deve lancar EntityNotFoundException quando material nao existe")
     void getById_naoEncontrado() {
         when(repository.findById(99)).thenReturn(Optional.empty());
 
@@ -117,10 +109,6 @@ class MaterialServiceTest {
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("99");
     }
-
-    // -----------------------------------------------------------------------
-    // listAll
-    // -----------------------------------------------------------------------
 
     @Test
     @DisplayName("listAll: deve retornar lista com todos os materiais")
@@ -135,7 +123,7 @@ class MaterialServiceTest {
     }
 
     @Test
-    @DisplayName("listAll: deve retornar lista vazia quando não há materiais")
+    @DisplayName("listAll: deve retornar lista vazia quando nao ha materiais")
     void listAll_listaVazia() {
         when(repository.findAllByOrderByDescricaoAsc()).thenReturn(List.of());
 
@@ -144,12 +132,8 @@ class MaterialServiceTest {
         assertThat(result).isEmpty();
     }
 
-    // -----------------------------------------------------------------------
-    // update
-    // -----------------------------------------------------------------------
-
     @Test
-    @DisplayName("update: deve atualizar material com nova descrição única")
+    @DisplayName("update: deve atualizar material com nova descricao unica")
     void update_sucesso() {
         MaterialUpdateDTO updateDTO = MaterialUpdateDTO.builder()
                 .descricao("Cimento CP-III")
@@ -170,7 +154,7 @@ class MaterialServiceTest {
     }
 
     @Test
-    @DisplayName("update: deve lançar EntityNotFoundException quando material não existe")
+    @DisplayName("update: deve lancar EntityNotFoundException quando material nao existe")
     void update_naoEncontrado() {
         when(repository.findById(99)).thenReturn(Optional.empty());
 
@@ -180,7 +164,7 @@ class MaterialServiceTest {
     }
 
     @Test
-    @DisplayName("update: deve lançar IllegalArgumentException quando nova descrição pertence a outro material")
+    @DisplayName("update: deve lancar IllegalArgumentException quando nova descricao pertence a outro material")
     void update_descricaoDuplicadaOutroMaterial() {
         MaterialUpdateDTO updateDTO = MaterialUpdateDTO.builder()
                 .descricao("Cimento CP-III")
@@ -200,12 +184,8 @@ class MaterialServiceTest {
 
         assertThatThrownBy(() -> service.update(1, updateDTO))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Outro material já usa essa descrição");
+                .hasMessageContaining("Outro material ja usa essa descricao");
     }
-
-    // -----------------------------------------------------------------------
-    // delete
-    // -----------------------------------------------------------------------
 
     @Test
     @DisplayName("delete: deve deletar quando material existe")
@@ -218,7 +198,7 @@ class MaterialServiceTest {
     }
 
     @Test
-    @DisplayName("delete: deve lançar EntityNotFoundException quando material não existe")
+    @DisplayName("delete: deve lancar EntityNotFoundException quando material nao existe")
     void delete_naoEncontrado() {
         when(repository.existsById(99)).thenReturn(false);
 
@@ -228,10 +208,6 @@ class MaterialServiceTest {
 
         verify(repository, never()).deleteById(any());
     }
-
-    // -----------------------------------------------------------------------
-    // helper
-    // -----------------------------------------------------------------------
 
     private void setId(Material m, Integer id) {
         try {

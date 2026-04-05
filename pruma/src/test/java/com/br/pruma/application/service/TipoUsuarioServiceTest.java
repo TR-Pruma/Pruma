@@ -4,6 +4,7 @@ import com.br.pruma.application.dto.request.TipoUsuarioRequestDTO;
 import com.br.pruma.application.dto.response.TipoUsuarioResponseDTO;
 import com.br.pruma.application.dto.update.TipoUsuarioUpdateDTO;
 import com.br.pruma.application.mapper.TipoUsuarioMapper;
+import com.br.pruma.application.service.impl.TipoUsuarioServiceImpl;
 import com.br.pruma.core.domain.TipoUsuario;
 import com.br.pruma.core.repository.TipoUsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,7 +28,7 @@ class TipoUsuarioServiceTest {
 
     @Mock TipoUsuarioRepository repository;
     @Mock TipoUsuarioMapper mapper;
-    @InjectMocks TipoUsuarioService service;
+    @InjectMocks TipoUsuarioServiceImpl service;
 
     TipoUsuario tipoUsuario;
     TipoUsuarioRequestDTO requestDTO;

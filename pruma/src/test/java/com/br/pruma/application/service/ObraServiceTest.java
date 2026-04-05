@@ -4,6 +4,7 @@ import com.br.pruma.application.dto.request.ObraRequestDTO;
 import com.br.pruma.application.dto.response.ObraResponseDTO;
 import com.br.pruma.application.dto.update.ObraUpdateDTO;
 import com.br.pruma.application.mapper.ObraMapper;
+import com.br.pruma.application.service.impl.ObraServiceImpl;
 import com.br.pruma.core.domain.Obra;
 import com.br.pruma.core.domain.Projeto;
 import com.br.pruma.core.repository.ObraRepository;
@@ -30,7 +31,7 @@ class ObraServiceTest {
     @Mock ObraRepository obraRepository;
     @Mock ProjetoRepository projetoRepository;
     @Mock ObraMapper mapper;
-    @InjectMocks ObraService service;
+    @InjectMocks ObraServiceImpl service;
 
     Obra obra;
     ObraRequestDTO requestDTO;
