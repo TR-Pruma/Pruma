@@ -104,7 +104,9 @@ class ProjetoServiceTest {
     @DisplayName("delete: deleta quando existe")
     void delete_sucesso() {
         when(repository.findById(1)).thenReturn(Optional.of(projeto));
+
         service.delete(1);
+
         verify(repository).delete(projeto);
     }
 

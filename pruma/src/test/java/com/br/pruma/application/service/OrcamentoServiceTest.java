@@ -106,7 +106,9 @@ class OrcamentoServiceTest {
     @DisplayName("delete: deleta quando existe")
     void delete_sucesso() {
         when(orcamentoRepository.findById(1)).thenReturn(Optional.of(orcamento));
+
         service.delete(1);
+
         verify(orcamentoRepository).delete(orcamento);
     }
 

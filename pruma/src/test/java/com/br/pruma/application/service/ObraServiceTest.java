@@ -111,7 +111,9 @@ class ObraServiceTest {
     @DisplayName("delete: deleta quando existe")
     void delete_sucesso() {
         when(obraRepository.findById(1)).thenReturn(Optional.of(obra));
+
         service.delete(1);
+
         verify(obraRepository).delete(obra);
     }
 
