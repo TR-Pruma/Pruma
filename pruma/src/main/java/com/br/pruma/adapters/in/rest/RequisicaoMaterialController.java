@@ -2,6 +2,7 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.RequisicaoMaterialRequestDTO;
 import com.br.pruma.application.dto.response.RequisicaoMaterialResponseDTO;
+import com.br.pruma.application.dto.update.RequisicaoMaterialUpdateDTO;
 import com.br.pruma.application.service.RequisicaoMaterialService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,41 +23,41 @@ public class RequisicaoMaterialController {
 
     private final RequisicaoMaterialService service;
 
-    @Operation(summary = "Lista todas as requisições")
+    @Operation(summary = "Lista todas as requisições de material")
     @GetMapping
     public ResponseEntity<List<RequisicaoMaterialResponseDTO>> listarTodos() {
         return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Lista requisições por projeto")
-    @GetMapping("/projeto/{projetoId}")
-    public ResponseEntity<List<RequisicaoMaterialResponseDTO>> listarPorProjeto(@PathVariable Integer projetoId) {
-        return ResponseEntity.ok(service.listByProjeto(projetoId));
+    @Operation(summary = "Lista requisições de material por obra")
+    @GetMapping("/obra/{obraId}")
+    public ResponseEntity<List<RequisicaoMaterialResponseDTO>> listarPorObra(@PathVariable Integer obraId) {
+        return ResponseEntity.ok(service.listByObra(obraId));
     }
 
-    @Operation(summary = "Busca requisição por ID")
+    @Operation(summary = "Busca requisição de material por ID")
     @GetMapping("/{id}")
     public ResponseEntity<RequisicaoMaterialResponseDTO> buscarPorId(@PathVariable Integer id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
-    @Operation(summary = "Cria nova requisição")
+    @Operation(summary = "Cria nova requisição de material")
     @PostMapping
     public ResponseEntity<RequisicaoMaterialResponseDTO> criar(@RequestBody @Valid RequisicaoMaterialRequestDTO dto) {
         RequisicaoMaterialResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.id()).toUri();
+                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 
-    @Operation(summary = "Atualiza requisição por ID")
-    @PutMapping("/{id}")
+    @Operation(summary = "Atualiza requisição de material por ID")
+    @PatchMapping("/{id}")
     public ResponseEntity<RequisicaoMaterialResponseDTO> atualizar(@PathVariable Integer id,
-                                                                    @RequestBody @Valid RequisicaoMaterialRequestDTO dto) {
+                                                                   @RequestBody @Valid RequisicaoMaterialUpdateDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
-    @Operation(summary = "Deleta requisição por ID")
+    @Operation(summary = "Deleta requisição de material por ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         service.delete(id);

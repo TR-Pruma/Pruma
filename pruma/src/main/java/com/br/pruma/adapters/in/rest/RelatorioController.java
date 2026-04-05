@@ -2,11 +2,14 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.RelatorioRequestDTO;
 import com.br.pruma.application.dto.response.RelatorioResponseDTO;
+import com.br.pruma.application.dto.update.RelatorioUpdateDTO;
 import com.br.pruma.application.service.RelatorioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -14,55 +17,53 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+@Tag(name = "Relatorio", description = "Operações relacionadas a relatórios")
 @RestController
 @RequestMapping("/pruma/v1/relatorios")
-@Tag(name = "Relatorio", description = "Gerencia relatórios de obras")
 @RequiredArgsConstructor
 public class RelatorioController {
 
     private final RelatorioService service;
 
-    @Operation(summary = "Cria um novo relatório")
     @PostMapping
-    public ResponseEntity<RelatorioResponseDTO> create(@Valid @RequestBody RelatorioRequestDTO request) {
+    public ResponseEntity<RelatorioResponseDTO> criar(@RequestBody @Valid RelatorioRequestDTO request) {
         RelatorioResponseDTO response = service.create(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(response.id()) // se usar classe em vez de record, troque para getId()
+                .buildAndExpand(response.getId())
                 .toUri();
         return ResponseEntity.created(location).body(response);
     }
 
-    @Operation(summary = "Lista todos os relatórios")
-    @GetMapping
-    public ResponseEntity<List<RelatorioResponseDTO>> listAll() {
-        return ResponseEntity.ok(service.listAll());
-    }
-
-    @Operation(summary = "Lista relatórios de uma obra específica")
-    @GetMapping("/obra/{obraId}")
-    public ResponseEntity<List<RelatorioResponseDTO>> listByObra(@PathVariable Integer obraId) {
-        return ResponseEntity.ok(service.listByObraId(obraId));
-    }
-
-    @Operation(summary = "Obtém um relatório por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<RelatorioResponseDTO> getById(@PathVariable Integer id) {
+    public ResponseEntity<RelatorioResponseDTO> buscarPorId(@PathVariable Integer id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
-    @Operation(summary = "Atualiza parcialmente um relatório")
-    @PutMapping("/{id}")
-    public ResponseEntity<RelatorioResponseDTO> update(
-            @PathVariable Integer id,
-            @Valid @RequestBody RelatorioRequestDTO request
-    ) {
-        return ResponseEntity.ok(service.update(id, request));
+    @GetMapping
+    public ResponseEntity<List<RelatorioResponseDTO>> listarTodos() {
+        return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Exclui permanentemente um relatório")
+    @GetMapping("/paginado")
+    public ResponseEntity<Page<RelatorioResponseDTO>> listarPaginado(Pageable pageable) {
+        return ResponseEntity.ok(service.list(pageable));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<RelatorioResponseDTO> atualizar(@PathVariable Integer id,
+                                                          @RequestBody @Valid RelatorioUpdateDTO dto) {
+        return ResponseEntity.ok(service.update(id, dto));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<RelatorioResponseDTO> substituir(@PathVariable Integer id,
+                                                           @RequestBody @Valid RelatorioRequestDTO dto) {
+        return ResponseEntity.ok(service.replace(id, dto));
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

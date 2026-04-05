@@ -22,35 +22,28 @@ public class MensagemInstantaneaAuxController {
 
     private final MensagemInstantaneaAuxService service;
 
-    @Operation(summary = "Lista todas")
+    @Operation(summary = "Lista todos os auxiliares de mensagem instantânea")
     @GetMapping
     public ResponseEntity<List<MensagemInstantaneaAuxResponseDTO>> listarTodos() {
         return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Busca por ID")
+    @Operation(summary = "Busca auxiliar de mensagem instantânea por ID")
     @GetMapping("/{id}")
     public ResponseEntity<MensagemInstantaneaAuxResponseDTO> buscarPorId(@PathVariable Integer id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
-    @Operation(summary = "Cria nova")
+    @Operation(summary = "Cria novo auxiliar de mensagem instantânea")
     @PostMapping
     public ResponseEntity<MensagemInstantaneaAuxResponseDTO> criar(@RequestBody @Valid MensagemInstantaneaAuxRequestDTO dto) {
         MensagemInstantaneaAuxResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.id()).toUri();
+                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 
-    @Operation(summary = "Atualiza por ID")
-    @PutMapping("/{id}")
-    public ResponseEntity<MensagemInstantaneaAuxResponseDTO> atualizar(@PathVariable Integer id,
-                                                                        @RequestBody @Valid MensagemInstantaneaAuxRequestDTO dto) {
-        return ResponseEntity.ok(service.update(id, dto));
-    }
-
-    @Operation(summary = "Deleta por ID")
+    @Operation(summary = "Deleta auxiliar de mensagem instantânea por ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
         service.delete(id);

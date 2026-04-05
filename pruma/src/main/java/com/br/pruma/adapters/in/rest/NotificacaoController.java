@@ -2,6 +2,7 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.NotificacaoRequestDTO;
 import com.br.pruma.application.dto.response.NotificacaoResponseDTO;
+import com.br.pruma.application.dto.update.NotificacaoUpdateDTO;
 import com.br.pruma.application.service.NotificacaoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,20 +46,14 @@ public class NotificacaoController {
     public ResponseEntity<NotificacaoResponseDTO> criar(@RequestBody @Valid NotificacaoRequestDTO dto) {
         NotificacaoResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.id()).toUri();
+                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 
-    @Operation(summary = "Marca notificação como lida")
-    @PatchMapping("/{id}/lida")
-    public ResponseEntity<NotificacaoResponseDTO> marcarComoLida(@PathVariable Integer id) {
-        return ResponseEntity.ok(service.marcarComoLida(id));
-    }
-
     @Operation(summary = "Atualiza notificação por ID")
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<NotificacaoResponseDTO> atualizar(@PathVariable Integer id,
-                                                            @RequestBody @Valid NotificacaoRequestDTO dto) {
+                                                            @RequestBody @Valid NotificacaoUpdateDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 

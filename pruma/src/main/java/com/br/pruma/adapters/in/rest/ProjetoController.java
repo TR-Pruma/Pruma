@@ -31,16 +31,16 @@ public class ProjetoController {
         return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Lista projetos paginados")
-    @GetMapping("/paginado")
-    public ResponseEntity<Page<ProjetoResponseDTO>> listarPaginado(Pageable pageable) {
-        return ResponseEntity.ok(service.list(pageable));
-    }
-
     @Operation(summary = "Lista projetos por cliente")
     @GetMapping("/cliente/{clienteId}")
     public ResponseEntity<List<ProjetoResponseDTO>> listarPorCliente(@PathVariable Integer clienteId) {
         return ResponseEntity.ok(service.listByCliente(clienteId));
+    }
+
+    @Operation(summary = "Lista projetos paginado")
+    @GetMapping("/paginado")
+    public ResponseEntity<Page<ProjetoResponseDTO>> listarPaginado(Pageable pageable) {
+        return ResponseEntity.ok(service.list(pageable));
     }
 
     @Operation(summary = "Busca projeto por ID")
@@ -54,18 +54,18 @@ public class ProjetoController {
     public ResponseEntity<ProjetoResponseDTO> criar(@RequestBody @Valid ProjetoRequestDTO dto) {
         ProjetoResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.id()).toUri();
+                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 
-    @Operation(summary = "Atualiza parcialmente projeto por ID (PATCH semântico)")
+    @Operation(summary = "Atualiza projeto por ID (patch parcial)")
     @PatchMapping("/{id}")
     public ResponseEntity<ProjetoResponseDTO> atualizar(@PathVariable Integer id,
                                                         @RequestBody @Valid ProjetoUpdateDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
-    @Operation(summary = "Substitui completamente projeto por ID (PUT semântico)")
+    @Operation(summary = "Substitui projeto por ID (put completo)")
     @PutMapping("/{id}")
     public ResponseEntity<ProjetoResponseDTO> substituir(@PathVariable Integer id,
                                                          @RequestBody @Valid ProjetoRequestDTO dto) {
