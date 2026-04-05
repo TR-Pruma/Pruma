@@ -29,9 +29,9 @@ public class InspecaoServiceImpl implements InspecaoService {
 
     @Override
     public InspecaoResponseDTO create(InspecaoRequestDTO dto) {
-        Projeto projeto = projetoRepository.findById(dto.getProjetoId())
+        Projeto projeto = projetoRepository.findById(dto.projetoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
-                        "Projeto com ID " + dto.getProjetoId() + " não encontrado."));
+                        "Projeto com ID " + dto.projetoId() + " não encontrado."));
         Inspecao entity = mapper.toEntity(dto);
         entity.setProjeto(projeto);
         return mapper.toResponseDTO(repository.save(entity));
@@ -72,12 +72,6 @@ public class InspecaoServiceImpl implements InspecaoService {
         Inspecao entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Inspeção com ID " + id + " não encontrada."));
-        if (dto.getProjetoId() != null) {
-            Projeto projeto = projetoRepository.findById(dto.getProjetoId())
-                    .orElseThrow(() -> new RecursoNaoEncontradoException(
-                            "Projeto com ID " + dto.getProjetoId() + " não encontrado."));
-            entity.setProjeto(projeto);
-        }
         mapper.updateFromDto(dto, entity);
         return mapper.toResponseDTO(repository.save(entity));
     }
@@ -87,9 +81,9 @@ public class InspecaoServiceImpl implements InspecaoService {
         repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Inspeção com ID " + id + " não encontrada."));
-        Projeto projeto = projetoRepository.findById(dto.getProjetoId())
+        Projeto projeto = projetoRepository.findById(dto.projetoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
-                        "Projeto com ID " + dto.getProjetoId() + " não encontrado."));
+                        "Projeto com ID " + dto.projetoId() + " não encontrado."));
         Inspecao entity = mapper.toEntity(dto);
         entity.setId(id);
         entity.setProjeto(projeto);
