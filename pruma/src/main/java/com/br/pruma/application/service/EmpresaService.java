@@ -10,10 +10,10 @@ import java.util.List;
 
 public interface EmpresaService {
     EmpresaResponseDTO create(EmpresaRequestDTO dto);
-    EmpresaResponseDTO getById(Integer id);
+    EmpresaResponseDTO getById(String cnpj);
     List<EmpresaResponseDTO> listAll();
     Page<EmpresaResponseDTO> list(Pageable pageable);
-    EmpresaResponseDTO update(Integer id, EmpresaUpdateDTO dto);
-    EmpresaResponseDTO replace(Integer id, EmpresaRequestDTO dto);
-    void delete(Integer id);
+    EmpresaResponseDTO update(String cnpj, EmpresaUpdateDTO dto);
+    EmpresaResponseDTO replace(String cnpj, EmpresaRequestDTO dto);
+    void delete(String cnpj);
 }

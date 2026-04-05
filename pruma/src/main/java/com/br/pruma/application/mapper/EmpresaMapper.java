@@ -2,6 +2,7 @@ package com.br.pruma.application.mapper;
 
 import com.br.pruma.application.dto.request.EmpresaRequestDTO;
 import com.br.pruma.application.dto.response.EmpresaResponseDTO;
+import com.br.pruma.application.dto.update.EmpresaUpdateDTO;
 import com.br.pruma.core.domain.Empresa;
 import org.mapstruct.*;
 
@@ -14,26 +15,24 @@ import java.util.List;
 )
 public interface EmpresaMapper {
 
-    /**
-     * Cria entidade a partir do DTO de request.
-     * Ignora o id, que é gerado pelo banco.
-     */
-
     Empresa toEntity(EmpresaRequestDTO dto);
 
-    /**
-     * Converte entidade para DTO de resposta.
-     */
     EmpresaResponseDTO toResponseDto(Empresa entity);
 
+    List<EmpresaResponseDTO> toResponseDtoList(List<Empresa> entities);
+
     /**
-     * Atualiza parcialmente a entidade existente com os campos não-nulos do DTO.
+     * Atualização completa via PUT.
      */
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromDto(EmpresaRequestDTO dto, @MappingTarget Empresa entity);
 
     /**
-     * Converte lista de entidades para lista de DTOs.
+     * Atualização parcial via PATCH.
+     * EmpresaUpdateDTO possui: nome, cnpj, email, telefone.
+     * A entidade não tem email/telefone — campos não mapeados são ignorados (IGNORE policy).
      */
-    List<EmpresaResponseDTO> toResponseDtoList(List<Empresa> entities);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "razaoSocial", source = "nome")
+    void updateFromDto(EmpresaUpdateDTO dto, @MappingTarget Empresa entity);
 }

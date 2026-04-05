@@ -27,55 +27,54 @@ public class EmpresaServiceImpl implements EmpresaService {
     @Override
     public EmpresaResponseDTO create(EmpresaRequestDTO dto) {
         Empresa entity = mapper.toEntity(dto);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDto(repository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public EmpresaResponseDTO getById(Integer id) {
-        return mapper.toResponse(repository.findById(id)
+    public EmpresaResponseDTO getById(String cnpj) {
+        return mapper.toResponseDto(repository.findByCnpj(cnpj)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
-                        "Empresa com ID " + id + " não encontrada.")));
+                        "Empresa com CNPJ " + cnpj + " não encontrada.")));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<EmpresaResponseDTO> listAll() {
         return repository.findAll().stream()
-                .map(mapper::toResponse)
+                .map(mapper::toResponseDto)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<EmpresaResponseDTO> list(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toResponse);
+        return repository.findAll(pageable).map(mapper::toResponseDto);
     }
 
     @Override
-    public EmpresaResponseDTO update(Integer id, EmpresaUpdateDTO dto) {
-        Empresa entity = repository.findById(id)
+    public EmpresaResponseDTO update(String cnpj, EmpresaUpdateDTO dto) {
+        Empresa entity = repository.findByCnpj(cnpj)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
-                        "Empresa com ID " + id + " não encontrada."));
+                        "Empresa com CNPJ " + cnpj + " não encontrada."));
         mapper.updateFromDto(dto, entity);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDto(repository.save(entity));
     }
 
     @Override
-    public EmpresaResponseDTO replace(Integer id, EmpresaRequestDTO dto) {
-        repository.findById(id)
+    public EmpresaResponseDTO replace(String cnpj, EmpresaRequestDTO dto) {
+        repository.findByCnpj(cnpj)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
-                        "Empresa com ID " + id + " não encontrada."));
+                        "Empresa com CNPJ " + cnpj + " não encontrada."));
         Empresa entity = mapper.toEntity(dto);
-        entity.setId(id);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDto(repository.save(entity));
     }
 
     @Override
-    public void delete(Integer id) {
-        Empresa entity = repository.findById(id)
+    public void delete(String cnpj) {
+        repository.findByCnpj(cnpj)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
-                        "Empresa com ID " + id + " não encontrada."));
-        repository.delete(entity);
+                        "Empresa com CNPJ " + cnpj + " não encontrada."));
+        repository.deleteByCnpj(cnpj);
     }
 }
