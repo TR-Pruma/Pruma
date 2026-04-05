@@ -30,13 +30,14 @@ class CategoriaServiceTest {
     @Mock CategoriaMapper mapper;
     @InjectMocks CategoriaServiceImpl service;
 
+    // mock() bypass o @NoArgsConstructor(access = PROTECTED)
     Categoria categoria;
     CategoriaRequestDTO requestDTO;
     CategoriaResponseDTO responseDTO;
 
     @BeforeEach
     void setUp() {
-        categoria   = new Categoria();
+        categoria   = mock(Categoria.class);
         requestDTO  = mock(CategoriaRequestDTO.class);
         responseDTO = mock(CategoriaResponseDTO.class);
     }

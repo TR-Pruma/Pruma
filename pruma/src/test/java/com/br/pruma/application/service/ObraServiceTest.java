@@ -33,13 +33,14 @@ class ObraServiceTest {
     @Mock ObraMapper mapper;
     @InjectMocks ObraServiceImpl service;
 
+    // mock() bypass o @NoArgsConstructor(access = PROTECTED)
     Obra obra;
     ObraRequestDTO requestDTO;
     ObraResponseDTO responseDTO;
 
     @BeforeEach
     void setUp() {
-        obra        = new Obra();
+        obra        = mock(Obra.class);
         requestDTO  = mock(ObraRequestDTO.class);
         responseDTO = mock(ObraResponseDTO.class);
     }
