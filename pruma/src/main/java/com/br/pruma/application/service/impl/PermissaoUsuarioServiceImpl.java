@@ -27,13 +27,13 @@ public class PermissaoUsuarioServiceImpl implements PermissaoUsuarioService {
     @Override
     public PermissaoUsuarioResponseDTO create(PermissaoUsuarioRequestDTO dto) {
         PermissaoUsuario entity = mapper.toEntity(dto);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDTO(repository.save(entity));
     }
 
     @Override
     @Transactional(readOnly = true)
     public PermissaoUsuarioResponseDTO getById(Integer id) {
-        return mapper.toResponse(repository.findById(id)
+        return mapper.toResponseDTO(repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "PermissaoUsuario com ID " + id + " não encontrada.")));
     }
@@ -42,21 +42,21 @@ public class PermissaoUsuarioServiceImpl implements PermissaoUsuarioService {
     @Transactional(readOnly = true)
     public List<PermissaoUsuarioResponseDTO> listAll() {
         return repository.findAll().stream()
-                .map(mapper::toResponse)
+                .map(mapper::toResponseDTO)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<PermissaoUsuarioResponseDTO> list(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toResponse);
+        return repository.findAll(pageable).map(mapper::toResponseDTO);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<PermissaoUsuarioResponseDTO> listByUsuario(Integer usuarioId) {
         return repository.findAllByUsuario_Id(usuarioId).stream()
-                .map(mapper::toResponse)
+                .map(mapper::toResponseDTO)
                 .toList();
     }
 
@@ -66,7 +66,7 @@ public class PermissaoUsuarioServiceImpl implements PermissaoUsuarioService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "PermissaoUsuario com ID " + id + " não encontrada."));
         mapper.updateFromDto(dto, entity);
-        return mapper.toResponse(repository.save(entity));
+        return mapper.toResponseDTO(repository.save(entity));
     }
 
     @Override
