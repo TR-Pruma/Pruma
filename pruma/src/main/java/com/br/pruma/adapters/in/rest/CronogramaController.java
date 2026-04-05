@@ -2,6 +2,7 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.CronogramaRequestDTO;
 import com.br.pruma.application.dto.response.CronogramaResponseDTO;
+import com.br.pruma.application.dto.update.CronogramaUpdateDTO;
 import com.br.pruma.application.service.CronogramaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,10 +52,10 @@ public class CronogramaController {
         return ResponseEntity.created(location).body(salvo);
     }
 
-    @Operation(summary = "Atualiza cronograma por ID")
-    @PutMapping("/{id}")
+    @Operation(summary = "Atualiza cronograma por ID (patch parcial)")
+    @PatchMapping("/{id}")
     public ResponseEntity<CronogramaResponseDTO> atualizar(@PathVariable Integer id,
-                                                           @RequestBody @Valid CronogramaRequestDTO dto) {
+                                                           @RequestBody @Valid CronogramaUpdateDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 

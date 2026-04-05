@@ -29,8 +29,8 @@ public class CronogramaServiceImpl implements CronogramaService {
 
     @Override
     public CronogramaResponseDTO create(CronogramaRequestDTO dto) {
-        Projeto projeto = projetoRepository.findById(dto.getProjetoId())
-                .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.getProjetoId()));
+        Projeto projeto = projetoRepository.findById(dto.projetoId())
+                .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.projetoId()));
         Cronograma entity = mapper.toEntity(dto);
         entity.setProjeto(projeto);
         return mapper.toResponse(repository.save(entity));
@@ -60,7 +60,7 @@ public class CronogramaServiceImpl implements CronogramaService {
     @Override
     @Transactional(readOnly = true)
     public List<CronogramaResponseDTO> listByProjeto(Integer projetoId) {
-        return repository.findAllByProjeto_Id(projetoId).stream()
+        return repository.findAllByProjetoId(projetoId).stream()
                 .map(mapper::toResponse)
                 .toList();
     }
@@ -82,8 +82,8 @@ public class CronogramaServiceImpl implements CronogramaService {
     public CronogramaResponseDTO replace(Integer id, CronogramaRequestDTO dto) {
         repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Cronograma não encontrado: " + id));
-        Projeto projeto = projetoRepository.findById(dto.getProjetoId())
-                .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.getProjetoId()));
+        Projeto projeto = projetoRepository.findById(dto.projetoId())
+                .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + dto.projetoId()));
         Cronograma entity = mapper.toEntity(dto);
         entity.setId(id);
         entity.setProjeto(projeto);
