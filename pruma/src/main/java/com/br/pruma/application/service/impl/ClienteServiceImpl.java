@@ -2,6 +2,7 @@ package com.br.pruma.application.service.impl;
 
 import com.br.pruma.application.dto.request.ClienteRequestDTO;
 import com.br.pruma.application.dto.response.ClienteResponseDTO;
+import com.br.pruma.application.dto.update.ClienteUpdateDTO;
 import com.br.pruma.application.mapper.ClienteMapper;
 import com.br.pruma.application.service.ClienteService;
 import com.br.pruma.config.RecursoNaoEncontradoException;
@@ -34,14 +35,11 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
-    public ClienteResponseDTO update(Integer id, ClienteRequestDTO dto) {
+    public ClienteResponseDTO update(Integer id, ClienteUpdateDTO dto) {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Cliente com ID " + id + " não encontrado."));
-        Endereco endereco = enderecoRepository.findById(dto.enderecoId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException(
-                        "Endereço com ID " + dto.enderecoId() + " não encontrado."));
-        clienteMapper.updateFromDto(dto, endereco, cliente);
+        clienteMapper.updateFromDto(dto, cliente);
         return clienteMapper.toDto(clienteRepository.save(cliente));
     }
 

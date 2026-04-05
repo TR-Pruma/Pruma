@@ -2,6 +2,7 @@ package com.br.pruma.application.mapper;
 
 import com.br.pruma.application.dto.request.ClienteRequestDTO;
 import com.br.pruma.application.dto.response.ClienteResponseDTO;
+import com.br.pruma.application.dto.update.ClienteUpdateDTO;
 import com.br.pruma.core.domain.Cliente;
 import com.br.pruma.core.domain.Endereco;
 import org.mapstruct.*;
@@ -22,9 +23,8 @@ public interface ClienteMapper {
     ClienteResponseDTO toDto(Cliente cliente);
 
     /**
-     * Atualiza parcialmente uma entidade Cliente.
-     * Campos nulos no DTO são ignorados (PATCH semântico).
-     * Padrão do projeto: @MappingTarget sempre no último parâmetro.
+     * Atualização completa via PUT (troca endereço e senha).
+     * Campos nulos no DTO são ignorados.
      */
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "dto.cpf",      target = "cpf")
@@ -35,4 +35,14 @@ public interface ClienteMapper {
     @Mapping(source = "dto.ativo",    target = "ativo")
     @Mapping(source = "endereco",     target = "endereco")
     void updateFromDto(ClienteRequestDTO dto, Endereco endereco, @MappingTarget Cliente entity);
+
+    /**
+     * Atualização parcial via PATCH (sem trocar endereço nem senha).
+     * Campos nulos no DTO são ignorados.
+     */
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "endereco", ignore = true)
+    @Mapping(target = "senha",    ignore = true)
+    @Mapping(target = "cpf",      source = "cpfCnpj")
+    void updateFromDto(ClienteUpdateDTO dto, @MappingTarget Cliente entity);
 }
