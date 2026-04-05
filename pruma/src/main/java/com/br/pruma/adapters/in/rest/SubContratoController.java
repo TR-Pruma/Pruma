@@ -31,7 +31,7 @@ public class SubContratoController {
     public ResponseEntity<SubContratoResponseDTO> create(@Valid @RequestBody SubContratoRequestDTO request) {
         SubContratoResponseDTO response = service.create(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(response.getId()).toUri();
+                .path("/{id}").buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(location).body(response);
     }
 
