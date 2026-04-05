@@ -10,10 +10,10 @@ import java.util.List;
 
 public interface PermissaoUsuarioService {
     PermissaoUsuarioResponseDTO create(PermissaoUsuarioRequestDTO dto);
-    PermissaoUsuarioResponseDTO getById(Integer id);
+    PermissaoUsuarioResponseDTO getById(Long id);
     List<PermissaoUsuarioResponseDTO> listAll();
     Page<PermissaoUsuarioResponseDTO> list(Pageable pageable);
-    List<PermissaoUsuarioResponseDTO> listByUsuario(Integer usuarioId);
-    PermissaoUsuarioResponseDTO update(Integer id, PermissaoUsuarioUpdateDTO dto);
-    void delete(Integer id);
+    List<PermissaoUsuarioResponseDTO> listByClienteCpf(String cpf);
+    PermissaoUsuarioResponseDTO update(Long id, PermissaoUsuarioUpdateDTO dto);
+    void delete(Long id);
 }
