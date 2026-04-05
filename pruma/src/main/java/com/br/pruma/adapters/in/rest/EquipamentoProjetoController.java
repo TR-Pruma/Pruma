@@ -40,7 +40,8 @@ public class EquipamentoProjetoController {
     public ResponseEntity<EquipamentoProjetoResponseDTO> criar(@RequestBody @Valid EquipamentoProjetoRequestDTO dto) {
         EquipamentoProjetoResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
+                .path("/{equipamentoId}/{projetoId}")
+                .buildAndExpand(salvo.getEquipamentoId(), salvo.getProjetoId()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 
