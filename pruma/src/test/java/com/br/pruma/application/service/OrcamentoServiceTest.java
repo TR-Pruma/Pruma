@@ -4,6 +4,7 @@ import com.br.pruma.application.dto.request.OrcamentoRequestDTO;
 import com.br.pruma.application.dto.response.OrcamentoResponseDTO;
 import com.br.pruma.application.dto.update.OrcamentoUpdateDTO;
 import com.br.pruma.application.mapper.OrcamentoMapper;
+import com.br.pruma.application.service.impl.OrcamentoServiceImpl;
 import com.br.pruma.core.domain.Empresa;
 import com.br.pruma.core.domain.Orcamento;
 import com.br.pruma.core.domain.Projeto;
@@ -33,7 +34,7 @@ class OrcamentoServiceTest {
     @Mock ProjetoRepository projetoRepository;
     @Mock EmpresaRepository empresaRepository;
     @Mock OrcamentoMapper mapper;
-    @InjectMocks OrcamentoService service;
+    @InjectMocks OrcamentoServiceImpl service;
 
     Orcamento orcamento;
     OrcamentoRequestDTO requestDTO;
@@ -115,18 +116,18 @@ class OrcamentoServiceTest {
     @Test
     @DisplayName("delete: deleta quando existe")
     void delete_sucesso() {
-        when(orcamentoRepository.existsById(1)).thenReturn(true);
+        when(orcamentoRepository.findById(1)).thenReturn(Optional.of(orcamento));
         service.delete(1);
-        verify(orcamentoRepository).deleteById(1);
+        verify(orcamentoRepository).delete(orcamento);
     }
 
     @Test
     @DisplayName("delete: lanca EntityNotFoundException quando nao existe")
     void delete_naoEncontrado() {
-        when(orcamentoRepository.existsById(99)).thenReturn(false);
+        when(orcamentoRepository.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.delete(99))
                 .isInstanceOf(EntityNotFoundException.class);
-        verify(orcamentoRepository, never()).deleteById(any());
+        verify(orcamentoRepository, never()).delete(any(Orcamento.class));
     }
 }

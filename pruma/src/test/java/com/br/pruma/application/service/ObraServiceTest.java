@@ -110,18 +110,18 @@ class ObraServiceTest {
     @Test
     @DisplayName("delete: deleta quando existe")
     void delete_sucesso() {
-        when(obraRepository.existsById(1)).thenReturn(true);
+        when(obraRepository.findById(1)).thenReturn(Optional.of(obra));
         service.delete(1);
-        verify(obraRepository).deleteById(1);
+        verify(obraRepository).delete(obra);
     }
 
     @Test
     @DisplayName("delete: lanca EntityNotFoundException quando nao existe")
     void delete_naoEncontrado() {
-        when(obraRepository.existsById(99)).thenReturn(false);
+        when(obraRepository.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.delete(99))
                 .isInstanceOf(EntityNotFoundException.class);
-        verify(obraRepository, never()).deleteById(any());
+        verify(obraRepository, never()).delete(any(Obra.class));
     }
 }
