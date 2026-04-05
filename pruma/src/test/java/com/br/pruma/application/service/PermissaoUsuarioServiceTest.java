@@ -1,5 +1,6 @@
 package com.br.pruma.application.service;
 
+import com.br.pruma.application.dto.request.FornecedorRequestDTO;
 import com.br.pruma.application.dto.request.PermissaoUsuarioRequestDTO;
 import com.br.pruma.application.dto.response.PermissaoUsuarioResponseDTO;
 import com.br.pruma.application.dto.update.PermissaoUsuarioUpdateDTO;
