@@ -39,7 +39,7 @@ public class AnexoController {
     public ResponseEntity<AnexoResponseDTO> criar(@RequestBody @Valid AnexoRequestDTO dto) {
         AnexoResponseDTO salvo = service.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(salvo.id()).toUri();
+                .path("/{id}").buildAndExpand(salvo.getId()).toUri();
         return ResponseEntity.created(location).body(salvo);
     }
 
