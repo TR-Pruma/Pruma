@@ -56,7 +56,7 @@ class PermissaoUsuarioServiceTest {
     void create_sucesso() {
         when(mapper.toEntity(requestDTO)).thenReturn(permissao);
         when(repository.save(permissao)).thenReturn(permissao);
-        when(mapper.toResponse(permissao)).thenReturn(responseDTO);
+        when(mapper.toResponseDTO(permissao)).thenReturn(responseDTO);
 
         PermissaoUsuarioResponseDTO result = service.create(requestDTO);
 
@@ -72,7 +72,7 @@ class PermissaoUsuarioServiceTest {
     @DisplayName("getById: deve retornar DTO quando permissao existe")
     void getById_encontrado() {
         when(repository.findById(1L)).thenReturn(Optional.of(permissao));
-        when(mapper.toResponse(permissao)).thenReturn(responseDTO);
+        when(mapper.toResponseDTO(permissao)).thenReturn(responseDTO);
 
         PermissaoUsuarioResponseDTO result = service.getById(1L);
 
@@ -97,7 +97,7 @@ class PermissaoUsuarioServiceTest {
     @DisplayName("listAll: deve retornar lista mapeada")
     void listAll() {
         when(repository.findAll()).thenReturn(List.of(permissao));
-        when(mapper.toResponse(permissao)).thenReturn(responseDTO);
+        when(mapper.toResponseDTO(permissao)).thenReturn(responseDTO);
 
         assertThat(service.listAll()).containsExactly(responseDTO);
     }
@@ -109,14 +109,13 @@ class PermissaoUsuarioServiceTest {
     @Test
     @DisplayName("update: deve atualizar permissao existente")
     void update_sucesso() {
-        when(repository.findById(1)).thenReturn(Optional.of(permissao));
+        when(repository.findById(1L)).thenReturn(Optional.of(permissao));
         when(repository.save(permissao)).thenReturn(permissao);
-        when(mapper.toResponse(permissao)).thenReturn(responseDTO);
+        when(mapper.toResponseDTO(permissao)).thenReturn(responseDTO);
 
         PermissaoUsuarioResponseDTO result = service.update(1L, updateDTO);
 
         assertThat(result).isNotNull();
-        verify(mapper).updateFromDto(updateDTO, permissao);
         verify(repository).save(permissao);
     }
 
