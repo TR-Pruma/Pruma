@@ -36,7 +36,7 @@ class CategoriaServiceTest {
 
     @BeforeEach
     void setUp() {
-        categoria   = mock(Categoria.class);
+        categoria   = new Categoria();
         requestDTO  = mock(CategoriaRequestDTO.class);
         responseDTO = mock(CategoriaResponseDTO.class);
     }

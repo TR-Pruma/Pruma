@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice
+@RestControllerAdvice("prumaGlobalExceptionHandler")
 public class GlobalExceptionHandler {
 
     // 400 — falha de validação de campos (@Valid)

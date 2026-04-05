@@ -39,7 +39,7 @@ class ObraServiceTest {
 
     @BeforeEach
     void setUp() {
-        obra        = mock(Obra.class);
+        obra        = new Obra();
         requestDTO  = mock(ObraRequestDTO.class);
         responseDTO = mock(ObraResponseDTO.class);
     }

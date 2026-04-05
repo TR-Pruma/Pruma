@@ -36,7 +36,7 @@ class OrcamentoServiceTest {
 
     @BeforeEach
     void setUp() {
-        orcamento   = mock(Orcamento.class);
+        orcamento   = new Orcamento();
         requestDTO  = mock(OrcamentoRequestDTO.class);
         responseDTO = mock(OrcamentoResponseDTO.class);
     }
