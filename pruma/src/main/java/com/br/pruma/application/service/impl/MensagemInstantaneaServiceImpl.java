@@ -3,11 +3,11 @@ package com.br.pruma.application.service.impl;
 import com.br.pruma.application.dto.request.MensagemInstantaneaRequestDTO;
 import com.br.pruma.application.dto.response.MensagemInstantaneaResponseDTO;
 import com.br.pruma.application.dto.update.MensagemInstantaneaUpdateDTO;
+import com.br.pruma.application.mapper.MensagemInstantaneaMapper;
 import com.br.pruma.application.service.MensagemInstantaneaService;
 import com.br.pruma.core.domain.MensagemInstantanea;
-import com.br.pruma.core.exception.NotFoundException;
-import com.br.pruma.core.mapper.MensagemInstantaneaMapper;
-import com.br.pruma.core.port.out.MensagemInstantaneaRepositoryPort;
+import com.br.pruma.core.exception.RecursoNaoEncontradoException;
+import com.br.pruma.core.repository.port.MensagemInstantaneaRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -62,6 +62,6 @@ public class MensagemInstantaneaServiceImpl implements MensagemInstantaneaServic
 
     private MensagemInstantanea findOrThrow(Integer id) {
         return repositoryPort.findById(id)
-                .orElseThrow(() -> new NotFoundException("MensagemInstantanea não encontrada: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("MensagemInstantanea não encontrada: " + id));
     }
 }
