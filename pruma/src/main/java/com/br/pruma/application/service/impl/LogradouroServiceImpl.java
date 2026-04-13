@@ -55,6 +55,15 @@ public class LogradouroServiceImpl implements LogradouroService {
 
     @Override
     @Transactional
+    public LogradouroResponseDTO replace(Integer id, LogradouroRequestDTO dto) {
+        findOrThrow(id);
+        Logradouro entity = mapper.toEntity(dto);
+        entity.setId(id);
+        return mapper.toResponse(repositoryPort.save(entity));
+    }
+
+    @Override
+    @Transactional
     public void delete(Integer id) {
         findOrThrow(id);
         repositoryPort.deleteById(id);

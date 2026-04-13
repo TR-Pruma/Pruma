@@ -9,26 +9,24 @@ import java.util.Optional;
 
 /**
  * Port de saída (Output Port) para persistência de Logradouro.
- * Define o contrato que a camada de aplicação usa sem depender
- * diretamente de JPA ou de qualquer tecnologia de persistência.
  */
 public interface LogradouroRepositoryPort {
 
-    /** Persiste ou atualiza um logradouro. */
     Logradouro save(Logradouro logradouro);
 
-    /** Busca um logradouro pelo seu ID. */
     Optional<Logradouro> findById(Integer id);
 
-    /** Retorna todos os logradouros. */
     List<Logradouro> findAll();
 
-    /** Retorna todos os logradouros paginados. */
     Page<Logradouro> findAll(Pageable pageable);
 
-    /** Remove um logradouro pelo seu ID. */
+    Optional<Logradouro> findByTipo(String tipo);
+
+    List<Logradouro> findAllByOrderByTipoAsc();
+
     void deleteById(Integer id);
 
-    /** Verifica se um logradouro existe pelo seu ID. */
+    void delete(Logradouro logradouro);
+
     boolean existsById(Integer id);
 }

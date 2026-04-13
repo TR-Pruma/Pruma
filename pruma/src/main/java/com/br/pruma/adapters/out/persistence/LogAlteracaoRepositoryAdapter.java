@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Adapter de saída (Output Adapter) que implementa o {@link LogAlteracaoRepositoryPort}
- * delegando as operações ao {@link LogAlteracaoRepository} do Spring Data JPA.
+ * Adapter de saída que implementa {@link LogAlteracaoRepositoryPort}
+ * delegando ao {@link LogAlteracaoRepository} do Spring Data JPA.
  */
 @Component
 @RequiredArgsConstructor
