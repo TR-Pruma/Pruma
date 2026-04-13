@@ -6,7 +6,7 @@ import com.br.pruma.application.dto.update.MaterialUtilizadoUpdateDTO;
 import com.br.pruma.application.mapper.MaterialUtilizadoMapper;
 import com.br.pruma.application.service.MaterialUtilizadoService;
 import com.br.pruma.core.domain.MaterialUtilizado;
-import com.br.pruma.core.exception.NotFoundException;
+import com.br.pruma.core.exception.RecursoNaoEncontradoException;
 import com.br.pruma.core.repository.port.MaterialUtilizadoRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -76,6 +76,6 @@ public class MaterialUtilizadoServiceImpl implements MaterialUtilizadoService {
 
     private MaterialUtilizado findOrThrow(Integer id) {
         return repositoryPort.findById(id)
-                .orElseThrow(() -> new NotFoundException("MaterialUtilizado não encontrado: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("MaterialUtilizado não encontrado: " + id));
     }
 }

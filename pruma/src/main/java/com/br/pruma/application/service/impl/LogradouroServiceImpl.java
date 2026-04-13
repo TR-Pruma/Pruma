@@ -6,7 +6,7 @@ import com.br.pruma.application.dto.update.LogradouroUpdateDTO;
 import com.br.pruma.application.mapper.LogradouroMapper;
 import com.br.pruma.application.service.LogradouroService;
 import com.br.pruma.core.domain.Logradouro;
-import com.br.pruma.core.exception.NotFoundException;
+import com.br.pruma.core.exception.RecursoNaoEncontradoException;
 import com.br.pruma.core.repository.port.LogradouroRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -62,6 +62,6 @@ public class LogradouroServiceImpl implements LogradouroService {
 
     private Logradouro findOrThrow(Integer id) {
         return repositoryPort.findById(id)
-                .orElseThrow(() -> new NotFoundException("Logradouro não encontrado: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Logradouro não encontrado: " + id));
     }
 }
