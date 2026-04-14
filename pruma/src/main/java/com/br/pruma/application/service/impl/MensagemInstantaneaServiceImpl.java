@@ -7,6 +7,7 @@ import com.br.pruma.application.mapper.MensagemInstantaneaMapper;
 import com.br.pruma.application.service.MensagemInstantaneaService;
 import com.br.pruma.core.domain.MensagemInstantanea;
 import com.br.pruma.core.exception.RecursoNaoEncontradoException;
+
 import com.br.pruma.core.repository.port.MensagemInstantaneaRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -43,6 +44,11 @@ public class MensagemInstantaneaServiceImpl implements MensagemInstantaneaServic
     @Override
     public Page<MensagemInstantaneaResponseDTO> list(Pageable pageable) {
         return repositoryPort.findAll(pageable).map(mapper::toResponse);
+    }
+
+    @Override
+    public List<MensagemInstantaneaResponseDTO> listByRemetente(Integer usuarioId) {
+        return List.of();
     }
 
     @Override
