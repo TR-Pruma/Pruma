@@ -35,7 +35,7 @@ public class PosObraServiceImpl implements PosObraService {
     @Transactional(readOnly = true)
     public PosObraResponseDTO getById(Integer id) {
         PosObra posObra = posObraRepositoryPort.findById(Long.valueOf(id))
-                .orElseThrow(() -> new EntityNotFoundException("PosObra n\u00e3o encontrada: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("PosObra não encontrada: " + id));
         return posObraMapper.toResponse(posObra);
     }
 
@@ -67,8 +67,8 @@ public class PosObraServiceImpl implements PosObraService {
     @Override
     public PosObraResponseDTO update(Integer id, PosObraUpdateDTO dto) {
         PosObra posObra = posObraRepositoryPort.findById(Long.valueOf(id))
-                .orElseThrow(() -> new EntityNotFoundException("PosObra n\u00e3o encontrada: " + id));
-        posObraMapper.updateEntity(dto, posObra);
+                .orElseThrow(() -> new EntityNotFoundException("PosObra não encontrada: " + id));
+        posObraMapper.updateFromDto(dto, posObra);
         PosObra updated = posObraRepositoryPort.save(posObra);
         return posObraMapper.toResponse(updated);
     }
@@ -76,7 +76,7 @@ public class PosObraServiceImpl implements PosObraService {
     @Override
     public PosObraResponseDTO replace(Integer id, PosObraRequestDTO dto) {
         posObraRepositoryPort.findById(Long.valueOf(id))
-                .orElseThrow(() -> new EntityNotFoundException("PosObra n\u00e3o encontrada: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("PosObra não encontrada: " + id));
         PosObra posObra = posObraMapper.toEntity(dto);
         posObra.setId(Long.valueOf(id));
         PosObra replaced = posObraRepositoryPort.save(posObra);
@@ -86,7 +86,7 @@ public class PosObraServiceImpl implements PosObraService {
     @Override
     public void delete(Integer id) {
         PosObra posObra = posObraRepositoryPort.findById(Long.valueOf(id))
-                .orElseThrow(() -> new EntityNotFoundException("PosObra n\u00e3o encontrada: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("PosObra não encontrada: " + id));
         posObraRepositoryPort.delete(posObra);
     }
 }
