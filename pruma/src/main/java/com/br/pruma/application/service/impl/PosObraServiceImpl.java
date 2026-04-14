@@ -7,15 +7,18 @@ import com.br.pruma.application.mapper.PosObraMapper;
 import com.br.pruma.application.service.PosObraService;
 import com.br.pruma.core.domain.PosObra;
 import com.br.pruma.core.repository.port.PosObraRepositoryPort;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PosObraServiceImpl implements PosObraService {
 
     private final PosObraRepositoryPort posObraRepositoryPort;
@@ -29,13 +32,15 @@ public class PosObraServiceImpl implements PosObraService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PosObraResponseDTO getById(Integer id) {
-        PosObra posObra = posObraRepositoryPort.findById(id)
-                .orElseThrow(() -> new RuntimeException("PosObra não encontrada com id: " + id));
+        PosObra posObra = posObraRepositoryPort.findById(Long.valueOf(id))
+                .orElseThrow(() -> new EntityNotFoundException("PosObra n\u00e3o encontrada: " + id));
         return posObraMapper.toResponse(posObra);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PosObraResponseDTO> listAll() {
         return posObraRepositoryPort.findAll()
                 .stream()
@@ -44,14 +49,16 @@ public class PosObraServiceImpl implements PosObraService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PosObraResponseDTO> list(Pageable pageable) {
         return posObraRepositoryPort.findAll(pageable)
                 .map(posObraMapper::toResponse);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PosObraResponseDTO> listByProjeto(Integer projetoId) {
-        return posObraRepositoryPort.findAllByProjetoId(projetoId)
+        return posObraRepositoryPort.findAllByObra_Id(Long.valueOf(projetoId))
                 .stream()
                 .map(posObraMapper::toResponse)
                 .toList();
@@ -59,8 +66,8 @@ public class PosObraServiceImpl implements PosObraService {
 
     @Override
     public PosObraResponseDTO update(Integer id, PosObraUpdateDTO dto) {
-        PosObra posObra = posObraRepositoryPort.findById(id)
-                .orElseThrow(() -> new RuntimeException("PosObra não encontrada com id: " + id));
+        PosObra posObra = posObraRepositoryPort.findById(Long.valueOf(id))
+                .orElseThrow(() -> new EntityNotFoundException("PosObra n\u00e3o encontrada: " + id));
         posObraMapper.updateEntity(dto, posObra);
         PosObra updated = posObraRepositoryPort.save(posObra);
         return posObraMapper.toResponse(updated);
@@ -68,18 +75,18 @@ public class PosObraServiceImpl implements PosObraService {
 
     @Override
     public PosObraResponseDTO replace(Integer id, PosObraRequestDTO dto) {
-        posObraRepositoryPort.findById(id)
-                .orElseThrow(() -> new RuntimeException("PosObra não encontrada com id: " + id));
+        posObraRepositoryPort.findById(Long.valueOf(id))
+                .orElseThrow(() -> new EntityNotFoundException("PosObra n\u00e3o encontrada: " + id));
         PosObra posObra = posObraMapper.toEntity(dto);
-        posObra.setId(id);
+        posObra.setId(Long.valueOf(id));
         PosObra replaced = posObraRepositoryPort.save(posObra);
         return posObraMapper.toResponse(replaced);
     }
 
     @Override
     public void delete(Integer id) {
-        posObraRepositoryPort.findById(id)
-                .orElseThrow(() -> new RuntimeException("PosObra não encontrada com id: " + id));
-        posObraRepositoryPort.deleteById(id);
+        PosObra posObra = posObraRepositoryPort.findById(Long.valueOf(id))
+                .orElseThrow(() -> new EntityNotFoundException("PosObra n\u00e3o encontrada: " + id));
+        posObraRepositoryPort.delete(posObra);
     }
 }
