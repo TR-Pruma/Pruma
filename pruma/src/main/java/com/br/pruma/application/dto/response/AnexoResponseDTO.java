@@ -15,5 +15,5 @@ public record AnexoResponseDTO(
         String tipoAnexo,
 
         @Schema(description = "Caminho onde o arquivo está armazenado", example = "/uploads/documento.pdf")
-        String caminhoArquivo
+        String caminho
 ) {}
