@@ -2,6 +2,7 @@ package com.br.pruma.application.mapper;
 
 import com.br.pruma.application.dto.request.RelatorioRequestDTO;
 import com.br.pruma.application.dto.response.RelatorioResponseDTO;
+import com.br.pruma.application.dto.update.RelatorioUpdateDTO;
 import com.br.pruma.core.domain.Obra;
 import com.br.pruma.core.domain.Relatorio;
 import org.mapstruct.*;
@@ -45,4 +46,12 @@ public interface RelatorioMapper {
      * Lista de entidades para lista de DTOs.
      */
     List<RelatorioResponseDTO> toDTOList(List<Relatorio> entities);
+
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "obra", expression = "java(dto.obraId() == null ? existing.getObra() : Obra.ofId(dto.obraId()))")
+    void updateFromDto(RelatorioUpdateDTO dto, @MappingTarget Relatorio existing);
+
+
 }
