@@ -5,6 +5,9 @@ import com.br.pruma.application.dto.response.PreObraResponseDTO;
 import com.br.pruma.application.dto.update.PreObraUpdateDTO;
 import com.br.pruma.application.mapper.PreObraMapper;
 import com.br.pruma.application.service.PreObraService;
+import com.br.pruma.core.domain.PreObra;
+import com.br.pruma.core.repository.port.PreObraRepositoryPort;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,46 +21,72 @@ import java.util.List;
 @Transactional
 public class PreObraServiceImpl implements PreObraService {
 
-    private final PreObraRepositoryPort posObraRepositoryPort;
-    private final PreObraMapper posObraMapper;
+    private final PreObraRepositoryPort preObraRepositoryPort;
+    private final PreObraMapper preObraMapper;
 
     @Override
     public PreObraResponseDTO create(PreObraRequestDTO dto) {
-        return null;
+        PreObra preObra = preObraMapper.toEntity(dto);
+        PreObra saved = preObraRepositoryPort.save(preObra);
+        return preObraMapper.toResponse(saved);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PreObraResponseDTO getById(Integer id) {
-        return null;
+        PreObra preObra = preObraRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("PreObra não encontrada: " + id));
+        return preObraMapper.toResponse(preObra);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PreObraResponseDTO> listAll() {
-        return List.of();
+        return preObraRepositoryPort.findAll()
+                .stream()
+                .map(preObraMapper::toResponse)
+                .toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PreObraResponseDTO> list(Pageable pageable) {
-        return null;
+        return preObraRepositoryPort.findAll(pageable)
+                .map(preObraMapper::toResponse);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PreObraResponseDTO> listByProjeto(Integer projetoId) {
-        return List.of();
+        return preObraRepositoryPort.findAllByObra_Id(projetoId)
+                .stream()
+                .map(preObraMapper::toResponse)
+                .toList();
     }
 
     @Override
     public PreObraResponseDTO update(Integer id, PreObraUpdateDTO dto) {
-        return null;
+        PreObra preObra = preObraRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("PreObra não encontrada: " + id));
+        preObraMapper.updateFromDto(dto, preObra);
+        PreObra updated = preObraRepositoryPort.save(preObra);
+        return preObraMapper.toResponse(updated);
     }
 
     @Override
     public PreObraResponseDTO replace(Integer id, PreObraRequestDTO dto) {
-        return null;
+        preObraRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("PreObra não encontrada: " + id));
+        PreObra preObra = preObraMapper.toEntity(dto);
+        preObra.setId(id);
+        PreObra replaced = preObraRepositoryPort.save(preObra);
+        return preObraMapper.toResponse(replaced);
     }
 
     @Override
     public void delete(Integer id) {
-
+        PreObra preObra = preObraRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("PreObra não encontrada: " + id));
+        preObraRepositoryPort.delete(preObra);
     }
 }
