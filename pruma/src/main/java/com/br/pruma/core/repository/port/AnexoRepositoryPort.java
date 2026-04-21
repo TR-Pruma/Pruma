@@ -25,4 +25,9 @@ public interface AnexoRepositoryPort {
     void delete(Anexo anexo);
 
     boolean existsById(Integer id);
+
+    Optional<Anexo> findByIdAndAtivoTrue(Integer id);
+    List<Anexo> findAllByProjetoIdAndAtivoTrue(Integer projetoId);
+    Page<Anexo> findAllByAtivoTrue(Pageable pageable);
+    void softDelete(Integer id);
 }

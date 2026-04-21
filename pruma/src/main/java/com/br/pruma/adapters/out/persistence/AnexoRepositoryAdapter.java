@@ -11,10 +11,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Adapter de saída que implementa {@link AnexoRepositoryPort}
- * delegando ao {@link AnexoRepository} do Spring Data JPA.
- */
 @Component
 @RequiredArgsConstructor
 public class AnexoRepositoryAdapter implements AnexoRepositoryPort {
@@ -43,7 +39,7 @@ public class AnexoRepositoryAdapter implements AnexoRepositoryPort {
 
     @Override
     public void deleteById(Integer id) {
-        anexoRepository.deleteById(id);
+        anexoRepository.softDelete(id);
     }
 
     @Override
@@ -55,4 +51,25 @@ public class AnexoRepositoryAdapter implements AnexoRepositoryPort {
     public boolean existsById(Integer id) {
         return anexoRepository.existsById(id);
     }
+
+    @Override
+    public Optional<Anexo> findByIdAndAtivoTrue(Integer id) {
+        return anexoRepository.findByIdAndAtivoTrue(id);
+    }
+
+    @Override
+    public List<Anexo> findAllByProjetoIdAndAtivoTrue(Integer projetoId) {
+        return anexoRepository.findAllByProjetoIdAndAtivoTrue(projetoId);
+    }
+
+    @Override
+    public Page<Anexo> findAllByAtivoTrue(Pageable pageable) {
+        return anexoRepository.findAllByAtivoTrue(pageable);
+    }
+
+    @Override
+    public void softDelete(Integer id) {
+        anexoRepository.softDelete(id);
+    }
+
 }
