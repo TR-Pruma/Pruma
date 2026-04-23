@@ -59,7 +59,7 @@ public class ItemOrcamentoServiceImpl implements ItemOrcamentoService {
     @Override
     @Transactional(readOnly = true)
     public List<ItemOrcamentoResponseDTO> listByOrcamento(Integer orcamentoId) {
-        return itemOrcamentoRepositoryPort.findAllByOrcamento_Id(orcamentoId)
+        return itemOrcamentoRepositoryPort.findByOrcamentoId(orcamentoId)
                 .stream()
                 .map(itemOrcamentoMapper::toResponse)
                 .toList();

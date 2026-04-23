@@ -7,6 +7,7 @@ import com.br.pruma.application.mapper.StatusEquipamentoMapper;
 import com.br.pruma.application.service.StatusEquipamentoService;
 import com.br.pruma.config.Constantes;
 import com.br.pruma.core.domain.StatusEquipamento;
+
 import com.br.pruma.core.repository.port.StatusEquipamentoRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class StatusEquipamentoServiceImpl implements StatusEquipamentoService {
     public StatusEquipamentoResponseDTO create(StatusEquipamentoRequestDTO dto) {
         StatusEquipamento statusEquipamento = statusEquipamentoMapper.toEntity(dto);
         StatusEquipamento saved = statusEquipamentoRepositoryPort.save(statusEquipamento);
-        return statusEquipamentoMapper.toResponse(saved);
+        return statusEquipamentoMapper.toDTO(saved);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class StatusEquipamentoServiceImpl implements StatusEquipamentoService {
     public StatusEquipamentoResponseDTO getById(Integer id) {
         StatusEquipamento statusEquipamento = statusEquipamentoRepositoryPort.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(Constantes.STATUS_EQUIPAMENTO_NAO_ENCONTRADO + id));
-        return statusEquipamentoMapper.toResponse(statusEquipamento);
+        return statusEquipamentoMapper.toDTO(statusEquipamento);
     }
 
     @Override
@@ -45,7 +46,7 @@ public class StatusEquipamentoServiceImpl implements StatusEquipamentoService {
     public List<StatusEquipamentoResponseDTO> listAll() {
         return statusEquipamentoRepositoryPort.findAll()
                 .stream()
-                .map(statusEquipamentoMapper::toResponse)
+                .map(statusEquipamentoMapper::toDTO)
                 .toList();
     }
 
@@ -53,7 +54,7 @@ public class StatusEquipamentoServiceImpl implements StatusEquipamentoService {
     @Transactional(readOnly = true)
     public Page<StatusEquipamentoResponseDTO> list(Pageable pageable) {
         return statusEquipamentoRepositoryPort.findAll(pageable)
-                .map(statusEquipamentoMapper::toResponse);
+                .map(statusEquipamentoMapper::toDTO);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class StatusEquipamentoServiceImpl implements StatusEquipamentoService {
                 .orElseThrow(() -> new EntityNotFoundException(Constantes.STATUS_EQUIPAMENTO_NAO_ENCONTRADO + id));
         statusEquipamentoMapper.updateFromDto(dto, statusEquipamento);
         StatusEquipamento updated = statusEquipamentoRepositoryPort.save(statusEquipamento);
-        return statusEquipamentoMapper.toResponse(updated);
+        return statusEquipamentoMapper.toDTO(updated);
     }
 
     @Override
@@ -72,7 +73,7 @@ public class StatusEquipamentoServiceImpl implements StatusEquipamentoService {
         StatusEquipamento statusEquipamento = statusEquipamentoMapper.toEntity(dto);
         statusEquipamento.setId(id);
         StatusEquipamento replaced = statusEquipamentoRepositoryPort.save(statusEquipamento);
-        return statusEquipamentoMapper.toResponse(replaced);
+        return statusEquipamentoMapper.toDTO(replaced);
     }
 
     @Override

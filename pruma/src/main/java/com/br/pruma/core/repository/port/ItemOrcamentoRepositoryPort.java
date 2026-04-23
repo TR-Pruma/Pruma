@@ -1,6 +1,8 @@
 package com.br.pruma.core.repository.port;
 
 import com.br.pruma.core.domain.ItemOrcamento;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,4 +43,6 @@ public interface ItemOrcamentoRepositoryPort {
      * Verifica se um item de orçamento existe pelo seu ID.
      */
     boolean existsById(Integer id);
+
+    Page<ItemOrcamento> findAll(Pageable pageable);
 }

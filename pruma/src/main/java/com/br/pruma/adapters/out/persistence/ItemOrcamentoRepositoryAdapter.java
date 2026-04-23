@@ -4,6 +4,8 @@ import com.br.pruma.core.domain.ItemOrcamento;
 import com.br.pruma.core.repository.ItemOrcamentoRepository;
 import com.br.pruma.core.repository.port.ItemOrcamentoRepositoryPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -47,5 +49,10 @@ public class ItemOrcamentoRepositoryAdapter implements ItemOrcamentoRepositoryPo
     @Override
     public boolean existsById(Integer id) {
         return itemOrcamentoRepository.existsById(id);
+    }
+
+    @Override
+    public Page<ItemOrcamento> findAll(Pageable pageable) {
+        return itemOrcamentoRepository.findAll(pageable);
     }
 }
