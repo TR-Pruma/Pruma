@@ -5,12 +5,12 @@ import com.br.pruma.application.dto.response.ItemOrcamentoResponseDTO;
 import com.br.pruma.application.dto.update.ItemOrcamentoUpdateDTO;
 import com.br.pruma.application.mapper.ItemOrcamentoMapper;
 import com.br.pruma.application.service.ItemOrcamentoService;
+import com.br.pruma.config.Constantes;
 import com.br.pruma.core.domain.ItemOrcamento;
 import com.br.pruma.core.repository.port.ItemOrcamentoRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,71 +22,72 @@ import java.util.List;
 @Transactional
 public class ItemOrcamentoServiceImpl implements ItemOrcamentoService {
 
-    private final ItemOrcamentoRepositoryPort repositoryPort;
-    private final ItemOrcamentoMapper mapper;
+    private final ItemOrcamentoRepositoryPort itemOrcamentoRepositoryPort;
+    private final ItemOrcamentoMapper itemOrcamentoMapper;
 
     @Override
     public ItemOrcamentoResponseDTO create(ItemOrcamentoRequestDTO dto) {
-        ItemOrcamento entity = mapper.toEntity(dto);
-        return mapper.toResponse(repositoryPort.save(entity));
+        ItemOrcamento itemOrcamento = itemOrcamentoMapper.toEntity(dto);
+        ItemOrcamento saved = itemOrcamentoRepositoryPort.save(itemOrcamento);
+        return itemOrcamentoMapper.toResponse(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
     public ItemOrcamentoResponseDTO getById(Integer id) {
-        return mapper.toResponse(repositoryPort.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ItemOrcamento não encontrado: " + id)));
+        ItemOrcamento itemOrcamento = itemOrcamentoRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.ITEM_ORCAMENTO_NAO_ENCONTRADO + id));
+        return itemOrcamentoMapper.toResponse(itemOrcamento);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ItemOrcamentoResponseDTO> listAll() {
-        return repositoryPort.findAll().stream()
-                .map(mapper::toResponse)
+        return itemOrcamentoRepositoryPort.findAll()
+                .stream()
+                .map(itemOrcamentoMapper::toResponse)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<ItemOrcamentoResponseDTO> list(Pageable pageable) {
-        List<ItemOrcamentoResponseDTO> all = repositoryPort.findAll().stream()
-                .map(mapper::toResponse)
-                .toList();
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), all.size());
-        List<ItemOrcamentoResponseDTO> page = (start > all.size()) ? List.of() : all.subList(start, end);
-        return new PageImpl<>(page, pageable, all.size());
+        return itemOrcamentoRepositoryPort.findAll(pageable)
+                .map(itemOrcamentoMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ItemOrcamentoResponseDTO> listByOrcamento(Integer orcamentoId) {
-        return repositoryPort.findByOrcamentoId(orcamentoId).stream()
-                .map(mapper::toResponse)
+        return itemOrcamentoRepositoryPort.findAllByOrcamento_Id(orcamentoId)
+                .stream()
+                .map(itemOrcamentoMapper::toResponse)
                 .toList();
     }
 
     @Override
     public ItemOrcamentoResponseDTO update(Integer id, ItemOrcamentoUpdateDTO dto) {
-        ItemOrcamento entity = repositoryPort.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ItemOrcamento não encontrado: " + id));
-        mapper.updateFromDto(dto, entity);
-        return mapper.toResponse(repositoryPort.save(entity));
+        ItemOrcamento itemOrcamento = itemOrcamentoRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.ITEM_ORCAMENTO_NAO_ENCONTRADO + id));
+        itemOrcamentoMapper.updateFromDto(dto, itemOrcamento);
+        ItemOrcamento updated = itemOrcamentoRepositoryPort.save(itemOrcamento);
+        return itemOrcamentoMapper.toResponse(updated);
     }
 
     @Override
     public ItemOrcamentoResponseDTO replace(Integer id, ItemOrcamentoRequestDTO dto) {
-        repositoryPort.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ItemOrcamento não encontrado: " + id));
-        ItemOrcamento updated = mapper.toEntity(dto);
-        updated.setId(id);
-        return mapper.toResponse(repositoryPort.save(updated));
+        itemOrcamentoRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.ITEM_ORCAMENTO_NAO_ENCONTRADO + id));
+        ItemOrcamento itemOrcamento = itemOrcamentoMapper.toEntity(dto);
+        itemOrcamento.setId(id);
+        ItemOrcamento replaced = itemOrcamentoRepositoryPort.save(itemOrcamento);
+        return itemOrcamentoMapper.toResponse(replaced);
     }
 
     @Override
     public void delete(Integer id) {
-        ItemOrcamento entity = repositoryPort.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ItemOrcamento não encontrado: " + id));
-        repositoryPort.delete(entity);
+        ItemOrcamento itemOrcamento = itemOrcamentoRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.ITEM_ORCAMENTO_NAO_ENCONTRADO + id));
+        itemOrcamentoRepositoryPort.delete(itemOrcamento);
     }
 }

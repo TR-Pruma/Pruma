@@ -5,8 +5,9 @@ import com.br.pruma.application.dto.response.StatusSolicitacaoResponseDTO;
 import com.br.pruma.application.dto.update.StatusSolicitacaoUpdateDTO;
 import com.br.pruma.application.mapper.StatusSolicitacaoMapper;
 import com.br.pruma.application.service.StatusSolicitacaoService;
+import com.br.pruma.config.Constantes;
 import com.br.pruma.core.domain.StatusSolicitacao;
-import com.br.pruma.core.repository.StatusSolicitacaoRepository;
+import com.br.pruma.core.repository.port.StatusSolicitacaoRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,66 +22,63 @@ import java.util.List;
 @Transactional
 public class StatusSolicitacaoServiceImpl implements StatusSolicitacaoService {
 
-    private final StatusSolicitacaoRepository repository;
-    private final StatusSolicitacaoMapper mapper;
+    private final StatusSolicitacaoRepositoryPort statusSolicitacaoRepositoryPort;
+    private final StatusSolicitacaoMapper statusSolicitacaoMapper;
 
     @Override
     public StatusSolicitacaoResponseDTO create(StatusSolicitacaoRequestDTO dto) {
-        StatusSolicitacao entity = mapper.toEntity(dto);
-        return mapper.toResponse(repository.save(entity));
+        StatusSolicitacao statusSolicitacao = statusSolicitacaoMapper.toEntity(dto);
+        StatusSolicitacao saved = statusSolicitacaoRepositoryPort.save(statusSolicitacao);
+        return statusSolicitacaoMapper.toResponse(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
     public StatusSolicitacaoResponseDTO getById(Integer id) {
-        return mapper.toResponse(repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "StatusSolicitacao não encontrado: " + id)));
+        StatusSolicitacao statusSolicitacao = statusSolicitacaoRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.STATUS_SOLICITACAO_NAO_ENCONTRADO + id));
+        return statusSolicitacaoMapper.toResponse(statusSolicitacao);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<StatusSolicitacaoResponseDTO> listAll() {
-        return repository.findAll().stream()
-                .map(mapper::toResponse)
+        return statusSolicitacaoRepositoryPort.findAll()
+                .stream()
+                .map(statusSolicitacaoMapper::toResponse)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<StatusSolicitacaoResponseDTO> list(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toResponse);
+        return statusSolicitacaoRepositoryPort.findAll(pageable)
+                .map(statusSolicitacaoMapper::toResponse);
     }
 
     @Override
     public StatusSolicitacaoResponseDTO update(Integer id, StatusSolicitacaoUpdateDTO dto) {
-        StatusSolicitacao entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "StatusSolicitacao não encontrado: " + id));
-
-        mapper.updateFromDto(dto, entity);
-
-        return mapper.toResponse(repository.save(entity));
+        StatusSolicitacao statusSolicitacao = statusSolicitacaoRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.STATUS_SOLICITACAO_NAO_ENCONTRADO + id));
+        statusSolicitacaoMapper.updateFromDto(dto, statusSolicitacao);
+        StatusSolicitacao updated = statusSolicitacaoRepositoryPort.save(statusSolicitacao);
+        return statusSolicitacaoMapper.toResponse(updated);
     }
 
     @Override
     public StatusSolicitacaoResponseDTO replace(Integer id, StatusSolicitacaoRequestDTO dto) {
-        repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "StatusSolicitacao não encontrado: " + id));
-
-        StatusSolicitacao entity = mapper.toEntity(dto);
-        entity.setId(id);
-
-        return mapper.toResponse(repository.save(entity));
+        statusSolicitacaoRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.STATUS_SOLICITACAO_NAO_ENCONTRADO + id));
+        StatusSolicitacao statusSolicitacao = statusSolicitacaoMapper.toEntity(dto);
+        statusSolicitacao.setId(id);
+        StatusSolicitacao replaced = statusSolicitacaoRepositoryPort.save(statusSolicitacao);
+        return statusSolicitacaoMapper.toResponse(replaced);
     }
 
     @Override
     public void delete(Integer id) {
-        StatusSolicitacao entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "StatusSolicitacao não encontrado: " + id));
-        entity.setAtivo(false);
-        repository.save(entity);
+        StatusSolicitacao statusSolicitacao = statusSolicitacaoRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.STATUS_SOLICITACAO_NAO_ENCONTRADO + id));
+        statusSolicitacaoRepositoryPort.delete(statusSolicitacao);
     }
 }

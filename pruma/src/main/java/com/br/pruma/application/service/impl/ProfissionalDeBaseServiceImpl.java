@@ -5,6 +5,7 @@ import com.br.pruma.application.dto.response.ProfissionalDeBaseResponseDTO;
 import com.br.pruma.application.dto.update.ProfissionalDeBaseUpdateDTO;
 import com.br.pruma.application.mapper.ProfissionalDeBaseMapper;
 import com.br.pruma.application.service.ProfissionalDeBaseService;
+import com.br.pruma.config.Constantes;
 import com.br.pruma.core.domain.ProfissionalDeBase;
 import com.br.pruma.core.repository.port.ProfissionalDeBaseRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,17 +27,17 @@ public class ProfissionalDeBaseServiceImpl implements ProfissionalDeBaseService 
 
     @Override
     public ProfissionalDeBaseResponseDTO create(ProfissionalDeBaseRequestDTO dto) {
-        ProfissionalDeBase entity = profissionalDeBaseMapper.toEntity(dto);
-        ProfissionalDeBase saved = profissionalDeBaseRepositoryPort.save(entity);
+        ProfissionalDeBase profissionalDeBase = profissionalDeBaseMapper.toEntity(dto);
+        ProfissionalDeBase saved = profissionalDeBaseRepositoryPort.save(profissionalDeBase);
         return profissionalDeBaseMapper.toResponse(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
     public ProfissionalDeBaseResponseDTO getById(Integer id) {
-        ProfissionalDeBase entity = profissionalDeBaseRepositoryPort.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ProfissionalDeBase não encontrado: " + id));
-        return profissionalDeBaseMapper.toResponse(entity);
+        ProfissionalDeBase profissionalDeBase = profissionalDeBaseRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.PROFISSIONAL_DE_BASE_NAO_ENCONTRADO + id));
+        return profissionalDeBaseMapper.toResponse(profissionalDeBase);
     }
 
     @Override
@@ -57,27 +58,27 @@ public class ProfissionalDeBaseServiceImpl implements ProfissionalDeBaseService 
 
     @Override
     public ProfissionalDeBaseResponseDTO update(Integer id, ProfissionalDeBaseUpdateDTO dto) {
-        ProfissionalDeBase entity = profissionalDeBaseRepositoryPort.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ProfissionalDeBase não encontrado: " + id));
-        profissionalDeBaseMapper.updateFromDto(dto, entity);
-        ProfissionalDeBase updated = profissionalDeBaseRepositoryPort.save(entity);
+        ProfissionalDeBase profissionalDeBase = profissionalDeBaseRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.PROFISSIONAL_DE_BASE_NAO_ENCONTRADO + id));
+        profissionalDeBaseMapper.updateFromDto(dto, profissionalDeBase);
+        ProfissionalDeBase updated = profissionalDeBaseRepositoryPort.save(profissionalDeBase);
         return profissionalDeBaseMapper.toResponse(updated);
     }
 
     @Override
     public ProfissionalDeBaseResponseDTO replace(Integer id, ProfissionalDeBaseRequestDTO dto) {
         profissionalDeBaseRepositoryPort.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ProfissionalDeBase não encontrado: " + id));
-        ProfissionalDeBase entity = profissionalDeBaseMapper.toEntity(dto);
-        entity.setId(id);
-        ProfissionalDeBase replaced = profissionalDeBaseRepositoryPort.save(entity);
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.PROFISSIONAL_DE_BASE_NAO_ENCONTRADO + id));
+        ProfissionalDeBase profissionalDeBase = profissionalDeBaseMapper.toEntity(dto);
+        profissionalDeBase.setId(id);
+        ProfissionalDeBase replaced = profissionalDeBaseRepositoryPort.save(profissionalDeBase);
         return profissionalDeBaseMapper.toResponse(replaced);
     }
 
     @Override
     public void delete(Integer id) {
-        ProfissionalDeBase entity = profissionalDeBaseRepositoryPort.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("ProfissionalDeBase não encontrado: " + id));
-        profissionalDeBaseRepositoryPort.delete(entity);
+        ProfissionalDeBase profissionalDeBase = profissionalDeBaseRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.PROFISSIONAL_DE_BASE_NAO_ENCONTRADO + id));
+        profissionalDeBaseRepositoryPort.delete(profissionalDeBase);
     }
 }

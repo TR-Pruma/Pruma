@@ -5,6 +5,7 @@ import com.br.pruma.application.dto.response.PreObraResponseDTO;
 import com.br.pruma.application.dto.update.PreObraUpdateDTO;
 import com.br.pruma.application.mapper.PreObraMapper;
 import com.br.pruma.application.service.PreObraService;
+import com.br.pruma.config.Constantes;
 import com.br.pruma.core.domain.PreObra;
 import com.br.pruma.core.repository.port.PreObraRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
@@ -35,7 +36,7 @@ public class PreObraServiceImpl implements PreObraService {
     @Transactional(readOnly = true)
     public PreObraResponseDTO getById(Integer id) {
         PreObra preObra = preObraRepositoryPort.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("PreObra não encontrada: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.PRE_OBRA_NAO_ENCONTRADA + id));
         return preObraMapper.toResponse(preObra);
     }
 
@@ -67,7 +68,7 @@ public class PreObraServiceImpl implements PreObraService {
     @Override
     public PreObraResponseDTO update(Integer id, PreObraUpdateDTO dto) {
         PreObra preObra = preObraRepositoryPort.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("PreObra não encontrada: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.PRE_OBRA_NAO_ENCONTRADA + id));
         preObraMapper.updateFromDto(dto, preObra);
         PreObra updated = preObraRepositoryPort.save(preObra);
         return preObraMapper.toResponse(updated);
@@ -76,7 +77,7 @@ public class PreObraServiceImpl implements PreObraService {
     @Override
     public PreObraResponseDTO replace(Integer id, PreObraRequestDTO dto) {
         preObraRepositoryPort.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("PreObra não encontrada: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.PRE_OBRA_NAO_ENCONTRADA + id));
         PreObra preObra = preObraMapper.toEntity(dto);
         preObra.setId(id);
         PreObra replaced = preObraRepositoryPort.save(preObra);
@@ -86,7 +87,7 @@ public class PreObraServiceImpl implements PreObraService {
     @Override
     public void delete(Integer id) {
         PreObra preObra = preObraRepositoryPort.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("PreObra não encontrada: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.PRE_OBRA_NAO_ENCONTRADA + id));
         preObraRepositoryPort.delete(preObra);
     }
 }

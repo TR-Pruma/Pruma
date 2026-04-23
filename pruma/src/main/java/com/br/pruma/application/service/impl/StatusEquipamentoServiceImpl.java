@@ -5,8 +5,9 @@ import com.br.pruma.application.dto.response.StatusEquipamentoResponseDTO;
 import com.br.pruma.application.dto.update.StatusEquipamentoUpdateDTO;
 import com.br.pruma.application.mapper.StatusEquipamentoMapper;
 import com.br.pruma.application.service.StatusEquipamentoService;
+import com.br.pruma.config.Constantes;
 import com.br.pruma.core.domain.StatusEquipamento;
-import com.br.pruma.core.repository.StatusEquipamentoRepository;
+import com.br.pruma.core.repository.port.StatusEquipamentoRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,66 +22,64 @@ import java.util.List;
 @Transactional
 public class StatusEquipamentoServiceImpl implements StatusEquipamentoService {
 
-    private final StatusEquipamentoRepository repository;
-    private final StatusEquipamentoMapper mapper;
+    private final StatusEquipamentoRepositoryPort statusEquipamentoRepositoryPort;
+    private final StatusEquipamentoMapper statusEquipamentoMapper;
 
     @Override
     public StatusEquipamentoResponseDTO create(StatusEquipamentoRequestDTO dto) {
-        StatusEquipamento entity = mapper.toEntity(dto);
-        return mapper.toDTO(repository.save(entity));
+        StatusEquipamento statusEquipamento = statusEquipamentoMapper.toEntity(dto);
+        StatusEquipamento saved = statusEquipamentoRepositoryPort.save(statusEquipamento);
+        return statusEquipamentoMapper.toResponse(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
     public StatusEquipamentoResponseDTO getById(Integer id) {
-        return mapper.toDTO(repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "StatusEquipamento não encontrado: " + id)));
+        StatusEquipamento statusEquipamento = statusEquipamentoRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.STATUS_EQUIPAMENTO_NAO_ENCONTRADO + id));
+        return statusEquipamentoMapper.toResponse(statusEquipamento);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<StatusEquipamentoResponseDTO> listAll() {
-        return repository.findAll().stream()
-                .map(mapper::toDTO)
+        return statusEquipamentoRepositoryPort.findAll()
+                .stream()
+                .map(statusEquipamentoMapper::toResponse)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<StatusEquipamentoResponseDTO> list(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toDTO);
+        return statusEquipamentoRepositoryPort.findAll(pageable)
+                .map(statusEquipamentoMapper::toResponse);
     }
 
     @Override
     public StatusEquipamentoResponseDTO update(Integer id, StatusEquipamentoUpdateDTO dto) {
-        StatusEquipamento entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "StatusEquipamento não encontrado: " + id));
-
-        mapper.updateFromDto(dto, entity);
-
-        return mapper.toDTO(repository.save(entity));
+        StatusEquipamento statusEquipamento = statusEquipamentoRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.STATUS_EQUIPAMENTO_NAO_ENCONTRADO + id));
+        statusEquipamentoMapper.updateFromDto(dto, statusEquipamento);
+        StatusEquipamento updated = statusEquipamentoRepositoryPort.save(statusEquipamento);
+        return statusEquipamentoMapper.toResponse(updated);
     }
 
     @Override
     public StatusEquipamentoResponseDTO replace(Integer id, StatusEquipamentoRequestDTO dto) {
-        repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "StatusEquipamento não encontrado: " + id));
-
-        StatusEquipamento entity = mapper.toEntity(dto);
-        entity.setId(id);
-
-        return mapper.toDTO(repository.save(entity));
+        statusEquipamentoRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.STATUS_EQUIPAMENTO_NAO_ENCONTRADO + id));
+        StatusEquipamento statusEquipamento = statusEquipamentoMapper.toEntity(dto);
+        statusEquipamento.setId(id);
+        StatusEquipamento replaced = statusEquipamentoRepositoryPort.save(statusEquipamento);
+        return statusEquipamentoMapper.toResponse(replaced);
     }
 
     @Override
     public void delete(Integer id) {
-        StatusEquipamento entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "StatusEquipamento não encontrado: " + id));
-        entity.setAtivo(false);
-        repository.save(entity);
+        StatusEquipamento statusEquipamento = statusEquipamentoRepositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.STATUS_EQUIPAMENTO_NAO_ENCONTRADO + id));
+        statusEquipamento.setAtivo(false);
+        statusEquipamentoRepositoryPort.save(statusEquipamento);
     }
 }
