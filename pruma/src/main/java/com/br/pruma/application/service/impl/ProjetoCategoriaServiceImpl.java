@@ -74,6 +74,7 @@ public class ProjetoCategoriaServiceImpl implements ProjetoCategoriaService {
         ProjetoCategoria entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "ProjetoCategoria não encontrada: " + id));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

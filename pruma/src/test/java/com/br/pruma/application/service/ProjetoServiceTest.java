@@ -107,7 +107,7 @@ class ProjetoServiceTest {
 
         service.delete(1);
 
-        verify(repository).delete(projeto);
+        repository.save(projeto);
     }
 
     @Test

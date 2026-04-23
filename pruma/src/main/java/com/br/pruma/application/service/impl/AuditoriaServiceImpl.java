@@ -64,6 +64,7 @@ public class AuditoriaServiceImpl implements AuditoriaService {
     public void delete(UUID id) {
         Auditoria entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Auditoria não encontrada: " + id));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

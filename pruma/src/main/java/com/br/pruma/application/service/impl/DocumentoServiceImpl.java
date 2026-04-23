@@ -104,6 +104,7 @@ public class DocumentoServiceImpl implements DocumentoService {
         Documento entity = repository.findByIdAndAtivoTrue(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Documento com ID " + id + " não encontrado."));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

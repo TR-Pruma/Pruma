@@ -66,6 +66,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         Feedback entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Feedback com ID " + id + " não encontrado."));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

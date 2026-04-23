@@ -19,7 +19,6 @@ public interface SolicitacaoMudancaMapper {
     @Mapping(target = "id",                 ignore = true)
     @Mapping(target = "projeto",            ignore = true)
     @Mapping(target = "statusSolicitacao",  ignore = true)
-    @Mapping(target = "createdAt",          ignore = true)
     SolicitacaoMudanca toEntity(SolicitacaoMudancaRequestDTO request);
 
     @Mapping(target = "id",                ignore = true)

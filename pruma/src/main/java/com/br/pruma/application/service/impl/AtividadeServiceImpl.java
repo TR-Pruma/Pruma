@@ -72,6 +72,7 @@ public class AtividadeServiceImpl implements AtividadeService {
     public void delete(Integer id) {
         Atividade entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Atividade não encontrada: " + id));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

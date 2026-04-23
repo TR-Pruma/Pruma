@@ -101,6 +101,7 @@ public class ChecklistServiceImpl implements ChecklistService {
         Checklist entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Checklist com ID " + id + " não encontrado."));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

@@ -18,13 +18,11 @@ public interface SubContratoMapper {
     @Mapping(target = "id",        ignore = true)
     @Mapping(target = "cliente",   ignore = true)
     @Mapping(target = "projeto",   ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
     SubContrato toEntity(SubContratoRequestDTO request);
 
     @Mapping(target = "id",        ignore = true)
     @Mapping(target = "cliente",   ignore = true)
     @Mapping(target = "projeto",   ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
     void updateFromDto(SubContratoRequestDTO request, @MappingTarget SubContrato entity);
 
 
@@ -33,6 +31,5 @@ public interface SubContratoMapper {
     @Mapping(target = "id",        ignore = true)
     @Mapping(target = "cliente",   ignore = true)
     @Mapping(target = "projeto",   ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
     void updateFromDto(SubContratoUpdateDTO dto, @MappingTarget SubContrato entity);
 }

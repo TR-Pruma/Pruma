@@ -76,6 +76,7 @@ public class FornecedorServiceImpl implements FornecedorService {
         Fornecedor entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Fornecedor com ID " + id + " não encontrado."));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

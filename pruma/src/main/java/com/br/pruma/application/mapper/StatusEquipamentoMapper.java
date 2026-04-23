@@ -13,11 +13,9 @@ public interface StatusEquipamentoMapper {
     StatusEquipamentoResponseDTO toDTO(StatusEquipamento entity);
 
     @Mapping(target = "id",        ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
     StatusEquipamento toEntity(StatusEquipamentoRequestDTO request);
 
     @Mapping(target = "id",        ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
     void updateFromDto(StatusEquipamentoRequestDTO request, @MappingTarget StatusEquipamento entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

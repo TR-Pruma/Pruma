@@ -29,11 +29,11 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @ToString(onlyExplicitlyIncluded = true)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Schema(description = "Representa um registro de auditoria do sistema")
-public class Auditoria implements Serializable {
+public class Auditoria extends AuditableEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -93,12 +93,4 @@ public class Auditoria implements Serializable {
             required    = true
     )
     private LocalDateTime dataHora;
-
-    @Version
-    @Column(name = "version", nullable = false)
-    @Schema(
-            description = "Versão do registro para controle de concorrência",
-            example     = "3"
-    )
-    private Long version;
 }

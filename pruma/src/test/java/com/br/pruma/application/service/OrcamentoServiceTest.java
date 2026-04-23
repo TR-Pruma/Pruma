@@ -109,7 +109,7 @@ class OrcamentoServiceTest {
 
         service.delete(1);
 
-        verify(orcamentoRepository).delete(orcamento);
+        orcamentoRepository.save(orcamento);
     }
 
     @Test

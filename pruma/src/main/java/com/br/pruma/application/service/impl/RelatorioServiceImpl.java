@@ -80,6 +80,7 @@ public class RelatorioServiceImpl implements RelatorioService {
         Relatorio entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Relatório não encontrado: " + id));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

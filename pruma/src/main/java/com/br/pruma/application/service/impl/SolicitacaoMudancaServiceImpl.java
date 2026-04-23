@@ -131,7 +131,8 @@ public class SolicitacaoMudancaServiceImpl implements SolicitacaoMudancaService 
         SolicitacaoMudanca entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "SolicitacaoMudanca não encontrada: " + id));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 
 }

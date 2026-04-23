@@ -94,6 +94,7 @@ public class FaseCronogramaServiceImpl implements FaseCronogramaService {
     public void delete(Integer id) {
         FaseCronograma entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("FaseCronograma não encontrada: " + id));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

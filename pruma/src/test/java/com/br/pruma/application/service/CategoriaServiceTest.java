@@ -106,12 +106,9 @@ class CategoriaServiceTest {
     @DisplayName("delete: deleta quando existe")
     void delete_sucesso() {
         when(repository.findById(1)).thenReturn(Optional.of(categoria));
-
         service.delete(1);
-
-        verify(repository).delete(categoria);
+        verify(repository).save(argThat(cat -> Boolean.FALSE.equals(cat.getAtivo())));
     }
-
     @Test
     @DisplayName("delete: lanca EntityNotFoundException quando nao existe")
     void delete_naoEncontrado() {

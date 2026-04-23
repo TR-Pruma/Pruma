@@ -96,6 +96,6 @@ class EquipamentoServiceTest {
 
         service.delete(1);
 
-        verify(repository).delete(equipamento);
+        verify(repository).save(equipamento);
     }
 }

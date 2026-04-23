@@ -66,6 +66,7 @@ public class EquipamentoProjetoServiceImpl implements EquipamentoProjetoService 
         EquipamentoProjeto entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "EquipamentoProjeto com ID " + id + " não encontrado."));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

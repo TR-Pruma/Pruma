@@ -68,6 +68,7 @@ public class ClienteTipoServiceImpl implements ClienteTipoService {
         ClienteTipo entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "ClienteTipo com ID " + id + " não encontrado."));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

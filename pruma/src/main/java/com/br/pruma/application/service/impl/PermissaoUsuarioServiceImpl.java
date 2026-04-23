@@ -80,6 +80,7 @@ public class PermissaoUsuarioServiceImpl implements PermissaoUsuarioService {
         PermissaoUsuario entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "PermissaoUsuario com ID " + id + " não encontrada."));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

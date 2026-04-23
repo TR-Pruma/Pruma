@@ -81,6 +81,7 @@ public class OrcamentoServiceImpl implements OrcamentoService {
     public void delete(Integer id) {
         Orcamento entity = orcamentoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Orcamento n\u00e3o encontrado: " + id));
-        orcamentoRepository.delete(entity);
+        entity.setAtivo(false);
+        orcamentoRepository.save(entity);
     }
 }

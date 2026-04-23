@@ -72,6 +72,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     public void delete(Integer id) {
         Categoria entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Categoria não encontrada: " + id));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

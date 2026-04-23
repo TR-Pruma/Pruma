@@ -76,6 +76,7 @@ public class ComunicacaoAuxServiceImpl implements ComunicacaoAuxService {
         ComunicacaoAux entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Comunicação auxiliar com ID " + id + " não encontrada."));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

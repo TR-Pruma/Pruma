@@ -66,6 +66,7 @@ public class HistoricoLocalizacaoServiceImpl implements HistoricoLocalizacaoServ
         HistoricoLocalizacao entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "HistoricoLocalizacao com ID " + id + " não encontrado."));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

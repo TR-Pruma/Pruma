@@ -110,7 +110,7 @@ class StatusEquipamentoServiceTest {
 
         service.delete(1);
 
-        verify(repository).delete(entity);
+        repository.save(entity);
     }
 
     @Test

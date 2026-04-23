@@ -16,9 +16,9 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @ToString(onlyExplicitlyIncluded = true)
-public class Relatorio implements Serializable {
+public class Relatorio extends AuditableEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -48,10 +48,4 @@ public class Relatorio implements Serializable {
     @Column(name = "data_criacao", nullable = false)
     private LocalDate dataCriacao;
 
-    /**
-     * Timestamp automático de criação no banco.
-     */
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false, nullable = false)
-    private LocalDate createdAt;
 }

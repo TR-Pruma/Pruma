@@ -130,6 +130,7 @@ public class SubContratoServiceImpl implements SubContratoService {
         SubContrato entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "SubContrato não encontrado: " + id));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

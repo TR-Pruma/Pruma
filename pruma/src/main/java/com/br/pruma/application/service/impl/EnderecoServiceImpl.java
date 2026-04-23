@@ -58,6 +58,7 @@ public class EnderecoServiceImpl implements EnderecoService {
         Endereco entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Endereço com ID " + id + " não encontrado."));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

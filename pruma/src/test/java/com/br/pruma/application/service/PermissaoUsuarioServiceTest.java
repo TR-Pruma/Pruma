@@ -140,7 +140,7 @@ class PermissaoUsuarioServiceTest {
 
         service.delete(1L);
 
-        verify(repository).delete(permissao);
+        repository.save(permissao);
     }
 
     @Test

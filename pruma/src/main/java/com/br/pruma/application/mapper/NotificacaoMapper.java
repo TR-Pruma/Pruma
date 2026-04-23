@@ -12,7 +12,6 @@ import org.mapstruct.*;
 public interface NotificacaoMapper {
 
     @Mapping(target = "id",          ignore = true)
-    @Mapping(target = "version",     ignore = true)
     @Mapping(target = "createdAt",   ignore = true)
     @Mapping(target = "updatedAt",   ignore = true)
     @Mapping(target = "cliente",     source = "clienteCpf",    qualifiedByName = "mapClienteByCpf")
@@ -24,7 +23,6 @@ public interface NotificacaoMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id",          ignore = true)
-    @Mapping(target = "version",     ignore = true)
     @Mapping(target = "createdAt",   ignore = true)
     @Mapping(target = "updatedAt",   ignore = true)
     @Mapping(target = "cliente",     source = "clienteCpf",    qualifiedByName = "mapClienteByCpf")
@@ -40,7 +38,6 @@ public interface NotificacaoMapper {
     @Mapping(target = "mensagem",      source = "mensagem")
     @Mapping(target = "dataHora",      source = "dataHora")
     @Mapping(target = "lida",          source = "lida")
-    @Mapping(target = "version",       source = "version")
     @Mapping(target = "createdAt",     source = "createdAt")
     @Mapping(target = "updatedAt",     source = "updatedAt")
     NotificacaoResponseDTO toResponse(Notificacao entity);

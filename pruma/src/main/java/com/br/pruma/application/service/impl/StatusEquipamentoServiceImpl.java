@@ -80,6 +80,7 @@ public class StatusEquipamentoServiceImpl implements StatusEquipamentoService {
         StatusEquipamento entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "StatusEquipamento não encontrado: " + id));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

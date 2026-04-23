@@ -94,6 +94,7 @@ public class CronogramaServiceImpl implements CronogramaService {
     public void delete(Integer id) {
         Cronograma entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Cronograma não encontrado: " + id));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

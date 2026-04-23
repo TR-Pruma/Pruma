@@ -80,6 +80,7 @@ public class StatusSolicitacaoServiceImpl implements StatusSolicitacaoService {
         StatusSolicitacao entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "StatusSolicitacao não encontrado: " + id));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }
