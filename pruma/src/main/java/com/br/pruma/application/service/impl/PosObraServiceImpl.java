@@ -5,6 +5,7 @@ import com.br.pruma.application.dto.response.PosObraResponseDTO;
 import com.br.pruma.application.dto.update.PosObraUpdateDTO;
 import com.br.pruma.application.mapper.PosObraMapper;
 import com.br.pruma.application.service.PosObraService;
+import com.br.pruma.config.Constantes;
 import com.br.pruma.core.domain.PosObra;
 import com.br.pruma.core.repository.port.PosObraRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
@@ -35,7 +36,7 @@ public class PosObraServiceImpl implements PosObraService {
     @Transactional(readOnly = true)
     public PosObraResponseDTO getById(Integer id) {
         PosObra posObra = posObraRepositoryPort.findById(Long.valueOf(id))
-                .orElseThrow(() -> new EntityNotFoundException("PosObra não encontrada: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.POS_OBRA_NAO_ENCONTRADA + id));
         return posObraMapper.toResponse(posObra);
     }
 
@@ -67,7 +68,7 @@ public class PosObraServiceImpl implements PosObraService {
     @Override
     public PosObraResponseDTO update(Integer id, PosObraUpdateDTO dto) {
         PosObra posObra = posObraRepositoryPort.findById(Long.valueOf(id))
-                .orElseThrow(() -> new EntityNotFoundException("PosObra não encontrada: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.POS_OBRA_NAO_ENCONTRADA + id));
         posObraMapper.updateFromDto(dto, posObra);
         PosObra updated = posObraRepositoryPort.save(posObra);
         return posObraMapper.toResponse(updated);
@@ -76,7 +77,7 @@ public class PosObraServiceImpl implements PosObraService {
     @Override
     public PosObraResponseDTO replace(Integer id, PosObraRequestDTO dto) {
         posObraRepositoryPort.findById(Long.valueOf(id))
-                .orElseThrow(() -> new EntityNotFoundException("PosObra não encontrada: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.POS_OBRA_NAO_ENCONTRADA + id));
         PosObra posObra = posObraMapper.toEntity(dto);
         posObra.setId(Long.valueOf(id));
         PosObra replaced = posObraRepositoryPort.save(posObra);
@@ -86,7 +87,7 @@ public class PosObraServiceImpl implements PosObraService {
     @Override
     public void delete(Integer id) {
         PosObra posObra = posObraRepositoryPort.findById(Long.valueOf(id))
-                .orElseThrow(() -> new EntityNotFoundException("PosObra não encontrada: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(Constantes.POS_OBRA_NAO_ENCONTRADA + id));
         posObraRepositoryPort.delete(posObra);
     }
 }
