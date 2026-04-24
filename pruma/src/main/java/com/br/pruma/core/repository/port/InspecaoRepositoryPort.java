@@ -21,7 +21,7 @@ public interface InspecaoRepositoryPort {
     Page<Inspecao> findAll(Pageable pageable);
 
     /** Busca todas as inspeções de um projeto. */
-    List<Inspecao> findAllByProjeto_Id(Integer projetoId);
+    List<Inspecao> findAllByProjetoId(Integer projetoId);
 
     void deleteById(Integer id);
 

@@ -149,7 +149,7 @@ class SolicitacaoMudancaServiceTest {
 
         service.delete(1);
 
-        repository.save(entity);
+        verify(repository).save(entity);
     }
 
     @Test

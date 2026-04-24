@@ -16,4 +16,5 @@ public class Constantes {
     public static final String PROJETO_CATEGORIA_NAO_ENCONTRADA = "Projeto Categoria não encontrada: ";
     public static final String PROJETO_NAO_ENCONTRADO = "Projeto não encontrado: ";
     public static final String CLIENTE_NAO_ENCONTRADO="Cliente não encontrado: ";
+    public static final String LOG_ALTERACAO_AUX_NAO_ENCONTRADO="LogAlteracaoAux não encontrado: ";
 }

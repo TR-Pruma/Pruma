@@ -7,14 +7,16 @@ import com.br.pruma.application.mapper.LogAlteracaoAuxMapper;
 import com.br.pruma.application.service.LogAlteracaoAuxService;
 import com.br.pruma.core.domain.LogAlteracaoAux;
 import com.br.pruma.core.repository.port.LogAlteracaoAuxRepositoryPort;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.br.pruma.config.Constantes.LOG_ALTERACAO_AUX_NAO_ENCONTRADO;
 
 @Service
 @RequiredArgsConstructor
@@ -61,11 +63,7 @@ public class LogAlteracaoAuxServiceImpl implements LogAlteracaoAuxService {
     }
 
     private LogAlteracaoAux findOrThrow(Integer id) {
-        try {
-            return repositoryPort.findById(id)
-                    .orElseThrow(ChangeSetPersister.NotFoundException::new);
-        } catch (ChangeSetPersister.NotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        return repositoryPort.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(LOG_ALTERACAO_AUX_NAO_ENCONTRADO+ id));
     }
 }

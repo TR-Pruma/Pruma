@@ -42,7 +42,7 @@ public class InspecaoRepositoryAdapter implements InspecaoRepositoryPort {
     }
 
     @Override
-    public List<Inspecao> findAllByProjeto_Id(Integer projetoId) {
+    public List<Inspecao> findAllByProjetoId(Integer projetoId) {
         return inspecaoRepository.findAllByProjeto_Id(projetoId);
     }
 
