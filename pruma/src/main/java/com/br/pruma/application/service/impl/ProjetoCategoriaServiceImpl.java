@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.br.pruma.config.Constantes.PROJETO_CATEGORIA_NAO_ENCONTRADA;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -35,7 +37,7 @@ public class ProjetoCategoriaServiceImpl implements ProjetoCategoriaService {
     public ProjetoCategoriaResponseDTO getById(Integer id) {
         return mapper.toDTO(repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "ProjetoCategoria não encontrada: " + id)));
+                        PROJETO_CATEGORIA_NAO_ENCONTRADA + id)));
     }
 
     @Override
@@ -64,7 +66,7 @@ public class ProjetoCategoriaServiceImpl implements ProjetoCategoriaService {
     public ProjetoCategoriaResponseDTO update(Integer id, ProjetoCategoriaUpdateDTO dto) {
         ProjetoCategoria entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "ProjetoCategoria não encontrada: " + id));
+                        PROJETO_CATEGORIA_NAO_ENCONTRADA + id));
         mapper.updateFromDto(dto, entity);
         return mapper.toDTO(repository.save(entity));
     }
@@ -73,7 +75,7 @@ public class ProjetoCategoriaServiceImpl implements ProjetoCategoriaService {
     public void delete(Integer id) {
         ProjetoCategoria entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "ProjetoCategoria não encontrada: " + id));
+                        PROJETO_CATEGORIA_NAO_ENCONTRADA + id));
         entity.setAtivo(false);
         repository.save(entity);
     }
