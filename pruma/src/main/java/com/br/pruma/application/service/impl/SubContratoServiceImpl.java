@@ -17,7 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import static com.br.pruma.config.Constantes.*;
 import java.util.List;
 
 @Service
@@ -36,11 +36,11 @@ public class SubContratoServiceImpl implements SubContratoService {
 
         Cliente cliente = clienteRepository.findByCpf(dto.clienteCpf())
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Cliente não encontrado: " + dto.clienteCpf()));
+                        CLIENTE_NAO_ENCONTRADO + dto.clienteCpf()));
 
         Projeto projeto = projetoRepository.findById(dto.projetoId())
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Projeto não encontrado: " + dto.projetoId()));
+                        PROJETO_NAO_ENCONTRADO + dto.projetoId()));
 
         entity.setCliente(cliente);
         entity.setProjeto(projeto);
@@ -53,7 +53,7 @@ public class SubContratoServiceImpl implements SubContratoService {
     public SubContratoResponseDTO getById(Integer id) {
         return mapper.toDTO(repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "SubContrato não encontrado: " + id)));
+                        SUBCONTRATO_NAO_ENCONTRADO + id)));
     }
 
     @Override
@@ -82,18 +82,18 @@ public class SubContratoServiceImpl implements SubContratoService {
     public SubContratoResponseDTO update(Integer id, SubContratoUpdateDTO dto) {
         SubContrato entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "SubContrato não encontrado: " + id));
+                        SUBCONTRATO_NAO_ENCONTRADO + id));
         if (dto.clienteCpf() != null) {
             Cliente cliente = clienteRepository.findByCpf(dto.clienteCpf())
                     .orElseThrow(() -> new EntityNotFoundException(
-                            "Cliente não encontrado: " + dto.clienteCpf()));
+                            CLIENTE_NAO_ENCONTRADO + dto.clienteCpf()));
             entity.setCliente(cliente);
         }
 
         if (dto.projetoId() != null) {
             Projeto projeto = projetoRepository.findById(dto.projetoId())
                     .orElseThrow(() -> new EntityNotFoundException(
-                            "Projeto não encontrado: " + dto.projetoId()));
+                            PROJETO_NAO_ENCONTRADO + dto.projetoId()));
             entity.setProjeto(projeto);
         }
 
@@ -106,17 +106,17 @@ public class SubContratoServiceImpl implements SubContratoService {
     public SubContratoResponseDTO replace(Integer id, SubContratoRequestDTO dto) {
         repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "SubContrato não encontrado: " + id));
+                        SUBCONTRATO_NAO_ENCONTRADO+ id));
 
         SubContrato entity = mapper.toEntity(dto);
 
         Cliente cliente = clienteRepository.findByCpf(dto.clienteCpf())
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Cliente não encontrado: " + dto.clienteCpf()));
+                       CLIENTE_NAO_ENCONTRADO + dto.clienteCpf()));
 
         Projeto projeto = projetoRepository.findById(dto.projetoId())
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Projeto não encontrado: " + dto.projetoId()));
+                        PROJETO_NAO_ENCONTRADO + dto.projetoId()));
 
         entity.setId(id);
         entity.setCliente(cliente);
@@ -129,7 +129,7 @@ public class SubContratoServiceImpl implements SubContratoService {
     public void delete(Integer id) {
         SubContrato entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "SubContrato não encontrado: " + id));
+                       SUBCONTRATO_NAO_ENCONTRADO+ id));
         entity.setAtivo(false);
         repository.save(entity);
     }

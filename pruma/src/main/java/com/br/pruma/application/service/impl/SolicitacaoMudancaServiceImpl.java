@@ -17,7 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import static com.br.pruma.config.Constantes.*;
 import java.util.List;
 
 @Service
@@ -82,19 +82,19 @@ public class SolicitacaoMudancaServiceImpl implements SolicitacaoMudancaService 
     public SolicitacaoMudancaResponseDTO update(Integer id, SolicitacaoMudancaUpdateDTO dto) {
         SolicitacaoMudanca entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "SolicitacaoMudanca não encontrada: " + id));
+                        SOLICITACAO_MUDANCA_NAO_ENCONTRADA + id));
 
         if (dto.projetoId() != null) {
             Projeto projeto = projetoRepository.findById(dto.projetoId())
                     .orElseThrow(() -> new EntityNotFoundException(
-                            "Projeto não encontrado: " + dto.projetoId()));
+                            PROJETO_NAO_ENCONTRADO + dto.projetoId()));
             entity.setProjeto(projeto);
         }
 
         if (dto.statusSolicitacaoId() != null) {
             StatusSolicitacao status = statusSolicitacaoRepository.findById(dto.statusSolicitacaoId())
                     .orElseThrow(() -> new EntityNotFoundException(
-                            "StatusSolicitacao não encontrado: " + dto.statusSolicitacaoId()));
+                            STATUS_SOLICITACAO_NAO_ENCONTRADO + dto.statusSolicitacaoId()));
             entity.setStatusSolicitacao(status);
         }
 
@@ -107,17 +107,17 @@ public class SolicitacaoMudancaServiceImpl implements SolicitacaoMudancaService 
     public SolicitacaoMudancaResponseDTO replace(Integer id, SolicitacaoMudancaRequestDTO dto) {
         repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "SolicitacaoMudanca não encontrada: " + id));
+                        SOLICITACAO_MUDANCA_NAO_ENCONTRADA + id));
 
         SolicitacaoMudanca entity = mapper.toEntity(dto);
 
         Projeto projeto = projetoRepository.findById(dto.projetoId())
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Projeto não encontrado: " + dto.projetoId()));
+                        PROJETO_NAO_ENCONTRADO + dto.projetoId()));
 
         StatusSolicitacao status = statusSolicitacaoRepository.findById(dto.statusSolicitacaoId())
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "StatusSolicitacao não encontrado: " + dto.statusSolicitacaoId()));
+                        STATUS_SOLICITACAO_NAO_ENCONTRADO + dto.statusSolicitacaoId()));
 
         entity.setId(id);
         entity.setProjeto(projeto);
@@ -130,9 +130,8 @@ public class SolicitacaoMudancaServiceImpl implements SolicitacaoMudancaService 
     public void delete(Integer id) {
         SolicitacaoMudanca entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "SolicitacaoMudanca não encontrada: " + id));
+                        STATUS_SOLICITACAO_NAO_ENCONTRADO+ id));
         entity.setAtivo(false);
         repository.save(entity);
     }
-
 }

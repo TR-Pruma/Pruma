@@ -13,8 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
+import static com.br.pruma.config.Constantes.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +35,7 @@ public class RelatorioServiceImpl implements RelatorioService {
     public RelatorioResponseDTO getById(Integer id) {
         return mapper.toDTO(repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Relatório não encontrado: " + id)));
+                        RELATORIO_NAO_ENCONTRADO + id)));
     }
 
     @Override
@@ -60,7 +60,7 @@ public class RelatorioServiceImpl implements RelatorioService {
     public RelatorioResponseDTO update(Integer id, RelatorioUpdateDTO dto) {
         Relatorio entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Relatório não encontrado: " + id));
+                        RELATORIO_NAO_ENCONTRADO + id));
         mapper.updateFromDto(dto, entity);
         return mapper.toDTO(repository.save(entity));
     }
@@ -69,7 +69,7 @@ public class RelatorioServiceImpl implements RelatorioService {
     public RelatorioResponseDTO replace(Integer id, RelatorioRequestDTO dto) {
         repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Relatório não encontrado: " + id));
+                        RELATORIO_NAO_ENCONTRADO + id));
         Relatorio entity = mapper.toEntity(dto);
         entity.setId(id);
         return mapper.toDTO(repository.save(entity));
@@ -79,7 +79,7 @@ public class RelatorioServiceImpl implements RelatorioService {
     public void delete(Integer id) {
         Relatorio entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Relatório não encontrado: " + id));
+                        RELATORIO_NAO_ENCONTRADO + id));
         entity.setAtivo(false);
         repository.save(entity);
     }
