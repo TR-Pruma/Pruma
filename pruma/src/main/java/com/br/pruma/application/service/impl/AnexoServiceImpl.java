@@ -62,6 +62,7 @@ public class AnexoServiceImpl implements AnexoService {
     public void delete(Integer id) {
         Anexo entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Anexo não encontrado: " + id));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

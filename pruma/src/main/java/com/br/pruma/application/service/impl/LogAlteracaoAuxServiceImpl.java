@@ -3,11 +3,11 @@ package com.br.pruma.application.service.impl;
 import com.br.pruma.application.dto.request.LogAlteracaoAuxRequestDTO;
 import com.br.pruma.application.dto.response.LogAlteracaoAuxResponseDTO;
 import com.br.pruma.application.dto.update.LogAlteracaoAuxUpdateDTO;
+import com.br.pruma.application.mapper.LogAlteracaoAuxMapper;
 import com.br.pruma.application.service.LogAlteracaoAuxService;
 import com.br.pruma.core.domain.LogAlteracaoAux;
-import com.br.pruma.core.exception.NotFoundException;
-import com.br.pruma.core.mapper.LogAlteracaoAuxMapper;
-import com.br.pruma.core.port.out.LogAlteracaoAuxRepositoryPort;
+import com.br.pruma.core.repository.port.LogAlteracaoAuxRepositoryPort;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.br.pruma.config.Constantes.LOG_ALTERACAO_AUX_NAO_ENCONTRADO;
 
 @Service
 @RequiredArgsConstructor
@@ -62,6 +64,6 @@ public class LogAlteracaoAuxServiceImpl implements LogAlteracaoAuxService {
 
     private LogAlteracaoAux findOrThrow(Integer id) {
         return repositoryPort.findById(id)
-                .orElseThrow(() -> new NotFoundException("LogAlteracaoAux não encontrado: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(LOG_ALTERACAO_AUX_NAO_ENCONTRADO+ id));
     }
 }

@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-public class SolicitacaoMudanca implements Serializable {
+public class SolicitacaoMudanca  extends AuditableEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -63,11 +63,4 @@ public class SolicitacaoMudanca implements Serializable {
      */
     @Column(name = "data_resposta")
     private LocalDate dataResposta;
-
-    /**
-     * Timestamp automático de criação no banco.
-     */
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false, nullable = false)
-    private LocalDate createdAt;
 }

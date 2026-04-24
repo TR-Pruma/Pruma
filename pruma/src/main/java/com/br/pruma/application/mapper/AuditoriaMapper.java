@@ -14,7 +14,6 @@ import org.mapstruct.*;
 public interface AuditoriaMapper {
 
     @Mapping(target = "id",          ignore = true)
-    @Mapping(target = "version",     ignore = true)
     @Mapping(target = "tipoUsuario", ignore = true)
     @Mapping(target = "clienteCpf",  source = "usuario")
     Auditoria toEntity(AuditoriaRequestDTO dto);
@@ -25,7 +24,6 @@ public interface AuditoriaMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id",          ignore = true)
-    @Mapping(target = "version",     ignore = true)
     @Mapping(target = "tipoUsuario", ignore = true)
     @Mapping(target = "clienteCpf",  source = "usuario")
     void updateFromDto(AuditoriaUpdateDTO dto, @MappingTarget Auditoria entity);

@@ -3,11 +3,11 @@ package com.br.pruma.application.service.impl;
 import com.br.pruma.application.dto.request.LogradouroRequestDTO;
 import com.br.pruma.application.dto.response.LogradouroResponseDTO;
 import com.br.pruma.application.dto.update.LogradouroUpdateDTO;
+import com.br.pruma.application.mapper.LogradouroMapper;
 import com.br.pruma.application.service.LogradouroService;
 import com.br.pruma.core.domain.Logradouro;
-import com.br.pruma.core.exception.NotFoundException;
-import com.br.pruma.core.mapper.LogradouroMapper;
-import com.br.pruma.core.port.out.LogradouroRepositoryPort;
+import com.br.pruma.core.exception.RecursoNaoEncontradoException;
+import com.br.pruma.core.repository.port.LogradouroRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,6 +55,15 @@ public class LogradouroServiceImpl implements LogradouroService {
 
     @Override
     @Transactional
+    public LogradouroResponseDTO replace(Integer id, LogradouroRequestDTO dto) {
+        findOrThrow(id);
+        Logradouro entity = mapper.toEntity(dto);
+        entity.setId(id);
+        return mapper.toResponse(repositoryPort.save(entity));
+    }
+
+    @Override
+    @Transactional
     public void delete(Integer id) {
         findOrThrow(id);
         repositoryPort.deleteById(id);
@@ -62,6 +71,6 @@ public class LogradouroServiceImpl implements LogradouroService {
 
     private Logradouro findOrThrow(Integer id) {
         return repositoryPort.findById(id)
-                .orElseThrow(() -> new NotFoundException("Logradouro não encontrado: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Logradouro não encontrado: " + id));
     }
 }

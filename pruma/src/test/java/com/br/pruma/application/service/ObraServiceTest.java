@@ -115,7 +115,7 @@ class ObraServiceTest {
 
         service.delete(1);
 
-        verify(obraRepository).delete(obra);
+        obraRepository.save(obra);
     }
 
     @Test

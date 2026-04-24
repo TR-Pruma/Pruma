@@ -95,6 +95,7 @@ public class InspecaoServiceImpl implements InspecaoService {
         Inspecao entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Inspeção com ID " + id + " não encontrada."));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

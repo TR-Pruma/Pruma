@@ -18,9 +18,9 @@ import java.io.Serializable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA requires a no-args constructor with at least protected visibility
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @ToString(onlyExplicitlyIncluded = true)
-public class ProjetoCategoria implements Serializable {
+public class ProjetoCategoria extends AuditableEntity  implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

@@ -105,6 +105,7 @@ public class ObraServiceImpl implements ObraService {
     public void delete(Integer id) {
         Obra entity = obraRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Obra não encontrada: " + id));
-        obraRepository.delete(entity);
+        entity.setAtivo(false);
+        obraRepository.save(entity);
     }
 }

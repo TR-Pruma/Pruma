@@ -91,6 +91,7 @@ public class ComunicacaoServiceImpl implements ComunicacaoService {
         Comunicacao entity = comunicacaoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Comunicação com ID " + id + " não encontrada."));
-        comunicacaoRepository.delete(entity);
+        entity.setAtivo(false);
+        comunicacaoRepository.save(entity);
     }
 }

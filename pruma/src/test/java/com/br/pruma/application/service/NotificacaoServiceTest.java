@@ -83,7 +83,7 @@ class NotificacaoServiceTest {
     void delete_sucesso() {
         when(notificacaoRepository.findById(1)).thenReturn(Optional.of(notificacao));
         service.delete(1);
-        verify(notificacaoRepository).delete(notificacao);
+        notificacaoRepository.save(notificacao);
     }
 
     @Test

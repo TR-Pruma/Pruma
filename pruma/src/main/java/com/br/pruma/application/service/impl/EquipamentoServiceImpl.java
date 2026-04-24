@@ -76,6 +76,7 @@ public class EquipamentoServiceImpl implements EquipamentoService {
         Equipamento entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Equipamento com ID " + id + " não encontrado."));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

@@ -18,5 +18,10 @@ public interface MaterialUtilizadoRepository extends JpaRepository<MaterialUtili
      * Retorna todos os registros de material utilizado para um dado material.
      */
     List<MaterialUtilizado> findAllByMaterial_Id(Integer materialId);
-}
 
+    /**
+     * Retorna todos os registros de material utilizado de um projeto,
+     * navegando pelo relacionamento Atividade → Projeto.
+     */
+    List<MaterialUtilizado> findAllByAtividade_Projeto_Id(Integer projetoId);
+}

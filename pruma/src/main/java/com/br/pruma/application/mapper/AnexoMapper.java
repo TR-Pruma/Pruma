@@ -22,7 +22,7 @@ public interface AnexoMapper {
     @Mapping(target = "id", source = "id")
     @Mapping(target = "projetoId", source = "projeto.id")
     @Mapping(target = "tipoAnexo", source = "tipoAnexo")
-    @Mapping(target = "caminhoArquivo", source = "caminhoArquivo")
+    @Mapping(target = "caminho", source = "caminho")
     AnexoResponseDTO toResponse(Anexo entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

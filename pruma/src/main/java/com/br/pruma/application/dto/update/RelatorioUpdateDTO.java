@@ -1,13 +1,9 @@
 package com.br.pruma.application.dto.update;
 
-import lombok.Data;
-
 import java.time.LocalDate;
 
-@Data
-public class RelatorioUpdateDTO {
-    private Integer projetoId;
-    private String titulo;
-    private String conteudo;
-    private LocalDate dataEmissao;
-}
+public record RelatorioUpdateDTO(
+        Integer obraId,       // alinhado com RelatorioRequestDTO
+        String descricao,     // alinhado com a entidade Relatorio
+        LocalDate dataCriacao // alinhado com a entidade Relatorio
+) {}

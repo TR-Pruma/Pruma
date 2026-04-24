@@ -81,6 +81,7 @@ public class ImagemProjetoServiceImpl implements ImagemProjetoService {
         ImagemProjeto entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "ImagemProjeto com ID " + id + " não encontrada."));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

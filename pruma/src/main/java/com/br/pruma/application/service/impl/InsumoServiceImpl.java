@@ -58,6 +58,7 @@ public class InsumoServiceImpl implements InsumoService {
         Insumo entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Insumo com ID " + id + " não encontrado."));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

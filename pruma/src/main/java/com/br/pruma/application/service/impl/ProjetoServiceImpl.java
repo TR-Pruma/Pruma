@@ -80,6 +80,7 @@ public class ProjetoServiceImpl implements ProjetoService {
     public void delete(Integer id) {
         Projeto entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado: " + id));
-        repository.delete(entity);
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

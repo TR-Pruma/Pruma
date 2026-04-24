@@ -3,11 +3,11 @@ package com.br.pruma.application.service.impl;
 import com.br.pruma.application.dto.request.MensagemInstantaneaAuxRequestDTO;
 import com.br.pruma.application.dto.response.MensagemInstantaneaAuxResponseDTO;
 import com.br.pruma.application.dto.update.MensagemInstantaneaAuxUpdateDTO;
+import com.br.pruma.application.mapper.MensagemInstantaneaAuxMapper;
 import com.br.pruma.application.service.MensagemInstantaneaAuxService;
 import com.br.pruma.core.domain.MensagemInstantaneaAux;
-import com.br.pruma.core.exception.NotFoundException;
-import com.br.pruma.core.mapper.MensagemInstantaneaAuxMapper;
-import com.br.pruma.core.port.out.MensagemInstantaneaAuxRepositoryPort;
+import com.br.pruma.core.exception.RecursoNaoEncontradoException;
+import com.br.pruma.core.repository.port.MensagemInstantaneaAuxRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -62,6 +62,6 @@ public class MensagemInstantaneaAuxServiceImpl implements MensagemInstantaneaAux
 
     private MensagemInstantaneaAux findOrThrow(Integer id) {
         return repositoryPort.findById(id)
-                .orElseThrow(() -> new NotFoundException("MensagemInstantaneaAux não encontrada: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("MensagemInstantaneaAux não encontrada: " + id));
     }
 }

@@ -23,7 +23,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 @Schema(description = "Representa uma categoria associada a projetos ou itens")
-public class Categoria implements Serializable {
+public class Categoria extends AuditableEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;

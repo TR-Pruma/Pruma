@@ -1,16 +1,12 @@
 package com.br.pruma.application.dto.update;
 
-import lombok.Data;
-
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Data
-public class SubContratoUpdateDTO {
-    private Integer projetoId;
-    private Integer fornecedorId;
-    private String descricao;
-    private BigDecimal valor;
-    private LocalDate dataInicio;
-    private LocalDate dataFim;
-}
+public record SubContratoUpdateDTO(
+        String clienteCpf,      // era fornecedorId — FK correta é cliente por CPF
+        Integer projetoId,
+        String descricao,
+        Float valor,            // alinhado com o tipo da entidade
+        LocalDate dataInicio,
+        LocalDate dataFim
+) {}

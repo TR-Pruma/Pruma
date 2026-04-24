@@ -89,4 +89,5 @@ jacoco.exec
 *.iml
 
 # keep this file tracked
+ src/main/resources/db/migration/
 

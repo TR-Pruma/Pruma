@@ -65,6 +65,7 @@ public class ClienteServiceImpl implements ClienteService {
         Cliente entity = clienteRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Cliente com ID " + id + " não encontrado."));
-        clienteRepository.delete(entity);
+        entity.setAtivo(false);
+        clienteRepository.save(entity);
     }
 }

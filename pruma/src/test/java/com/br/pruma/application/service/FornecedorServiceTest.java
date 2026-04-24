@@ -42,10 +42,6 @@ class FornecedorServiceTest {
         responseDTO = mock(FornecedorResponseDTO.class);
     }
 
-    // -----------------------------------------------------------------------
-    // create
-    // -----------------------------------------------------------------------
-
     @Test
     @DisplayName("create: salva e retorna DTO")
     void create_sucesso() {
@@ -56,10 +52,6 @@ class FornecedorServiceTest {
         assertThat(service.create(requestDTO)).isEqualTo(responseDTO);
         verify(repository).save(fornecedor);
     }
-
-    // -----------------------------------------------------------------------
-    // getById
-    // -----------------------------------------------------------------------
 
     @Test
     @DisplayName("getById: retorna DTO quando existe")
@@ -80,9 +72,6 @@ class FornecedorServiceTest {
                 .hasMessageContaining("99");
     }
 
-    // -----------------------------------------------------------------------
-    // listAll
-    // -----------------------------------------------------------------------
 
     @Test
     @DisplayName("listAll: retorna lista mapeada")
@@ -92,10 +81,6 @@ class FornecedorServiceTest {
 
         assertThat(service.listAll()).containsExactly(responseDTO);
     }
-
-    // -----------------------------------------------------------------------
-    // update
-    // -----------------------------------------------------------------------
 
     @Test
     @DisplayName("update: atualiza quando existe")
@@ -118,11 +103,6 @@ class FornecedorServiceTest {
                 .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining("99");
     }
-
-    // -----------------------------------------------------------------------
-    // delete
-    // -----------------------------------------------------------------------
-
     @Test
     @DisplayName("delete: deleta quando existe")
     void delete_sucesso() {
@@ -130,7 +110,7 @@ class FornecedorServiceTest {
 
         service.delete(1);
 
-        verify(repository).delete(fornecedor);
+        verify(repository).save(fornecedor);
     }
 
     @Test

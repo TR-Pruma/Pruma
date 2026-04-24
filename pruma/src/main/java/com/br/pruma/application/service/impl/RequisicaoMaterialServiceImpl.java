@@ -3,11 +3,11 @@ package com.br.pruma.application.service.impl;
 import com.br.pruma.application.dto.request.RequisicaoMaterialRequestDTO;
 import com.br.pruma.application.dto.response.RequisicaoMaterialResponseDTO;
 import com.br.pruma.application.dto.update.RequisicaoMaterialUpdateDTO;
+import com.br.pruma.application.mapper.RequisicaoMaterialMapper;
 import com.br.pruma.application.service.RequisicaoMaterialService;
 import com.br.pruma.core.domain.RequisicaoMaterial;
-import com.br.pruma.core.exception.NotFoundException;
-import com.br.pruma.core.mapper.RequisicaoMaterialMapper;
-import com.br.pruma.core.port.out.RequisicaoMaterialRepositoryPort;
+import com.br.pruma.core.exception.RecursoNaoEncontradoException;
+import com.br.pruma.core.repository.port.RequisicaoMaterialRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -76,6 +76,6 @@ public class RequisicaoMaterialServiceImpl implements RequisicaoMaterialService 
 
     private RequisicaoMaterial findOrThrow(Integer id) {
         return repositoryPort.findById(id)
-                .orElseThrow(() -> new NotFoundException("RequisicaoMaterial não encontrada: " + id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("RequisicaoMaterial não encontrada: " + id));
     }
 }

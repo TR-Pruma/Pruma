@@ -11,9 +11,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @ToString(exclude = "cronograma")
-public class FaseCronograma {
+public class FaseCronograma  extends  AuditableEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

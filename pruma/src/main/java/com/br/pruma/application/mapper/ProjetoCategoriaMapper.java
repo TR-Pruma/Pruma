@@ -3,6 +3,7 @@ package com.br.pruma.application.mapper;
 
 import com.br.pruma.application.dto.request.ProjetoCategoriaRequestDTO;
 import com.br.pruma.application.dto.response.ProjetoCategoriaResponseDTO;
+import com.br.pruma.application.dto.update.ProjetoCategoriaUpdateDTO;
 import com.br.pruma.core.domain.ProjetoCategoria;
 import org.mapstruct.*;
 import java.util.List;
@@ -40,5 +41,12 @@ public interface ProjetoCategoriaMapper {
      * Lista de entidades para lista de DTOs.
      */
     List<ProjetoCategoriaResponseDTO> toDTOList(List<ProjetoCategoria> entities);
+
+    /**
+     * Atualiza a entidade existente com os campos não-nulos do UpdateDTO (PATCH).
+     */
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    void updateFromDto(ProjetoCategoriaUpdateDTO dto, @MappingTarget ProjetoCategoria entity);
 }
 

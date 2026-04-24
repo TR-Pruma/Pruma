@@ -1,0 +1,2 @@
+-- V2: Colunas de enriquecimento do profissional informal já incluídas na V1 (baseline).
+-- Migration mantida para preservar o histórico de versões do Flyway.
