@@ -21,7 +21,7 @@ public interface ImagemProjetoRepositoryPort {
     Page<ImagemProjeto> findAll(Pageable pageable);
 
     /** Busca todas as imagens de um projeto. */
-    List<ImagemProjeto> findAllByProjeto_Id(Integer projetoId);
+    List<ImagemProjeto> findAllByProjetoId(Integer projetoId);
 
     void deleteById(Integer id);
 

@@ -42,12 +42,12 @@ public class LembreteRepositoryAdapter implements LembreteRepositoryPort {
     }
 
     @Override
-    public List<Lembrete> findByCliente_CpfOrderByDataHora(String clienteCpf) {
+    public List<Lembrete> findByClienteCpfOrderByDataHora(String clienteCpf) {
         return lembreteRepository.findByCliente_CpfOrderByDataHora(clienteCpf);
     }
 
     @Override
-    public List<Lembrete> findByTipoUsuario_IdOrderByDataHora(Integer tipoUsuarioId) {
+    public List<Lembrete> findByTipoUsuarioIdOrderByDataHora(Integer tipoUsuarioId) {
         return lembreteRepository.findByTipoUsuario_IdOrderByDataHora(tipoUsuarioId);
     }
 

@@ -20,8 +20,7 @@ public interface FaseCronogramaRepositoryPort {
 
     Page<FaseCronograma> findAll(Pageable pageable);
 
-    /** Busca todas as fases de um cronograma. */
-    List<FaseCronograma> findAllByCronograma_Id(Integer cronogramaId);
+    List<FaseCronograma> findAllByCronogramaId(Integer cronogramaId);
 
     void deleteById(Integer id);
 

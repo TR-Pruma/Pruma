@@ -43,7 +43,7 @@ public class PosObraRepositoryAdapter implements PosObraRepositoryPort {
     }
 
     @Override
-    public List<PosObra> findAllByObra_Id(Long obraId) {
+    public List<PosObra> findAllByObraId(Long obraId) {
         return posObraRepository.findAllByObra_Id(obraId);
     }
 

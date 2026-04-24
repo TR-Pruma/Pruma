@@ -20,10 +20,10 @@ public interface ComunicacaoAuxRepositoryPort {
     Optional<ComunicacaoAux> findByComunicacaoIdAndAtivoTrue(Integer comunicacaoId);
 
     /** Lista aux ativos de um projeto, ordenados por data de criação desc. */
-    Page<ComunicacaoAux> findByComunicacao_ProjetoIdAndAtivoTrueOrderByCreatedAtDesc(Integer projetoId, Pageable pageable);
+    Page<ComunicacaoAux> findByComunicacaoProjetoIdAndAtivoTrueOrderByCreatedAtDesc(Integer projetoId, Pageable pageable);
 
     /** Lista aux ativos de um cliente, ordenados por data de criação desc. */
-    List<ComunicacaoAux> findByComunicacao_ClienteIdAndAtivoTrueOrderByCreatedAtDesc(Integer clienteId);
+    List<ComunicacaoAux> findByComunicacaoClienteIdAndAtivoTrueOrderByCreatedAtDesc(Integer clienteId);
 
     List<ComunicacaoAux> findAll();
 

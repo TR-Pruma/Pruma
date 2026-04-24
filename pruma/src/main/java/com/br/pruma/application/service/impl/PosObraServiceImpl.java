@@ -59,7 +59,7 @@ public class PosObraServiceImpl implements PosObraService {
     @Override
     @Transactional(readOnly = true)
     public List<PosObraResponseDTO> listByProjeto(Integer projetoId) {
-        return posObraRepositoryPort.findAllByObra_Id(Long.valueOf(projetoId))
+        return posObraRepositoryPort.findAllByObraId(Long.valueOf(projetoId))
                 .stream()
                 .map(posObraMapper::toResponse)
                 .toList();

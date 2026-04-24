@@ -39,7 +39,7 @@ public class PreObraRepositoryAdapter implements PreObraRepositoryPort {
     }
 
     @Override
-    public List<PreObra> findAllByObra_Id(Integer obraId) {
+    public List<PreObra> findAllByObraId(Integer obraId) {
         return preObraRepository.findAllByObra_Id(obraId);
     }
 

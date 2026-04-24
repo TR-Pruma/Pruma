@@ -22,7 +22,7 @@ public interface PosObraRepositoryPort {
     Page<PosObra> findAll(Pageable pageable);
 
     /** Lista todos os registros de pós-obra vinculados a uma obra. */
-    List<PosObra> findAllByObra_Id(Long obraId);
+    List<PosObra> findAllByObraId(Long obraId);
 
     /** Lista registros cuja data de conclusão esteja entre as datas informadas. */
     List<PosObra> findAllByDataConclusaoBetween(LocalDate startDate, LocalDate endDate);

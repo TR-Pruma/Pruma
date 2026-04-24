@@ -22,7 +22,7 @@ public interface PreObraRepositoryPort {
     Page<PreObra> findAll(Pageable pageable);
 
     /** Lista todos os registros de pré-obra vinculados a uma obra. */
-    List<PreObra> findAllByObra_Id(Integer obraId);
+    List<PreObra> findAllByObraId(Integer obraId);
 
     /** Lista registros cuja data de início esteja entre as datas informadas. */
     List<PreObra> findAllByDataInicioBetween(LocalDate startDate, LocalDate endDate);

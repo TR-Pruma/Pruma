@@ -22,10 +22,10 @@ public interface OrcamentoRepositoryPort {
     Page<Orcamento> findAll(Pageable pageable);
 
     /** Busca orçamentos por projeto. */
-    List<Orcamento> findAllByProjeto_Id(Integer projetoId);
+    List<Orcamento> findAllByProjetoId(Integer projetoId);
 
     /** Busca orçamentos pelo CNPJ da empresa. */
-    List<Orcamento> findAllByEmpresa_Cnpj(String empresaCnpj);
+    List<Orcamento> findAllByEmpresaCnpj(String empresaCnpj);
 
     /** Busca orçamentos pelo status. */
     List<Orcamento> findAllByStatus(StatusOrcamento status);

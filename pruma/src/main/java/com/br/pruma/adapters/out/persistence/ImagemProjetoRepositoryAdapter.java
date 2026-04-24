@@ -42,7 +42,7 @@ public class ImagemProjetoRepositoryAdapter implements ImagemProjetoRepositoryPo
     }
 
     @Override
-    public List<ImagemProjeto> findAllByProjeto_Id(Integer projetoId) {
+    public List<ImagemProjeto> findAllByProjetoId(Integer projetoId) {
         return imagemProjetoRepository.findAllByProjeto_Id(projetoId);
     }
 

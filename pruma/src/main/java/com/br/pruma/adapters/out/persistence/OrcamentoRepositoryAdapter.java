@@ -43,12 +43,12 @@ public class OrcamentoRepositoryAdapter implements OrcamentoRepositoryPort {
     }
 
     @Override
-    public List<Orcamento> findAllByProjeto_Id(Integer projetoId) {
+    public List<Orcamento> findAllByProjetoId(Integer projetoId) {
         return orcamentoRepository.findAllByProjeto_Id(projetoId);
     }
 
     @Override
-    public List<Orcamento> findAllByEmpresa_Cnpj(String empresaCnpj) {
+    public List<Orcamento> findAllByEmpresaCnpj(String empresaCnpj) {
         return orcamentoRepository.findAllByEmpresa_Cnpj(empresaCnpj);
     }
 

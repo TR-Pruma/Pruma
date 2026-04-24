@@ -59,7 +59,7 @@ public class PreObraServiceImpl implements PreObraService {
     @Override
     @Transactional(readOnly = true)
     public List<PreObraResponseDTO> listByProjeto(Integer projetoId) {
-        return preObraRepositoryPort.findAllByObra_Id(projetoId)
+        return preObraRepositoryPort.findAllByObraId(projetoId)
                 .stream()
                 .map(preObraMapper::toResponse)
                 .toList();

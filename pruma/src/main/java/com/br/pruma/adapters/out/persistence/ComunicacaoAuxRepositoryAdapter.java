@@ -37,12 +37,12 @@ public class ComunicacaoAuxRepositoryAdapter implements ComunicacaoAuxRepository
     }
 
     @Override
-    public Page<ComunicacaoAux> findByComunicacao_ProjetoIdAndAtivoTrueOrderByCreatedAtDesc(Integer projetoId, Pageable pageable) {
+    public Page<ComunicacaoAux> findByComunicacaoProjetoIdAndAtivoTrueOrderByCreatedAtDesc(Integer projetoId, Pageable pageable) {
         return comunicacaoAuxRepository.findByComunicacao_ProjetoIdAndAtivoTrueOrderByCreatedAtDesc(projetoId, pageable);
     }
 
     @Override
-    public List<ComunicacaoAux> findByComunicacao_ClienteIdAndAtivoTrueOrderByCreatedAtDesc(Integer clienteId) {
+    public List<ComunicacaoAux> findByComunicacaoClienteIdAndAtivoTrueOrderByCreatedAtDesc(Integer clienteId) {
         return comunicacaoAuxRepository.findByComunicacao_ClienteIdAndAtivoTrueOrderByCreatedAtDesc(clienteId);
     }
 

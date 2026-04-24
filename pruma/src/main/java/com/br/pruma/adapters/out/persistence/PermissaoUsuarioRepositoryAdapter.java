@@ -42,17 +42,17 @@ public class PermissaoUsuarioRepositoryAdapter implements PermissaoUsuarioReposi
     }
 
     @Override
-    public List<PermissaoUsuario> findByCliente_Cpf(String cpf) {
+    public List<PermissaoUsuario> findByClienteCpf(String cpf) {
         return permissaoUsuarioRepository.findByCliente_Cpf(cpf);
     }
 
     @Override
-    public List<PermissaoUsuario> findByTipoUsuario_Id(Integer tipoUsuarioId) {
+    public List<PermissaoUsuario> findByTipoUsuarioId(Integer tipoUsuarioId) {
         return permissaoUsuarioRepository.findByTipoUsuario_Id(tipoUsuarioId);
     }
 
     @Override
-    public Optional<PermissaoUsuario> findByCliente_CpfAndPermissao(String cpf, String permissao) {
+    public Optional<PermissaoUsuario> findByClienteCpfAndPermissao(String cpf, String permissao) {
         return permissaoUsuarioRepository.findByCliente_CpfAndPermissao(cpf, permissao);
     }
 

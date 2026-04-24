@@ -22,13 +22,13 @@ public interface PermissaoUsuarioRepositoryPort {
     Page<PermissaoUsuario> findAll(Pageable pageable);
 
     /** Lista permissões pelo CPF do cliente. */
-    List<PermissaoUsuario> findByCliente_Cpf(String cpf);
+    List<PermissaoUsuario> findByClienteCpf(String cpf);
 
     /** Lista permissões pelo id do tipo de usuário. */
-    List<PermissaoUsuario> findByTipoUsuario_Id(Integer tipoUsuarioId);
+    List<PermissaoUsuario> findByTipoUsuarioId(Integer tipoUsuarioId);
 
     /** Busca permissão específica por CPF e descrição da permissão. */
-    Optional<PermissaoUsuario> findByCliente_CpfAndPermissao(String cpf, String permissao);
+    Optional<PermissaoUsuario> findByClienteCpfAndPermissao(String cpf, String permissao);
 
     void deleteById(Long id);
 

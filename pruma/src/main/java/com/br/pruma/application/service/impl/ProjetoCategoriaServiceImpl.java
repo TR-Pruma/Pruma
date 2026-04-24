@@ -52,10 +52,6 @@ public class ProjetoCategoriaServiceImpl implements ProjetoCategoriaService {
         return repository.findAll(pageable).map(mapper::toDTO);
     }
 
-    /**
-     * TODO: ProjetoCategoria não possui FK para Projeto no modelo atual.
-     * Implementação provisória — requer revisão do domínio para ser funcional.
-     */
     @Override
     @Transactional(readOnly = true)
     public List<ProjetoCategoriaResponseDTO> listByProjeto(Integer projetoId) {

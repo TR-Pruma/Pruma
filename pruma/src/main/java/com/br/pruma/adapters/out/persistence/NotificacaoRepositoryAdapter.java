@@ -42,12 +42,12 @@ public class NotificacaoRepositoryAdapter implements NotificacaoRepositoryPort {
     }
 
     @Override
-    public List<Notificacao> findAllByCliente_Cpf(String clienteCpf) {
+    public List<Notificacao> findAllByClienteCpf(String clienteCpf) {
         return notificacaoRepository.findAllByCliente_Cpf(clienteCpf);
     }
 
     @Override
-    public List<Notificacao> findAllByTipoUsuario_Id(Integer tipoUsuarioId) {
+    public List<Notificacao> findAllByTipoUsuarioId(Integer tipoUsuarioId) {
         return notificacaoRepository.findAllByTipoUsuario_Id(tipoUsuarioId);
     }
 

@@ -21,10 +21,10 @@ public interface NotificacaoRepositoryPort {
     Page<Notificacao> findAll(Pageable pageable);
 
     /** Lista notificações de um cliente pelo CPF. */
-    List<Notificacao> findAllByCliente_Cpf(String clienteCpf);
+    List<Notificacao> findAllByClienteCpf(String clienteCpf);
 
     /** Lista notificações por tipo de usuário. */
-    List<Notificacao> findAllByTipoUsuario_Id(Integer tipoUsuarioId);
+    List<Notificacao> findAllByTipoUsuarioId(Integer tipoUsuarioId);
 
     /** Lista notificações pelo status de leitura. */
     List<Notificacao> findAllByLida(Boolean lida);

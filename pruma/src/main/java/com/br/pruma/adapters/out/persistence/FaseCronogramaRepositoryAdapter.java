@@ -42,7 +42,7 @@ public class FaseCronogramaRepositoryAdapter implements FaseCronogramaRepository
     }
 
     @Override
-    public List<FaseCronograma> findAllByCronograma_Id(Integer cronogramaId) {
+    public List<FaseCronograma> findAllByCronogramaId(Integer cronogramaId) {
         return faseCronogramaRepository.findAllByCronograma_Id(cronogramaId);
     }
 

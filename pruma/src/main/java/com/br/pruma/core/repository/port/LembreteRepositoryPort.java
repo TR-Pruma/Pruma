@@ -21,10 +21,10 @@ public interface LembreteRepositoryPort {
     Page<Lembrete> findAll(Pageable pageable);
 
     /** Retorna os lembretes de um cliente ordenados por data/hora. */
-    List<Lembrete> findByCliente_CpfOrderByDataHora(String clienteCpf);
+    List<Lembrete> findByClienteCpfOrderByDataHora(String clienteCpf);
 
     /** Retorna os lembretes de um tipo de usuário ordenados por data/hora. */
-    List<Lembrete> findByTipoUsuario_IdOrderByDataHora(Integer tipoUsuarioId);
+    List<Lembrete> findByTipoUsuarioIdOrderByDataHora(Integer tipoUsuarioId);
 
     void deleteById(Integer id);
 

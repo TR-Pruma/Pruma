@@ -22,7 +22,7 @@ public interface ObraRepositoryPort {
     Page<Obra> findAll(Pageable pageable);
 
     /** Lista todas as obras de um projeto. */
-    List<Obra> findAllByProjeto_Id(Integer projetoId);
+    List<Obra> findAllByProjetoId(Integer projetoId);
 
     /** Lista obras cuja data de início esteja entre as datas informadas. */
     List<Obra> findAllByDataInicioBetween(LocalDate start, LocalDate end);
@@ -31,7 +31,7 @@ public interface ObraRepositoryPort {
     List<Obra> findAllByDescricaoContainingIgnoreCase(String descricao);
 
     /** Verifica existência de obras para um projeto. */
-    boolean existsByProjeto_Id(Integer projetoId);
+    boolean existsByProjetoId(Integer projetoId);
 
     void deleteById(Integer id);
 

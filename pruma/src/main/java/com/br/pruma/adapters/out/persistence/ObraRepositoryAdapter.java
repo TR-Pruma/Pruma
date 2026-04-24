@@ -43,7 +43,7 @@ public class ObraRepositoryAdapter implements ObraRepositoryPort {
     }
 
     @Override
-    public List<Obra> findAllByProjeto_Id(Integer projetoId) {
+    public List<Obra> findAllByProjetoId(Integer projetoId) {
         return obraRepository.findAllByProjeto_Id(projetoId);
     }
 
@@ -58,7 +58,7 @@ public class ObraRepositoryAdapter implements ObraRepositoryPort {
     }
 
     @Override
-    public boolean existsByProjeto_Id(Integer projetoId) {
+    public boolean existsByProjetoId(Integer projetoId) {
         return obraRepository.existsByProjeto_Id(projetoId);
     }
 
