@@ -95,4 +95,36 @@ class NotificacaoServiceTest {
                 .isInstanceOf(RecursoNaoEncontradoException.class);
         verify(notificacaoRepository, never()).delete(any(Notificacao.class));
     }
+
+
+    @Test
+    @DisplayName("listAll: retorna lista vazia quando nao ha notificacoes")
+    void listAll_vazia() {
+        when(notificacaoRepository.findAll()).thenReturn(List.of());
+
+        assertThat(service.listAll()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("update: atualiza quando existe")
+    void update_sucesso() {
+        var updateDTO = mock(com.br.pruma.application.dto.update.NotificacaoUpdateDTO.class);
+        when(notificacaoRepository.findById(1)).thenReturn(Optional.of(notificacao));
+        when(notificacaoRepository.save(notificacao)).thenReturn(notificacao);
+        when(mapper.toResponse(notificacao)).thenReturn(responseDTO);
+
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
+        verify(mapper).updateFromDto(updateDTO, notificacao);
+    }
+
+    @Test
+    @DisplayName("update: lanca RecursoNaoEncontradoException quando nao existe")
+    void update_naoEncontrado() {
+        var updateDTO = mock(com.br.pruma.application.dto.update.NotificacaoUpdateDTO.class);
+        when(notificacaoRepository.findById(99)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.update(99, updateDTO))
+                .isInstanceOf(RecursoNaoEncontradoException.class)
+                .hasMessageContaining("99");
+    }
 }

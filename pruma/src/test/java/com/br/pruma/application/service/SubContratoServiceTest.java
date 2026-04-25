@@ -162,4 +162,61 @@ class SubContratoServiceTest {
                 .hasMessageContaining("99");
         verify(repository, never()).delete(any(SubContrato.class));
     }
+    @Test
+    @DisplayName("create: lanca EntityNotFoundException quando projeto nao existe")
+    void create_projetoNaoEncontrado() {
+        when(requestDTO.clienteCpf()).thenReturn("123.456.789-00");
+        when(requestDTO.projetoId()).thenReturn(99);
+        when(mapper.toEntity(requestDTO)).thenReturn(entity);
+        when(clienteRepository.findByCpf("123.456.789-00")).thenReturn(Optional.of(cliente));
+        when(projetoRepository.findById(99)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.create(requestDTO))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("99");
+    }
+
+    @Test
+    @DisplayName("listAll: retorna lista vazia quando nao ha subcontratos")
+    void listAll_vazia() {
+        when(repository.findAll()).thenReturn(List.of());
+
+        assertThat(service.listAll()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("listByProjeto: retorna lista vazia quando projeto nao tem subcontratos")
+    void listByProjeto_vazia() {
+        when(repository.findByProjetoId(99)).thenReturn(List.of());
+
+        assertThat(service.listByProjeto(99)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("update: atualiza cliente quando clienteCpf nao e nulo")
+    void update_comTrocaDeCliente() {
+        when(repository.findById(1)).thenReturn(Optional.of(entity));
+        when(updateDTO.clienteCpf()).thenReturn("999.999.999-99");
+        when(updateDTO.projetoId()).thenReturn(null);
+        when(clienteRepository.findByCpf("999.999.999-99")).thenReturn(Optional.of(cliente));
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toDTO(entity)).thenReturn(responseDTO);
+
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
+        verify(entity).setCliente(cliente);
+    }
+
+    @Test
+    @DisplayName("update: atualiza projeto quando projetoId nao e nulo")
+    void update_comTrocaDeProjeto() {
+        when(repository.findById(1)).thenReturn(Optional.of(entity));
+        when(updateDTO.clienteCpf()).thenReturn(null);
+        when(updateDTO.projetoId()).thenReturn(2);
+        when(projetoRepository.findById(2)).thenReturn(Optional.of(projeto));
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toDTO(entity)).thenReturn(responseDTO);
+
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
+        verify(entity).setProjeto(projeto);
+    }
 }

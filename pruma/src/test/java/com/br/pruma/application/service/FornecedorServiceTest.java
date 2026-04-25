@@ -123,4 +123,12 @@ class FornecedorServiceTest {
                 .hasMessageContaining("99");
         verify(repository, never()).delete(any(Fornecedor.class));
     }
+
+    @Test
+    @DisplayName("listAll: retorna lista vazia quando nao ha fornecedores")
+    void listAll_vazia() {
+        when(repository.findAll()).thenReturn(List.of());
+
+        assertThat(service.listAll()).isEmpty();
+    }
 }

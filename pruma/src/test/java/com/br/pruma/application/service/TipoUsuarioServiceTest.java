@@ -117,4 +117,11 @@ class TipoUsuarioServiceTest {
                 .isInstanceOf(EntityNotFoundException.class);
         verify(repository, never()).deleteById(any());
     }
+    @Test
+    @DisplayName("listAll: retorna lista vazia quando nao ha tipos")
+    void listAll_vazia() {
+        when(repository.findAll()).thenReturn(List.of());
+
+        assertThat(service.listAll()).isEmpty();
+    }
 }

@@ -108,23 +108,39 @@ class ObraServiceTest {
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
+    // SUBSTITUIR o delete_sucesso existente por:
     @Test
-    @DisplayName("delete: deleta quando existe")
+    @DisplayName("delete: soft-delete quando existe")
     void delete_sucesso() {
         when(obraRepository.findById(1)).thenReturn(Optional.of(obra));
 
         service.delete(1);
 
-        obraRepository.save(obra);
+        verify(obra).setAtivo(false);
+        verify(obraRepository).save(obra);
+        verify(obraRepository, never()).deleteById(any());
+    }
+
+    // ADICIONAR:
+    @Test
+    @DisplayName("listAll: retorna lista vazia quando nao ha obras")
+    void listAll_vazia() {
+        when(obraRepository.findAll()).thenReturn(List.of());
+
+        assertThat(service.listAll()).isEmpty();
     }
 
     @Test
-    @DisplayName("delete: lanca EntityNotFoundException quando nao existe")
-    void delete_naoEncontrado() {
-        when(obraRepository.findById(99)).thenReturn(Optional.empty());
+    @DisplayName("update: atualiza projeto quando projetoId nao e nulo no updateDTO")
+    void update_comTrocaDeProjeto() {
+        var updateDTO = mock(ObraUpdateDTO.class);
+        when(updateDTO.getProjetoId()).thenReturn(2);
+        when(obraRepository.findById(1)).thenReturn(Optional.of(obra));
+        when(projetoRepository.findById(2)).thenReturn(Optional.of(mock(Projeto.class)));
+        when(obraRepository.save(obra)).thenReturn(obra);
+        when(mapper.toResponse(obra)).thenReturn(responseDTO);
 
-        assertThatThrownBy(() -> service.delete(99))
-                .isInstanceOf(EntityNotFoundException.class);
-        verify(obraRepository, never()).delete(any(Obra.class));
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
+        verify(obra).setProjeto(any(Projeto.class));
     }
 }

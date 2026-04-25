@@ -96,4 +96,36 @@ class EmpresaServiceTest {
         assertThatThrownBy(() -> service.delete("99.999.999/9999-99"))
                 .isInstanceOf(RecursoNaoEncontradoException.class);
     }
+
+    @Test
+    @DisplayName("listAll: retorna lista vazia quando nao ha empresas")
+    void listAll_vazia() {
+        when(repository.findAll()).thenReturn(List.of());
+
+        assertThat(service.listAll()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("update: atualiza quando CNPJ existe")
+    void update_sucesso() {
+        var updateDTO = mock(EmpresaUpdateDTO.class);
+        when(repository.findByCnpj("00.000.000/0001-00")).thenReturn(Optional.of(empresa));
+        when(repository.save(empresa)).thenReturn(empresa);
+        when(mapper.toResponseDto(empresa)).thenReturn(responseDTO);
+
+        assertThat(service.update("00.000.000/0001-00", updateDTO)).isEqualTo(responseDTO);
+        verify(mapper).updateFromDto(updateDTO, empresa);
+        verify(repository).save(empresa);
+    }
+
+    @Test
+    @DisplayName("update: lanca RecursoNaoEncontradoException quando CNPJ nao existe")
+    void update_naoEncontrado() {
+        var updateDTO = mock(EmpresaUpdateDTO.class);
+        when(repository.findByCnpj("99.999.999/9999-99")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.update("99.999.999/9999-99", updateDTO))
+                .isInstanceOf(RecursoNaoEncontradoException.class)
+                .hasMessageContaining("99.999.999/9999-99");
+    }
 }

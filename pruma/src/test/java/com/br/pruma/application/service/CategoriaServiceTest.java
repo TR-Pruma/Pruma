@@ -118,4 +118,26 @@ class CategoriaServiceTest {
                 .isInstanceOf(EntityNotFoundException.class);
         verify(repository, never()).delete(any(Categoria.class));
     }
+
+    @Test
+    @DisplayName("listAll: retorna lista vazia quando nao ha categorias")
+    void listAll_vazia() {
+        when(repository.findAll()).thenReturn(List.of());
+
+        assertThat(service.listAll()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("delete: deve chamar setAtivo(false) e salvar — soft-delete")
+    void delete_sucesso_softDelete() {
+        // Usa objeto real com estado para verificar a mutação
+        Categoria real = mock(Categoria.class);
+        when(repository.findById(1)).thenReturn(Optional.of(real));
+
+        service.delete(1);
+
+        verify(real).setAtivo(false);
+        verify(repository).save(real);
+        verify(repository, never()).deleteById(any());
+    }
 }

@@ -162,4 +162,62 @@ class SolicitacaoMudancaServiceTest {
                 .hasMessageContaining("99");
         verify(repository, never()).delete(any(SolicitacaoMudanca.class));
     }
+
+    @Test
+    @DisplayName("create: lanca EntityNotFoundException quando status nao existe")
+    void create_statusNaoEncontrado() {
+        when(requestDTO.projetoId()).thenReturn(1);
+        when(requestDTO.statusSolicitacaoId()).thenReturn(99);
+        when(mapper.toEntity(requestDTO)).thenReturn(entity);
+        when(projetoRepository.findById(1)).thenReturn(Optional.of(projeto));
+        when(statusSolicitacaoRepository.findById(99)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.create(requestDTO))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("99");
+    }
+
+    @Test
+    @DisplayName("listAll: retorna lista vazia quando nao ha solicitacoes")
+    void listAll_vazia() {
+        when(repository.findAll()).thenReturn(List.of());
+
+        assertThat(service.listAll()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("listByProjeto: retorna lista vazia quando projeto nao tem solicitacoes")
+    void listByProjeto_vazia() {
+        when(repository.findByProjetoId(99)).thenReturn(List.of());
+
+        assertThat(service.listByProjeto(99)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("update: atualiza projeto quando projetoId nao e nulo")
+    void update_comTrocaDeProjeto() {
+        when(repository.findById(1)).thenReturn(Optional.of(entity));
+        when(updateDTO.projetoId()).thenReturn(2);
+        when(updateDTO.statusSolicitacaoId()).thenReturn(null);
+        when(projetoRepository.findById(2)).thenReturn(Optional.of(projeto));
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toDTO(entity)).thenReturn(responseDTO);
+
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
+        verify(entity).setProjeto(projeto);
+    }
+
+    @Test
+    @DisplayName("update: atualiza status quando statusSolicitacaoId nao e nulo")
+    void update_comTrocaDeStatus() {
+        when(repository.findById(1)).thenReturn(Optional.of(entity));
+        when(updateDTO.projetoId()).thenReturn(null);
+        when(updateDTO.statusSolicitacaoId()).thenReturn(2);
+        when(statusSolicitacaoRepository.findById(2)).thenReturn(Optional.of(status));
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toDTO(entity)).thenReturn(responseDTO);
+
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
+        verify(entity).setStatusSolicitacao(status);
+    }
 }
