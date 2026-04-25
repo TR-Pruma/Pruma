@@ -339,6 +339,21 @@ var dto = ChecklistUpdateDTO.builder().nome("Novo").build();
 var dto = new ChecklistUpdateDTO();
 dto.setNome("Novo");
 ```
+### 7.0 Checklist obrigatório ANTES de escrever qualquer teste
+
+| O que verificar | Onde olhar | Impacto no teste |
+|---|---|---|
+| Domain usa `@SuperBuilder`? | `core/domain/XxxEntity.java` | Usar `.builder().build()` — `new` proibido |
+| Domain estende `AuditableEntity`? | mesma classe | Campo `ativo` é `Boolean` → usar `getAtivo()`, nunca `isAtivo()` |
+| RequestDTO é `record` ou tem `@Builder`? | `dto/request/XxxRequestDTO.java` | `record` → construtor direto; `@Builder` → `.builder()` |
+| ResponseDTO é `record` ou tem `@Builder`? | `dto/response/XxxResponseDTO.java` | `record` → construtor direto; `@Builder` → `.builder()` |
+| UpdateDTO é `record`, `@Builder` ou só `@Data`? | `dto/update/XxxUpdateDTO.java` | `@Data` sem `@Builder` → `new XxxUpdateDTO()` + setters |
+| Service usa `Repository` direto ou `Port`? | `service/impl/XxxServiceImpl.java` | Mock do tipo correto |
+| Tipo do ID (`Integer`, `UUID`, `Long`)? | domain ou service | Fixtures e `findById()` com o tipo certo |
+| Delete é soft ou hard? | `ServiceImpl.delete()` | Soft → `getAtivo() == false` + `verify(save)` |
+| Exceção lançada? | `ServiceImpl` | `EntityNotFoundException` vs `RecursoNaoEncontradoException` |
+| Service tem dependências extras? | campos do `ServiceImpl` | Adicionar `@Mock` para cada uma |
+
 
 ### 7.2 Configuração base do teste
 

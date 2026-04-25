@@ -99,3 +99,40 @@ V{next+10}__alter_profissional_add_score_fields.sql
 V{next+11}__alter_imagem_projeto_add_exif_fields.sql
 
 find . -path "*/application/service/impl/*ServiceImpl.java" \ -exec sed -i 's/repository\.delete(entity);/entity.setAtivo(false);\n        repository.save(entity);/' {} +
+
+
+
+
+
+
+
+═══════════════════════════════════════════════════════
+TESTES UNITÁRIOS — Services faltando
+═══════════════════════════════════════════════════════
+
+[ ] AnexoServiceTest
+[ ] AuditoriaServiceTest
+[ ] ClienteServiceTest
+[ ] ClienteTipoServiceTest
+[ ] ComunicacaoServiceTest
+[ ] ComunicacaoAuxServiceTest
+[ ] DocumentoServiceTest
+[ ] EnderecoServiceTest
+[ ] EquipamentoProjetoServiceTest
+[ ] FeedbackServiceTest
+[ ] HistoricoLocalizacaoServiceTest
+[ ] ImagemProjetoServiceTest
+[ ] InsumoServiceTest
+[ ] InsumoFornecedorServiceTest
+[ ] LogAlteracaoServiceTest
+[ ] LogAlteracaoAuxServiceTest
+[ ] LogradouroServiceTest
+[ ] MaterialUtilizadoServiceTest
+[ ] MensagemInstantaneaServiceTest
+[ ] MensagemInstantaneaAuxServiceTest
+[ ] PosObraServiceTest
+[ ] PreObraServiceTest
+[ ] ProfissionalDeBaseServiceTest
+[ ] ProjetoCategoriaServiceTest
+[ ] RelatorioServiceTest
+[ ] StatusSolicitacaoServiceTest
