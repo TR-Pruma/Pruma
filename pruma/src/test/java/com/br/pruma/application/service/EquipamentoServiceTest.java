@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -97,5 +98,32 @@ class EquipamentoServiceTest {
         service.delete(1);
 
         verify(repository).save(equipamento);
+    }
+
+    @Test
+    @DisplayName("listAll: retorna lista mapeada")
+    void listAll() {
+        when(repository.findAll()).thenReturn(List.of(equipamento));
+        when(mapper.toResponseDto(equipamento)).thenReturn(responseDTO);
+
+        assertThat(service.listAll()).containsExactly(responseDTO);
+    }
+
+    @Test
+    @DisplayName("listAll: retorna lista vazia quando nao ha equipamentos")
+    void listAll_vazia() {
+        when(repository.findAll()).thenReturn(List.of());
+
+        assertThat(service.listAll()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("delete: lanca RecursoNaoEncontradoException quando nao existe")
+    void delete_naoEncontrado() {
+        when(repository.findById(99)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.delete(99))
+                .isInstanceOf(RecursoNaoEncontradoException.class);
+        verify(repository, never()).save(any());
     }
 }

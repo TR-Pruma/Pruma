@@ -101,24 +101,24 @@ class OrcamentoServiceTest {
         assertThatThrownBy(() -> service.update(99, updateDTO))
                 .isInstanceOf(EntityNotFoundException.class);
     }
-
     @Test
-    @DisplayName("delete: deleta quando existe")
+    @DisplayName("delete: soft-delete quando existe")
     void delete_sucesso() {
         when(orcamentoRepository.findById(1)).thenReturn(Optional.of(orcamento));
 
         service.delete(1);
 
-        orcamentoRepository.save(orcamento);
+        verify(orcamento).setAtivo(false);
+        verify(orcamentoRepository).save(orcamento);
+        verify(orcamentoRepository, never()).deleteById(any());
     }
 
+    // ADICIONAR:
     @Test
-    @DisplayName("delete: lanca EntityNotFoundException quando nao existe")
-    void delete_naoEncontrado() {
-        when(orcamentoRepository.findById(99)).thenReturn(Optional.empty());
+    @DisplayName("listAll: retorna lista vazia quando nao ha orcamentos")
+    void listAll_vazia() {
+        when(orcamentoRepository.findAll()).thenReturn(List.of());
 
-        assertThatThrownBy(() -> service.delete(99))
-                .isInstanceOf(EntityNotFoundException.class);
-        verify(orcamentoRepository, never()).delete(any(Orcamento.class));
+        assertThat(service.listAll()).isEmpty();
     }
 }

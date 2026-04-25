@@ -100,23 +100,26 @@ class ProjetoServiceTest {
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
+
+    // SUBSTITUIR o delete_sucesso existente por:
     @Test
-    @DisplayName("delete: deleta quando existe")
+    @DisplayName("delete: soft-delete quando existe")
     void delete_sucesso() {
         when(repository.findById(1)).thenReturn(Optional.of(projeto));
 
         service.delete(1);
 
-        repository.save(projeto);
+        verify(projeto).setAtivo(false);
+        verify(repository).save(projeto);
+        verify(repository, never()).deleteById(any());
     }
 
+    // ADICIONAR:
     @Test
-    @DisplayName("delete: lanca EntityNotFoundException quando nao existe")
-    void delete_naoEncontrado() {
-        when(repository.findById(99)).thenReturn(Optional.empty());
+    @DisplayName("listAll: retorna lista vazia quando nao ha projetos")
+    void listAll_vazia() {
+        when(repository.findAll()).thenReturn(List.of());
 
-        assertThatThrownBy(() -> service.delete(99))
-                .isInstanceOf(EntityNotFoundException.class);
-        verify(repository, never()).delete(any(Projeto.class));
+        assertThat(service.listAll()).isEmpty();
     }
 }

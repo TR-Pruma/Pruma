@@ -124,4 +124,11 @@ class StatusEquipamentoServiceTest {
                 .hasMessageContaining("99");
         verify(statusEquipamentoRepositoryPort, never()).save(any());
     }
+    @Test
+    @DisplayName("listAll: retorna lista vazia quando nao ha status")
+    void listAll_vazia() {
+        when(statusEquipamentoRepositoryPort.findAll()).thenReturn(List.of());
+
+        assertThat(service.listAll()).isEmpty();
+    }
 }

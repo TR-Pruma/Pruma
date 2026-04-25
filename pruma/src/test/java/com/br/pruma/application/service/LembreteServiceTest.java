@@ -127,4 +127,36 @@ class LembreteServiceTest {
                 .isInstanceOf(EntityNotFoundException.class);
         verify(lembreteRepo, never()).deleteById(any());
     }
+
+    @Test
+    @DisplayName("listAll: retorna lista vazia quando nao ha lembretes")
+    void listAll_vazia() {
+        when(lembreteRepo.findAll()).thenReturn(List.of());
+
+        assertThat(service.listAll()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("create: lanca EntityNotFoundException quando cliente nao existe")
+    void create_clienteNaoEncontrado() {
+        when(requestDTO.getClienteCpf()).thenReturn("999");
+        when(clienteRepo.findById(999)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.create(requestDTO))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("999");
+    }
+
+    @Test
+    @DisplayName("create: lanca EntityNotFoundException quando tipoUsuario nao existe")
+    void create_tipoUsuarioNaoEncontrado() {
+        when(requestDTO.getClienteCpf()).thenReturn("1");
+        when(requestDTO.getTipoUsuarioId()).thenReturn(99);
+        when(clienteRepo.findById(1)).thenReturn(Optional.of(mock(Cliente.class)));
+        when(tipoUsuarioRepo.findById(99)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.create(requestDTO))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("99");
+    }
 }
