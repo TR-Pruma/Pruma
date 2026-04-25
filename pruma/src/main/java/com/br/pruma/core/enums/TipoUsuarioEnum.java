@@ -11,5 +11,6 @@ public enum TipoUsuarioEnum {
     CLIENTE,
     PROFISSIONAL,
     TECNICO,
-    EMPRESA
+    EMPRESA,
+    ADMIN
 }
