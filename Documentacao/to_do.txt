@@ -1,0 +1,101 @@
+1 — Trust Flow Engine (TFE) — Score de Confiabilidade
+O documento define o TFE como um funcional de 3 eixos com pesos fixos: Desempenho Técnico (45%), Comportamento Operacional, e Validação Social/Apadrinhamento (50%). Nenhuma dessas estruturas existe no domínio atual.
+
+Entidades a criar:
+
+ScoreTFE — snapshot periódico do score total (0–100) de um ProfissionalDeBase, com campos scoreTecnico, scoreOperacional, scoreSocial, scoreTotal, dataCalculo
+
+HistoricoScoreTFE — série temporal dos scores para auditoria e visualização de evolução
+
+MetricaDesempenhoTecnico — armazena desvioTemporalPontualidade, totalEtapasConcluidas, qualidadeMediaFotos (nota 0–1 baseada em análise EXIF), vinculada a ProfissionalDeBase
+
+MetricaComportamentoOperacional — armazena frequenciaLoginDias, tempoMedioResposta, indiceConsistenciaDocumental (Jaccard score), vinculada a ProfissionalDeBase
+
+RelacaoApadrinhamento — tabela associativa entre dois ProfissionalDeBase com dataInicio, ativo, representando o grafo social descrito no doc
+
+2 — Trabalhador Informal como Entidade de Primeira Classe
+A entidade ProfissionalDeBase existe mas não captura os atributos específicos do trabalhador informal (ℒ do documento).
+
+Campos faltantes em ProfissionalDeBase (ou nova entidade TrabalhadorInformal com herança):
+
+cpf, nisTrabalhador, situacaoFormal (enum: FORMAL, INFORMAL, MEI)
+
+especialidades (lista de Especialidade — pedreiro, pintor, eletricista, etc.)
+
+totalObrasFinalizadas, totalObrasAtivas
+
+scoreAtualTFE (FK para ScoreTFE mais recente)
+
+dataCadastro, origemCadastro (enum: WHATSAPP_MOR, APP, INDICACAO)
+
+Nova entidade:
+
+TrajetoriaLaboral — linha do tempo de obras/projetos concluídos com obraId, profissionalId, dataInicio, dataFim, avaliacaoRecebida, funcionando como portfolio auditável
+
+3 — Integração MOR (Entradas de Campo via WhatsApp)
+O MOR processa entradas multimodais desestruturadas (foto, áudio, texto) e as converte em dados estruturados. O CRUD não tem nenhuma abstração para esse pipeline.
+
+Entidades a criar:
+
+InteracaoCampo — representa uma entrada bruta do MOR com profissionalId, obraId, tipoMidia (enum: FOTO, AUDIO, TEXTO), conteudoBruto (URL/path), timestampEnvio, statusProcessamento (enum: PENDENTE, PROCESSADO, ERRO)
+
+MetadadosImagem — expande ImagemProjeto com campos de EXIF: latitudeExif, longitudeExif, timestampExif, dispositivoOrigem, suspeita_manipulacao (boolean), hashOriginal — necessário para alimentar o eixo scoreTecnico do TFE
+
+RegistroGeolocalizacao — mais rico que HistoricoLocalizacao atual, com latitudeReal, longitudeReal, precisaoMetros, fonte (GPS, rede), vinculadoAInteracao (FK para InteracaoCampo)
+
+4 — Pilar Fintech / Microcrédito
+O documento descreve um motor de microcrédito que usa o score TFE para precificação de risco, com integração bancária e fatiamento automático de pagamentos. A entidade Pagamento existe mas é genérica demais.
+
+Entidades a criar:
+
+PropostaCredito — profissionalId, valorSolicitado, finalidade, scoreNaMomento, taxaJurosOferecida, status (enum: AGUARDANDO, APROVADO, NEGADO, PAGO)
+
+ParcelaCredito — vinculada a PropostaCredito com numeroParcela, valorParcela, dataVencimento, dataPagamento, status
+
+FatiamentoPagamento — representa o split automático de um pagamento de obra em valorPlataforma, valorFornecedores, valorDeducaoDivida, valorLiquidoTrabalhador — isso é exatamente o operador projetor 
+P
+P descrito no documento
+
+Adicionar em Pagamento os campos: modalidade (enum: PIX, DREX, BOLETO, CONTRATO_INTELIGENTE), fatiamentoId (FK para FatiamentoPagamento)
+
+5 — Marketplace B2B
+O documento descreve um grafo de agentes econômicos com take rate por transação. O CRUD tem Fornecedor e InsumoFornecedor mas sem conceito de pedido ou comissão.
+
+Entidades a criar:
+
+LojistaParceiro — entidade distinta de Fornecedor, com cnpj, razaoSocial, taxaComissaoPercentual, ativo, categoriasProdutos
+
+PedidoMarketplace — profissionalId, obraId, lojistaId, dataPedido, valorBruto, valorComissaoPlataforma, status (enum: PENDENTE, CONFIRMADO, ENTREGUE, CANCELADO)
+
+ItemPedidoMarketplace — itens do pedido com insumoId, quantidade, precoUnitario, precoTotal
+
+Adicionar em Insumo o campo lojistaPreferencialId (FK para LojistaParceiro) — representa o algoritmo de roteamento ℛ descrito no documento
+
+6 — Migrations Flyway para Tudo Acima
+Cada nova entidade precisa de uma migration versionada. Baseado no padrão do projeto, criar:
+
+V{next}__create_score_tfe.sql
+
+V{next+1}__create_historico_score_tfe.sql
+
+V{next+2}__create_metricas_tfe.sql
+
+V{next+3}__create_relacao_apadrinhamento.sql
+
+V{next+4}__create_interacao_campo.sql
+
+V{next+5}__create_metadados_imagem.sql
+
+V{next+6}__create_proposta_credito_parcelas.sql
+
+V{next+7}__create_fatiamento_pagamento.sql
+
+V{next+8}__create_lojista_parceiro.sql
+
+V{next+9}__create_pedido_marketplace.sql
+
+V{next+10}__alter_profissional_add_score_fields.sql
+
+V{next+11}__alter_imagem_projeto_add_exif_fields.sql
+
+find . -path "*/application/service/impl/*ServiceImpl.java" \ -exec sed -i 's/repository\.delete(entity);/entity.setAtivo(false);\n        repository.save(entity);/' {} +

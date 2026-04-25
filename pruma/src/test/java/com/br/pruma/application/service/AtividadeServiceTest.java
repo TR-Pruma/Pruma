@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AtividadeServiceImpl — testes unitários")
-class AtividadeServiceImplTest {
+class AtividadeServiceTest {
 
     @Mock
     private AtividadeRepository repository;
