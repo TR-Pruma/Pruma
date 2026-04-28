@@ -13,11 +13,13 @@ import com.br.pruma.core.repository.ProfissionalDeBaseRepository;
 import com.br.pruma.core.repository.ProjetoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class HistoricoLocalizacaoServiceImpl implements HistoricoLocalizacaoService {
 
     private final HistoricoLocalizacaoRepository repository;
@@ -27,7 +29,6 @@ public class HistoricoLocalizacaoServiceImpl implements HistoricoLocalizacaoServ
 
     @Override
     public HistoricoLocalizacaoResponseDTO salvar(HistoricoLocalizacaoRequestDTO dto) {
-        // dto.profissionalCpf() é Long — converte para String de 11 dígitos
         String cpfStr = String.valueOf(dto.profissionalCpf());
 
         ProfissionalDeBase profissional = profissionalRepository
@@ -44,6 +45,7 @@ public class HistoricoLocalizacaoServiceImpl implements HistoricoLocalizacaoServ
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<HistoricoLocalizacaoResponseDTO> listarTodos() {
         return repository.findAll().stream()
                 .map(mapper::toDTO)
@@ -51,6 +53,7 @@ public class HistoricoLocalizacaoServiceImpl implements HistoricoLocalizacaoServ
     }
 
     @Override
+    @Transactional(readOnly = true)
     public HistoricoLocalizacaoResponseDTO buscarPorId(Integer id) {
         return repository.findById(id)
                 .map(mapper::toDTO)
@@ -60,10 +63,10 @@ public class HistoricoLocalizacaoServiceImpl implements HistoricoLocalizacaoServ
 
     @Override
     public void deletar(Integer id) {
-        if (!repository.existsById(id)) {
-            throw new RecursoNaoEncontradoException(
-                    "Não é possível deletar. HistoricoLocalizacao com ID " + id + " não existe.");
-        }
-        repository.deleteById(id);
+        HistoricoLocalizacao entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "HistoricoLocalizacao com ID " + id + " não encontrado."));
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

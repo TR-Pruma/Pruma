@@ -25,9 +25,9 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @ToString(onlyExplicitlyIncluded = true)
-public class Insumo implements Serializable {
+public class Insumo extends AuditableEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -57,10 +57,6 @@ public class Insumo implements Serializable {
     @Positive
     @Column(name = "custo", nullable = false, precision = 10, scale = 2)
     private BigDecimal custo;
-
-    @Version
-    @Column(name = "version", nullable = false)
-    private Long version;
 
     public void atualizarCusto(BigDecimal novoCusto) {
         if (novoCusto == null || novoCusto.compareTo(BigDecimal.ZERO) <= 0) {

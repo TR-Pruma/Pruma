@@ -3,9 +3,10 @@ package com.br.pruma.application.service;
 import com.br.pruma.application.dto.request.NotificacaoRequestDTO;
 import com.br.pruma.application.dto.response.NotificacaoResponseDTO;
 import com.br.pruma.application.mapper.NotificacaoMapper;
+import com.br.pruma.application.service.impl.NotificacaoServiceImpl;
 import com.br.pruma.core.domain.Notificacao;
 import com.br.pruma.core.repository.NotificacaoRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.br.pruma.config.RecursoNaoEncontradoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,9 +25,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class NotificacaoServiceTest {
 
-    @Mock NotificacaoRepository repository;
+    @Mock NotificacaoRepository notificacaoRepository;
     @Mock NotificacaoMapper mapper;
-    @InjectMocks NotificacaoService service;
+    @InjectMocks NotificacaoServiceImpl service;
 
     Notificacao notificacao;
     NotificacaoRequestDTO requestDTO;
@@ -40,58 +41,90 @@ class NotificacaoServiceTest {
     }
 
     @Test
-    @DisplayName("criar: salva e retorna DTO")
-    void criar_sucesso() {
+    @DisplayName("create: salva e retorna DTO")
+    void create_sucesso() {
         when(mapper.toEntity(requestDTO)).thenReturn(notificacao);
-        when(repository.save(notificacao)).thenReturn(notificacao);
+        when(notificacaoRepository.save(notificacao)).thenReturn(notificacao);
         when(mapper.toResponse(notificacao)).thenReturn(responseDTO);
 
-        assertThat(service.criar(requestDTO)).isEqualTo(responseDTO);
+        assertThat(service.create(requestDTO)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("buscarPorId: retorna DTO quando existe")
-    void buscarPorId_encontrado() {
-        when(repository.findById(1L)).thenReturn(Optional.of(notificacao));
+    @DisplayName("getById: retorna DTO quando existe")
+    void getById_encontrado() {
+        when(notificacaoRepository.findById(1)).thenReturn(Optional.of(notificacao));
         when(mapper.toResponse(notificacao)).thenReturn(responseDTO);
 
-        assertThat(service.buscarPorId(1L)).isEqualTo(responseDTO);
+        assertThat(service.getById(1)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("buscarPorId: lanca EntityNotFoundException quando nao existe")
-    void buscarPorId_naoEncontrado() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("getById: lanca RecursoNaoEncontradoException quando nao existe")
+    void getById_naoEncontrado() {
+        when(notificacaoRepository.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.buscarPorId(99L))
-                .isInstanceOf(EntityNotFoundException.class)
+        assertThatThrownBy(() -> service.getById(99))
+                .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining("99");
     }
 
     @Test
-    @DisplayName("listarPorCliente: retorna lista pelo CPF")
-    void listarPorCliente() {
-        when(repository.findAllByCliente_Cpf("12345678900")).thenReturn(List.of(notificacao));
+    @DisplayName("listAll: retorna lista mapeada")
+    void listAll() {
+        when(notificacaoRepository.findAll()).thenReturn(List.of(notificacao));
         when(mapper.toResponse(notificacao)).thenReturn(responseDTO);
 
-        assertThat(service.listarPorCliente("12345678900")).containsExactly(responseDTO);
+        assertThat(service.listAll()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("deletar: deleta quando existe")
-    void deletar_sucesso() {
-        when(repository.existsById(1L)).thenReturn(true);
-        service.deletar(1L);
-        verify(repository).deleteById(1L);
+    @DisplayName("delete: deleta quando existe")
+    void delete_sucesso() {
+        when(notificacaoRepository.findById(1)).thenReturn(Optional.of(notificacao));
+        service.delete(1);
+        notificacaoRepository.save(notificacao);
     }
 
     @Test
-    @DisplayName("deletar: lanca EntityNotFoundException quando nao existe")
-    void deletar_naoEncontrado() {
-        when(repository.existsById(99L)).thenReturn(false);
+    @DisplayName("delete: lanca RecursoNaoEncontradoException quando nao existe")
+    void delete_naoEncontrado() {
+        when(notificacaoRepository.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.deletar(99L))
-                .isInstanceOf(EntityNotFoundException.class);
-        verify(repository, never()).deleteById(any());
+        assertThatThrownBy(() -> service.delete(99))
+                .isInstanceOf(RecursoNaoEncontradoException.class);
+        verify(notificacaoRepository, never()).delete(any(Notificacao.class));
+    }
+
+
+    @Test
+    @DisplayName("listAll: retorna lista vazia quando nao ha notificacoes")
+    void listAll_vazia() {
+        when(notificacaoRepository.findAll()).thenReturn(List.of());
+
+        assertThat(service.listAll()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("update: atualiza quando existe")
+    void update_sucesso() {
+        var updateDTO = mock(com.br.pruma.application.dto.update.NotificacaoUpdateDTO.class);
+        when(notificacaoRepository.findById(1)).thenReturn(Optional.of(notificacao));
+        when(notificacaoRepository.save(notificacao)).thenReturn(notificacao);
+        when(mapper.toResponse(notificacao)).thenReturn(responseDTO);
+
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
+        verify(mapper).updateFromDto(updateDTO, notificacao);
+    }
+
+    @Test
+    @DisplayName("update: lanca RecursoNaoEncontradoException quando nao existe")
+    void update_naoEncontrado() {
+        var updateDTO = mock(com.br.pruma.application.dto.update.NotificacaoUpdateDTO.class);
+        when(notificacaoRepository.findById(99)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.update(99, updateDTO))
+                .isInstanceOf(RecursoNaoEncontradoException.class)
+                .hasMessageContaining("99");
     }
 }

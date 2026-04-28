@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = {"profissional", "projeto"})
 
-public class HistoricoLocalizacao {
+public class HistoricoLocalizacao extends  AuditableEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

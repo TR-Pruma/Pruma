@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -60,9 +61,9 @@ public class ObraController {
         return ResponseEntity.ok(service.listByProjeto(projetoId));
     }
 
-    @Operation(summary = "Busca obras por descrição (busca simples ou paginada)")
+    @Operation(summary = "Busca obras por descrição (paginada)")
     @GetMapping("/search")
-    public ResponseEntity<?> searchByDescricao(
+    public ResponseEntity<Page<ObraResponseDTO>> searchByDescricao(
             @RequestParam(name = "descricao", required = false, defaultValue = "") String descricao,
             @PageableDefault(size = 20) Pageable pageable
     ) {
@@ -72,8 +73,8 @@ public class ObraController {
         return ResponseEntity.ok(service.searchByDescricao(descricao, pageable));
     }
 
-    @Operation(summary = "Atualiza parcialmente uma obra existente (PATCH semantics implemented via DTO)")
-    @PutMapping("/{id}")
+    @Operation(summary = "Atualiza parcialmente uma obra existente")
+    @PatchMapping("/{id}")
     public ResponseEntity<ObraResponseDTO> update(
             @PathVariable Integer id,
             @Valid @RequestBody ObraUpdateDTO request
@@ -81,8 +82,8 @@ public class ObraController {
         return ResponseEntity.ok(service.update(id, request));
     }
 
-    @Operation(summary = "Substitui uma obra (PUT) — substituição completa dos campos permitidos")
-    @PostMapping("/{id}/replace")
+    @Operation(summary = "Substitui completamente uma obra (PUT)")
+    @PutMapping("/{id}")
     public ResponseEntity<ObraResponseDTO> replace(
             @PathVariable Integer id,
             @Valid @RequestBody ObraRequestDTO request

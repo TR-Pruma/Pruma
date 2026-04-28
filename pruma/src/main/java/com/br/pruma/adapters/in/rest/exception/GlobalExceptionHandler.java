@@ -1,5 +1,6 @@
-package com.br.pruma.config;
+package com.br.pruma.adapters.in.rest.exception;
 
+import com.br.pruma.core.exception.RecursoNaoEncontradoException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice
+@RestControllerAdvice("prumaGlobalExceptionHandler")
 public class GlobalExceptionHandler {
 
     // 400 — falha de validação de campos (@Valid)
@@ -24,7 +25,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erros);
     }
 
-    // 400 — violação de regra de negócio (ex: equipamento já alocado)
+    // 400 — violação de regra de negócio
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleBadRequest(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

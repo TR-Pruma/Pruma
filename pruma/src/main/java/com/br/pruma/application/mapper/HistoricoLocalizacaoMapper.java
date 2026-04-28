@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class HistoricoLocalizacaoMapper {
+
     public HistoricoLocalizacao toEntity(HistoricoLocalizacaoRequestDTO dto,
                                          ProfissionalDeBase profissional,
                                          Projeto projeto) {
@@ -19,14 +20,14 @@ public class HistoricoLocalizacaoMapper {
                 .dataHora(dto.dataHora())
                 .build();
     }
+
     public HistoricoLocalizacaoResponseDTO toDTO(HistoricoLocalizacao entity) {
         return new HistoricoLocalizacaoResponseDTO(
                 entity.getId(),
-                entity.getProfissional().getVersion(),
+                Long.parseLong(entity.getProfissional().getCpf()),
                 entity.getProjeto().getId(),
                 entity.getLocalizacao(),
                 entity.getDataHora()
         );
     }
-
 }

@@ -2,11 +2,10 @@ package com.br.pruma.application.mapper;
 
 import com.br.pruma.application.dto.request.LogAlteracaoAuxRequestDTO;
 import com.br.pruma.application.dto.response.LogAlteracaoAuxResponseDTO;
+import com.br.pruma.application.dto.update.LogAlteracaoAuxUpdateDTO;
 import com.br.pruma.core.domain.LogAlteracao;
 import com.br.pruma.core.domain.LogAlteracaoAux;
 import org.mapstruct.*;
-
-
 
 @Mapper(componentModel = "spring")
 public interface LogAlteracaoAuxMapper {
@@ -21,7 +20,16 @@ public interface LogAlteracaoAuxMapper {
     LogAlteracaoAux toEntity(LogAlteracaoAuxRequestDTO dto);
 
     /**
-     * Atualiza somente o body (tipoAlteracao) em uma entidade já existente.
+     * Atualiza somente o tipoAlteracao em uma entidade já existente a partir do UpdateDTO.
+     * Mantém intactos o relacionamento log e o ID.
+     */
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "log", ignore = true)
+    @Mapping(target = "logId", ignore = true)
+    void updateEntity(LogAlteracaoAuxUpdateDTO dto, @MappingTarget LogAlteracaoAux entity);
+
+    /**
+     * Atualiza somente o body (tipoAlteracao) em uma entidade já existente a partir do RequestDTO.
      * Mantém intactos os relacionamentos e o ID.
      */
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -50,5 +58,4 @@ public interface LogAlteracaoAuxMapper {
                 .id(logId)
                 .build();
     }
-
 }

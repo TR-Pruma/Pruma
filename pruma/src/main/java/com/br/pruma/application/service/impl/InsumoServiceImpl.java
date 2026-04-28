@@ -9,11 +9,13 @@ import com.br.pruma.core.domain.Insumo;
 import com.br.pruma.core.repository.InsumoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class InsumoServiceImpl implements InsumoService {
 
     private final InsumoRepository repository;
@@ -26,6 +28,7 @@ public class InsumoServiceImpl implements InsumoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public InsumoResponseDTO getById(Integer id) {
         return repository.findById(id)
                 .map(mapper::toDto)
@@ -34,6 +37,7 @@ public class InsumoServiceImpl implements InsumoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<InsumoResponseDTO> getAll() {
         return repository.findAll().stream()
                 .map(mapper::toDto)
@@ -51,10 +55,10 @@ public class InsumoServiceImpl implements InsumoService {
 
     @Override
     public void delete(Integer id) {
-        if (!repository.existsById(id)) {
-            throw new RecursoNaoEncontradoException(
-                    "Não é possível deletar. Insumo com ID " + id + " não existe.");
-        }
-        repository.deleteById(id);
+        Insumo entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Insumo com ID " + id + " não encontrado."));
+        entity.setAtivo(false);
+        repository.save(entity);
     }
 }

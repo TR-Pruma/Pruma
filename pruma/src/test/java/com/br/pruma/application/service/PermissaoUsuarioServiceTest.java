@@ -2,10 +2,12 @@ package com.br.pruma.application.service;
 
 import com.br.pruma.application.dto.request.PermissaoUsuarioRequestDTO;
 import com.br.pruma.application.dto.response.PermissaoUsuarioResponseDTO;
+import com.br.pruma.application.dto.update.PermissaoUsuarioUpdateDTO;
 import com.br.pruma.application.mapper.PermissaoUsuarioMapper;
+import com.br.pruma.application.service.impl.PermissaoUsuarioServiceImpl;
+import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.PermissaoUsuario;
 import com.br.pruma.core.repository.PermissaoUsuarioRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,162 +32,134 @@ class PermissaoUsuarioServiceTest {
     private PermissaoUsuarioMapper mapper;
 
     @InjectMocks
-    private PermissaoUsuarioService service;
+    private PermissaoUsuarioServiceImpl service;
 
     private PermissaoUsuario permissao;
     private PermissaoUsuarioRequestDTO requestDTO;
+    private PermissaoUsuarioUpdateDTO updateDTO;
     private PermissaoUsuarioResponseDTO responseDTO;
 
     @BeforeEach
     void setUp() {
-        permissao = new PermissaoUsuario();
-        requestDTO = new PermissaoUsuarioRequestDTO();
-        responseDTO = new PermissaoUsuarioResponseDTO();
+        permissao   = mock(PermissaoUsuario.class);
+        requestDTO  = mock(PermissaoUsuarioRequestDTO.class);
+        updateDTO   = mock(PermissaoUsuarioUpdateDTO.class);
+        responseDTO = mock(PermissaoUsuarioResponseDTO.class);
     }
 
     // -----------------------------------------------------------------------
-    // criar
+    // create
     // -----------------------------------------------------------------------
 
     @Test
-    @DisplayName("criar: deve salvar e retornar DTO")
-    void criar_sucesso() {
+    @DisplayName("create: deve salvar e retornar DTO")
+    void create_sucesso() {
         when(mapper.toEntity(requestDTO)).thenReturn(permissao);
         when(repository.save(permissao)).thenReturn(permissao);
         when(mapper.toResponseDTO(permissao)).thenReturn(responseDTO);
 
-        PermissaoUsuarioResponseDTO result = service.criar(requestDTO);
+        PermissaoUsuarioResponseDTO result = service.create(requestDTO);
 
         assertThat(result).isNotNull();
         verify(repository).save(permissao);
     }
 
     // -----------------------------------------------------------------------
-    // buscarPorId
+    // getById
     // -----------------------------------------------------------------------
 
     @Test
-    @DisplayName("buscarPorId: deve retornar DTO quando permissão existe")
-    void buscarPorId_encontrado() {
+    @DisplayName("getById: deve retornar DTO quando permissao existe")
+    void getById_encontrado() {
         when(repository.findById(1L)).thenReturn(Optional.of(permissao));
         when(mapper.toResponseDTO(permissao)).thenReturn(responseDTO);
 
-        PermissaoUsuarioResponseDTO result = service.buscarPorId(1L);
+        PermissaoUsuarioResponseDTO result = service.getById(1L);
 
         assertThat(result).isNotNull();
     }
 
     @Test
-    @DisplayName("buscarPorId: deve lançar EntityNotFoundException quando não encontrar")
-    void buscarPorId_naoEncontrado() {
+    @DisplayName("getById: deve lancar RecursoNaoEncontradoException quando nao encontrar")
+    void getById_naoEncontrado() {
         when(repository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.buscarPorId(99L))
-                .isInstanceOf(EntityNotFoundException.class)
+        assertThatThrownBy(() -> service.getById(99L))
+                .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining("99");
     }
 
     // -----------------------------------------------------------------------
-    // atualizar
+    // listAll
     // -----------------------------------------------------------------------
 
     @Test
-    @DisplayName("atualizar: deve atualizar permissão existente")
-    void atualizar_sucesso() {
+    @DisplayName("listAll: deve retornar lista mapeada")
+    void listAll() {
+        when(repository.findAll()).thenReturn(List.of(permissao));
+        when(mapper.toResponseDTO(permissao)).thenReturn(responseDTO);
+
+        assertThat(service.listAll()).containsExactly(responseDTO);
+    }
+
+    // -----------------------------------------------------------------------
+    // update
+    // -----------------------------------------------------------------------
+
+    @Test
+    @DisplayName("update: deve atualizar permissao existente")
+    void update_sucesso() {
         when(repository.findById(1L)).thenReturn(Optional.of(permissao));
-        when(mapper.toEntity(requestDTO)).thenReturn(permissao);
         when(repository.save(permissao)).thenReturn(permissao);
         when(mapper.toResponseDTO(permissao)).thenReturn(responseDTO);
 
-        PermissaoUsuarioResponseDTO result = service.atualizar(1L, requestDTO);
+        PermissaoUsuarioResponseDTO result = service.update(1L, updateDTO);
 
         assertThat(result).isNotNull();
         verify(repository).save(permissao);
     }
 
     @Test
-    @DisplayName("atualizar: deve lançar EntityNotFoundException quando permissão não existe")
-    void atualizar_naoEncontrado() {
+    @DisplayName("update: deve lancar RecursoNaoEncontradoException quando nao existe")
+    void update_naoEncontrado() {
         when(repository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.atualizar(99L, requestDTO))
-                .isInstanceOf(EntityNotFoundException.class)
+        assertThatThrownBy(() -> service.update(99L, updateDTO))
+                .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining("99");
     }
 
     // -----------------------------------------------------------------------
-    // deletar
+    // delete
     // -----------------------------------------------------------------------
 
     @Test
-    @DisplayName("deletar: deve deletar permissão existente")
-    void deletar_sucesso() {
-        when(repository.existsById(1L)).thenReturn(true);
+    @DisplayName("delete: deve deletar permissao existente")
+    void delete_sucesso() {
+        when(repository.findById(1L)).thenReturn(Optional.of(permissao));
 
-        service.deletar(1L);
+        service.delete(1L);
 
-        verify(repository).deleteById(1L);
+        repository.save(permissao);
     }
 
     @Test
-    @DisplayName("deletar: deve lançar EntityNotFoundException quando não existe")
-    void deletar_naoEncontrado() {
-        when(repository.existsById(99L)).thenReturn(false);
+    @DisplayName("delete: deve lancar RecursoNaoEncontradoException quando nao existe")
+    void delete_naoEncontrado() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.deletar(99L))
-                .isInstanceOf(EntityNotFoundException.class)
+        assertThatThrownBy(() -> service.delete(99L))
+                .isInstanceOf(RecursoNaoEncontradoException.class)
                 .hasMessageContaining("99");
-
-        verify(repository, never()).deleteById(any());
-    }
-
-    // -----------------------------------------------------------------------
-    // buscarPorCliente
-    // -----------------------------------------------------------------------
-
-    @Test
-    @DisplayName("buscarPorCliente: deve retornar lista de permissões do CPF")
-    void buscarPorCliente_retornaLista() {
-        when(repository.findByCliente_Cpf("12345678900")).thenReturn(List.of(permissao));
-        when(mapper.toResponseDTO(permissao)).thenReturn(responseDTO);
-
-        List<PermissaoUsuarioResponseDTO> result = service.buscarPorCliente("12345678900");
-
-        assertThat(result).hasSize(1);
+        verify(repository, never()).delete(any(PermissaoUsuario.class));
     }
 
     @Test
-    @DisplayName("buscarPorCliente: deve retornar lista vazia quando CPF não tem permissões")
-    void buscarPorCliente_listaVazia() {
-        when(repository.findByCliente_Cpf("00000000000")).thenReturn(List.of());
+    @DisplayName("listAll: retorna lista vazia quando nao ha permissoes")
+    void listAll_vazia() {
+        when(repository.findAll()).thenReturn(List.of());
 
-        List<PermissaoUsuarioResponseDTO> result = service.buscarPorCliente("00000000000");
-
-        assertThat(result).isEmpty();
+        assertThat(service.listAll()).isEmpty();
     }
 
-    // -----------------------------------------------------------------------
-    // buscarPorTipoUsuario
-    // -----------------------------------------------------------------------
-
-    @Test
-    @DisplayName("buscarPorTipoUsuario: deve retornar lista de permissões do tipo")
-    void buscarPorTipoUsuario_retornaLista() {
-        when(repository.findByTipoUsuario_Id(1)).thenReturn(List.of(permissao));
-        when(mapper.toResponseDTO(permissao)).thenReturn(responseDTO);
-
-        List<PermissaoUsuarioResponseDTO> result = service.buscarPorTipoUsuario(1);
-
-        assertThat(result).hasSize(1);
-    }
-
-    @Test
-    @DisplayName("buscarPorTipoUsuario: deve retornar lista vazia quando tipo não tem permissões")
-    void buscarPorTipoUsuario_listaVazia() {
-        when(repository.findByTipoUsuario_Id(99)).thenReturn(List.of());
-
-        List<PermissaoUsuarioResponseDTO> result = service.buscarPorTipoUsuario(99);
-
-        assertThat(result).isEmpty();
-    }
 }

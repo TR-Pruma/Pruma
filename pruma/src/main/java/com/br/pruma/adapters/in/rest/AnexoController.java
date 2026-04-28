@@ -3,54 +3,50 @@ package com.br.pruma.adapters.in.rest;
 import com.br.pruma.application.dto.request.AnexoRequestDTO;
 import com.br.pruma.application.dto.response.AnexoResponseDTO;
 import com.br.pruma.application.service.AnexoService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @Tag(name = "Anexo", description = "Operações relacionadas a anexos")
 @RestController
-@RequestMapping("pruma/v1/anexos")
+@RequestMapping("/pruma/v1/anexos")
+@RequiredArgsConstructor
 public class AnexoController {
 
-    private static final Logger log = LoggerFactory.getLogger(AnexoController.class);
     private final AnexoService service;
 
-    public AnexoController(AnexoService service) {
-        this.service = service;
-    }
-
+    @Operation(summary = "Lista todos os anexos")
     @GetMapping
     public ResponseEntity<List<AnexoResponseDTO>> listarTodos() {
-        log.info("Listando todos os anexos");
-        return ResponseEntity.ok(service.listarTodos());
+        return ResponseEntity.ok(service.listAll());
     }
 
+    @Operation(summary = "Busca anexo por ID")
     @GetMapping("/{id}")
     public ResponseEntity<AnexoResponseDTO> buscarPorId(@PathVariable Integer id) {
-        log.info("Buscando anexo por id: {}", id);
-        return Optional.ofNullable(service.buscarPorId(id))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(service.getById(id));
     }
 
+    @Operation(summary = "Cria novo anexo")
     @PostMapping
     public ResponseEntity<AnexoResponseDTO> criar(@RequestBody @Valid AnexoRequestDTO dto) {
-        log.info("Criando novo anexo");
-        AnexoResponseDTO salvo = service.salvar(dto);
-        return ResponseEntity.created(URI.create("/pruma/v1/anexos/" + salvo.getId())).body(salvo);
+        AnexoResponseDTO salvo = service.create(dto);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(salvo.id()).toUri();
+        return ResponseEntity.created(location).body(salvo);
     }
 
+    @Operation(summary = "Deleta anexo por ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
-        log.info("Deletando anexo com id: {}", id);
-        service.deletar(id);
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

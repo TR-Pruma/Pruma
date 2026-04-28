@@ -1,42 +1,19 @@
 package com.br.pruma.application.service;
 
-import com.br.pruma.core.domain.Atividade;
-import com.br.pruma.core.repository.AtividadeRepository;
-import org.springframework.stereotype.Service;
+import com.br.pruma.application.dto.request.AtividadeRequestDTO;
+import com.br.pruma.application.dto.response.AtividadeResponseDTO;
+import com.br.pruma.application.dto.update.AtividadeUpdateDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
 
-@Service
-public class AtividadeService {
-
-    private final AtividadeRepository repository;
-
-    public AtividadeService(AtividadeRepository repository) {
-        this.repository = repository;
-    }
-
-    public List<Atividade> listarTodos() {
-        return repository.findAll();
-    }
-
-    public Optional<Atividade> buscarPorId(Integer id) {
-        return repository.findById(id);
-    }
-
-    public Atividade salvar(Atividade atividade) {
-        return repository.save(atividade);
-    }
-
-    // ✅ Método atômico para update — sem race condition
-    public Optional<Atividade> atualizar(Integer id, Atividade dadosNovos) {
-        return repository.findById(id).map(existente -> {
-            dadosNovos.setId(id);
-            return repository.save(dadosNovos);
-        });
-    }
-
-    public void deletar(Integer id) {
-        repository.deleteById(id);
-    }
+public interface AtividadeService {
+    AtividadeResponseDTO create(AtividadeRequestDTO dto);
+    AtividadeResponseDTO getById(Integer id);
+    List<AtividadeResponseDTO> listAll();
+    Page<AtividadeResponseDTO> list(Pageable pageable);
+    AtividadeResponseDTO update(Integer id, AtividadeUpdateDTO dto);
+    AtividadeResponseDTO replace(Integer id, AtividadeRequestDTO dto);
+    void delete(Integer id);
 }

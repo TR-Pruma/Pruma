@@ -1,0 +1,2 @@
+-- V3: Colunas de enriquecimento do fornecedor já incluídas na V1 (baseline).
+-- Migration mantida para preservar o histórico de versões do Flyway.

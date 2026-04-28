@@ -2,6 +2,7 @@ package com.br.pruma.adapters.in.rest;
 
 import com.br.pruma.application.dto.request.LogAlteracaoAuxRequestDTO;
 import com.br.pruma.application.dto.response.LogAlteracaoAuxResponseDTO;
+import com.br.pruma.application.dto.update.LogAlteracaoAuxUpdateDTO;
 import com.br.pruma.application.service.LogAlteracaoAuxService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,13 +28,9 @@ public class LogAlteracaoAuxController {
             @PathVariable Integer logId,
             @Valid @RequestBody LogAlteracaoAuxRequestDTO requestBody
     ) {
-        // Sobrescreve o logId vindo do body com o da URL
-        var dto = LogAlteracaoAuxRequestDTO.builder()
-                .logId(logId)
-                .tipoAlteracao(requestBody.getTipoAlteracao())
-                .build();
+        requestBody.setLogId(logId);
 
-        LogAlteracaoAuxResponseDTO response = service.create(dto);
+        LogAlteracaoAuxResponseDTO response = service.create(requestBody);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .build()
@@ -49,23 +46,16 @@ public class LogAlteracaoAuxController {
     public ResponseEntity<LogAlteracaoAuxResponseDTO> getByLog(
             @PathVariable Integer logId
     ) {
-        LogAlteracaoAuxResponseDTO response = service.getById(logId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(service.getById(logId));
     }
 
-    @Operation(summary = "Atualiza o tipo de alteração do registro auxiliar")
+    @Operation(summary = "Atualiza o registro auxiliar de um log de alteração")
     @PutMapping
     public ResponseEntity<LogAlteracaoAuxResponseDTO> update(
             @PathVariable Integer logId,
-            @Valid @RequestBody LogAlteracaoAuxRequestDTO requestBody
+            @Valid @RequestBody LogAlteracaoAuxUpdateDTO dto
     ) {
-        var dto = LogAlteracaoAuxRequestDTO.builder()
-                .logId(logId)
-                .tipoAlteracao(requestBody.getTipoAlteracao())
-                .build();
-
-        LogAlteracaoAuxResponseDTO response = service.update(logId, dto);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(service.update(logId, dto));
     }
 
     @Operation(summary = "Remove o registro auxiliar de um log de alteração")

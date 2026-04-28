@@ -4,6 +4,7 @@ import com.br.pruma.application.dto.request.TipoUsuarioRequestDTO;
 import com.br.pruma.application.dto.response.TipoUsuarioResponseDTO;
 import com.br.pruma.application.dto.update.TipoUsuarioUpdateDTO;
 import com.br.pruma.application.mapper.TipoUsuarioMapper;
+import com.br.pruma.application.service.impl.TipoUsuarioServiceImpl;
 import com.br.pruma.core.domain.TipoUsuario;
 import com.br.pruma.core.repository.TipoUsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,7 +28,7 @@ class TipoUsuarioServiceTest {
 
     @Mock TipoUsuarioRepository repository;
     @Mock TipoUsuarioMapper mapper;
-    @InjectMocks TipoUsuarioService service;
+    @InjectMocks TipoUsuarioServiceImpl service;
 
     TipoUsuario tipoUsuario;
     TipoUsuarioRequestDTO requestDTO;
@@ -115,5 +116,12 @@ class TipoUsuarioServiceTest {
         assertThatThrownBy(() -> service.delete(99))
                 .isInstanceOf(EntityNotFoundException.class);
         verify(repository, never()).deleteById(any());
+    }
+    @Test
+    @DisplayName("listAll: retorna lista vazia quando nao ha tipos")
+    void listAll_vazia() {
+        when(repository.findAll()).thenReturn(List.of());
+
+        assertThat(service.listAll()).isEmpty();
     }
 }

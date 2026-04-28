@@ -4,9 +4,10 @@ import com.br.pruma.application.dto.request.EquipamentoRequestDTO;
 import com.br.pruma.application.dto.response.EquipamentoResponseDTO;
 import com.br.pruma.application.dto.update.EquipamentoUpdateDTO;
 import com.br.pruma.application.mapper.EquipamentoMapper;
+import com.br.pruma.application.service.impl.EquipamentoServiceImpl;
+import com.br.pruma.config.RecursoNaoEncontradoException;
 import com.br.pruma.core.domain.Equipamento;
 import com.br.pruma.core.repository.EquipamentoRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,93 +27,103 @@ class EquipamentoServiceTest {
 
     @Mock EquipamentoRepository repository;
     @Mock EquipamentoMapper mapper;
-    @InjectMocks EquipamentoService service;
+    @InjectMocks EquipamentoServiceImpl service;
 
     Equipamento equipamento;
     EquipamentoRequestDTO requestDTO;
+    EquipamentoUpdateDTO updateDTO;
     EquipamentoResponseDTO responseDTO;
 
     @BeforeEach
     void setUp() {
         equipamento = mock(Equipamento.class);
         requestDTO  = mock(EquipamentoRequestDTO.class);
+        updateDTO   = mock(EquipamentoUpdateDTO.class);
         responseDTO = mock(EquipamentoResponseDTO.class);
     }
 
     @Test
-    @DisplayName("criar: salva e retorna DTO")
-    void criar_sucesso() {
+    @DisplayName("create: salva e retorna DTO")
+    void create_sucesso() {
         when(mapper.toEntity(requestDTO)).thenReturn(equipamento);
         when(repository.save(equipamento)).thenReturn(equipamento);
-        when(mapper.toResponse(equipamento)).thenReturn(responseDTO);
+        when(mapper.toResponseDto(equipamento)).thenReturn(responseDTO);
 
-        assertThat(service.criar(requestDTO)).isEqualTo(responseDTO);
+        assertThat(service.create(requestDTO)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("buscarPorId: retorna DTO quando existe")
-    void buscarPorId_encontrado() {
-        when(repository.findById(1L)).thenReturn(Optional.of(equipamento));
-        when(mapper.toResponse(equipamento)).thenReturn(responseDTO);
+    @DisplayName("getById: retorna DTO quando existe")
+    void getById_encontrado() {
+        when(repository.findById(1)).thenReturn(Optional.of(equipamento));
+        when(mapper.toResponseDto(equipamento)).thenReturn(responseDTO);
 
-        assertThat(service.buscarPorId(1L)).isEqualTo(responseDTO);
+        assertThat(service.getById(1)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("buscarPorId: lanca EntityNotFoundException quando nao existe")
-    void buscarPorId_naoEncontrado() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("getById: lanca RecursoNaoEncontradoException quando nao existe")
+    void getById_naoEncontrado() {
+        when(repository.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.buscarPorId(99L))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("99");
+        assertThatThrownBy(() -> service.getById(99))
+                .isInstanceOf(RecursoNaoEncontradoException.class);
     }
 
     @Test
-    @DisplayName("listarTodos: retorna lista mapeada")
-    void listarTodos() {
-        when(repository.findAll()).thenReturn(List.of(equipamento));
-        when(mapper.toResponse(equipamento)).thenReturn(responseDTO);
-
-        assertThat(service.listarTodos()).containsExactly(responseDTO);
-    }
-
-    @Test
-    @DisplayName("atualizar: atualiza quando existe")
-    void atualizar_sucesso() {
-        var updateDTO = mock(EquipamentoUpdateDTO.class);
-        when(repository.findById(1L)).thenReturn(Optional.of(equipamento));
+    @DisplayName("update: atualiza quando existe")
+    void update_sucesso() {
+        when(repository.findById(1)).thenReturn(Optional.of(equipamento));
         when(repository.save(equipamento)).thenReturn(equipamento);
-        when(mapper.toResponse(equipamento)).thenReturn(responseDTO);
+        when(mapper.toResponseDto(equipamento)).thenReturn(responseDTO);
 
-        assertThat(service.atualizar(1L, updateDTO)).isEqualTo(responseDTO);
-        verify(mapper).updateFromDto(updateDTO, equipamento);
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
+        verify(mapper).updateEntityFromDto(updateDTO, equipamento);
     }
 
     @Test
-    @DisplayName("atualizar: lanca EntityNotFoundException quando nao existe")
-    void atualizar_naoEncontrado() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("update: lanca RecursoNaoEncontradoException quando nao existe")
+    void update_naoEncontrado() {
+        when(repository.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.atualizar(99L, mock(EquipamentoUpdateDTO.class)))
-                .isInstanceOf(EntityNotFoundException.class);
+        assertThatThrownBy(() -> service.update(99, updateDTO))
+                .isInstanceOf(RecursoNaoEncontradoException.class);
     }
 
     @Test
-    @DisplayName("deletar: deleta quando existe")
-    void deletar_sucesso() {
-        when(repository.existsById(1L)).thenReturn(true);
-        service.deletar(1L);
-        verify(repository).deleteById(1L);
+    @DisplayName("delete: deleta quando existe")
+    void delete_sucesso() {
+        when(repository.findById(1)).thenReturn(Optional.of(equipamento));
+
+        service.delete(1);
+
+        verify(repository).save(equipamento);
     }
 
     @Test
-    @DisplayName("deletar: lanca EntityNotFoundException quando nao existe")
-    void deletar_naoEncontrado() {
-        when(repository.existsById(99L)).thenReturn(false);
+    @DisplayName("listAll: retorna lista mapeada")
+    void listAll() {
+        when(repository.findAll()).thenReturn(List.of(equipamento));
+        when(mapper.toResponseDto(equipamento)).thenReturn(responseDTO);
 
-        assertThatThrownBy(() -> service.deletar(99L))
-                .isInstanceOf(EntityNotFoundException.class);
-        verify(repository, never()).deleteById(any());
+        assertThat(service.listAll()).containsExactly(responseDTO);
+    }
+
+    @Test
+    @DisplayName("listAll: retorna lista vazia quando nao ha equipamentos")
+    void listAll_vazia() {
+        when(repository.findAll()).thenReturn(List.of());
+
+        assertThat(service.listAll()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("delete: lanca RecursoNaoEncontradoException quando nao existe")
+    void delete_naoEncontrado() {
+        when(repository.findById(99)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.delete(99))
+                .isInstanceOf(RecursoNaoEncontradoException.class);
+        verify(repository, never()).save(any());
     }
 }

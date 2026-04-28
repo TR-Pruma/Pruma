@@ -9,7 +9,7 @@ import lombok.ToString;
 @Data
 @Entity
 @Table(name = "permissao_usuario")
-public class PermissaoUsuario {
+public class PermissaoUsuario extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

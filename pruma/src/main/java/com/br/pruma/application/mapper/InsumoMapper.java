@@ -16,7 +16,6 @@ public interface InsumoMapper {
 
     // DTO → ENTIDADE (criação)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "version", ignore = true)
     @Mapping(target = "unidadeMedida", source = "unidadeMedida", qualifiedByName = "stringToUnidade")
     Insumo toEntity(InsumoRequestDTO dto);
 
@@ -27,7 +26,6 @@ public interface InsumoMapper {
     // ATUALIZAÇÃO PARCIAL
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id",      ignore = true)
-    @Mapping(target = "version", ignore = true)
     @Mapping(target = "unidadeMedida", source = "unidadeMedida", qualifiedByName = "stringToUnidade")
     void updateFromDto(InsumoRequestDTO dto, @MappingTarget Insumo entity);
 

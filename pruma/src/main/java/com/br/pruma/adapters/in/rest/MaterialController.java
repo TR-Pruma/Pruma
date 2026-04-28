@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -25,48 +28,50 @@ public class MaterialController {
 
     @Operation(summary = "Cria um novo material")
     @PostMapping
-    public ResponseEntity<MaterialResponseDTO> create(
-            @Valid @RequestBody MaterialRequestDTO request
-    ) {
+    public ResponseEntity<MaterialResponseDTO> create(@Valid @RequestBody MaterialRequestDTO request) {
         MaterialResponseDTO response = service.create(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.getId())
-                .toUri();
+                .path("/{id}").buildAndExpand(response.getId()).toUri();
         return ResponseEntity.created(location).body(response);
     }
 
     @Operation(summary = "Lista todos os materiais")
     @GetMapping
     public ResponseEntity<List<MaterialResponseDTO>> listAll() {
-        List<MaterialResponseDTO> list = service.listAll();
-        return ResponseEntity.ok(list);
+        return ResponseEntity.ok(service.listAll());
     }
 
-    @Operation(summary = "Busca um material por ID")
+    @Operation(summary = "Busca material por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<MaterialResponseDTO> getById(
-            @PathVariable Integer id
-    ) {
-        MaterialResponseDTO response = service.getById(id);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<MaterialResponseDTO> getById(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.getById(id));
     }
 
-    @Operation(summary = "Atualiza um material existente")
-    @PutMapping("/{id}")
+    @Operation(summary = "Lista materiais com paginação")
+    @GetMapping("/page")
+    public ResponseEntity<Page<MaterialResponseDTO>> list(@PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(service.list(pageable));
+    }
+
+    @Operation(summary = "Atualiza parcialmente um material")
+    @PatchMapping("/{id}")
     public ResponseEntity<MaterialResponseDTO> update(
             @PathVariable Integer id,
-            @Valid @RequestBody MaterialUpdateDTO request
-    ) {
-        MaterialResponseDTO response = service.update(id, request);
-        return ResponseEntity.ok(response);
+            @Valid @RequestBody MaterialUpdateDTO request) {
+        return ResponseEntity.ok(service.update(id, request));
     }
 
-    @Operation(summary = "Remove um material por ID")
+    @Operation(summary = "Substitui completamente um material (PUT)")
+    @PutMapping("/{id}")
+    public ResponseEntity<MaterialResponseDTO> replace(
+            @PathVariable Integer id,
+            @Valid @RequestBody MaterialRequestDTO request) {
+        return ResponseEntity.ok(service.replace(id, request));
+    }
+
+    @Operation(summary = "Exclui permanentemente um material")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
-            @PathVariable Integer id
-    ) {
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

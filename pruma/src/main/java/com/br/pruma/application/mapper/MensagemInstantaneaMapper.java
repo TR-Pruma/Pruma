@@ -34,7 +34,7 @@ public interface MensagemInstantaneaMapper {
     @Mapping(target = "tipoDestinatario", source = "tipoDestinatario")
     @Mapping(target = "conteudo",         source = "conteudo")
     @Mapping(target = "dataHora",         source = "dataHora")
-    void updateFromDto(MensagemInstantaneaUpdateDTO dto, @MappingTarget MensagemInstantanea entity);
+    void updateEntity(MensagemInstantaneaUpdateDTO dto, @MappingTarget MensagemInstantanea entity);
 
     @Mapping(target = "id",               source = "id")
     @Mapping(target = "clienteCpf",       source = "cliente.cpf")

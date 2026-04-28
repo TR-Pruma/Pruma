@@ -3,6 +3,7 @@ package com.br.pruma.application.mapper;
 import com.br.pruma.application.dto.request.EquipamentoRequestDTO;
 import com.br.pruma.application.dto.update.EquipamentoAtivoUpdateDTO;
 import com.br.pruma.application.dto.update.EquipamentoStatusUpdateDTO;
+import com.br.pruma.application.dto.update.EquipamentoUpdateDTO;
 import com.br.pruma.application.dto.response.EquipamentoListDTO;
 import com.br.pruma.application.dto.response.EquipamentoResponseDTO;
 import com.br.pruma.core.domain.Equipamento;
@@ -24,11 +25,11 @@ public interface EquipamentoMapper {
     Equipamento toEntity(EquipamentoRequestDTO dto);
 
     /**
-     * Atualiza entidade existente com os campos não-nulos do DTO de criação/atualização.
+     * Atualiza entidade existente com os campos não-nulos do DTO de atualização parcial.
      */
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
-    void updateEntityFromDto(EquipamentoRequestDTO dto, @MappingTarget Equipamento entity);
+    void updateEntityFromDto(EquipamentoUpdateDTO dto, @MappingTarget Equipamento entity);
 
     /**
      * Converte entidade para DTO de resposta detalhada.
@@ -54,6 +55,3 @@ public interface EquipamentoMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateStatusFromDto(EquipamentoStatusUpdateDTO dto, @MappingTarget Equipamento entity);
 }
-
-
-

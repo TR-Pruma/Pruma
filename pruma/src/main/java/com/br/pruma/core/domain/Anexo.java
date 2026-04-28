@@ -55,21 +55,21 @@ public class Anexo extends AuditableEntity implements Serializable {
 
     @NotBlank
     @Size(max = 1024)
-    @Column(name = "caminho_arquivo", length = 1024, nullable = false)
+    @Column(name = "caminho", length = 1024, nullable = false)
     @Schema(description = "Caminho onde o arquivo está armazenado", example = "/uploads/documento.pdf")
-    private String caminhoArquivo;
+    private String caminho;
 
     @Size(max = 255)
-    @Column(name = "nome_arquivo", length = 255)
+    @Column(name = "nome", length = 255)
     @Schema(description = "Nome original do arquivo", example = "documento.pdf")
     private String nomeArquivo;
 
     @Size(max = 100)
-    @Column(name = "content_type", length = 100)
+    @Column(name = "tipo_mime", length = 100)
     @Schema(description = "Content type do arquivo", example = "application/pdf")
     private String contentType;
 
-    @Column(name = "tamanho_bytes")
+    @Column(name = "tamanho")
     @Schema(description = "Tamanho do arquivo em bytes", example = "102400")
     private Long tamanhoBytes;
 

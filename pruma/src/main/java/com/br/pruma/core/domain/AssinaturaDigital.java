@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Table(
         name = "assinatura_digital",
         indexes = {
-                @Index(name = "idx_assinatura_data_hora", columnList = "data_hora")
+                @Index(name = "idx_assinatura_data_assinatura", columnList = "data_assinatura")
         }
 )
 @Getter
@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
-@Schema(description = "Representa uma assinatura digital vinculada a um cliente e um documento")
+@Schema(description = "Representa uma assinatura digital vinculada a um usuário e um documento")
 public class AssinaturaDigital extends AuditableEntity implements Serializable {
 
     @Serial
@@ -32,7 +32,7 @@ public class AssinaturaDigital extends AuditableEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "assinatura_id", updatable = false, nullable = false)
+    @Column(name = "assinatura_digital_id", updatable = false, nullable = false)
     @EqualsAndHashCode.Include
     @ToString.Include
     @Schema(description = "Identificador único da assinatura digital", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -40,17 +40,10 @@ public class AssinaturaDigital extends AuditableEntity implements Serializable {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "cliente_cpf", referencedColumnName = "cliente_cpf", nullable = false)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "usuario_id", nullable = false)
     @ToString.Exclude
-    @Schema(description = "CPF do cliente que realizou a assinatura", example = "12345678900", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Cliente cliente;
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "tipo_usuario", referencedColumnName = "tipo_usuario", nullable = false)
-    @ToString.Exclude
-    @Schema(description = "Tipo de usuário que realizou a assinatura", example = "2", requiredMode = Schema.RequiredMode.REQUIRED)
-    private TipoUsuario tipoUsuario;
+    @Schema(description = "Usuário que realizou a assinatura", example = "5", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Usuario usuario;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -59,9 +52,14 @@ public class AssinaturaDigital extends AuditableEntity implements Serializable {
     @Schema(description = "Identificador do documento assinado", example = "10", requiredMode = Schema.RequiredMode.REQUIRED)
     private Documento documento;
 
+    @Column(name = "hash", nullable = true, length = 255)
+    @ToString.Include
+    @Schema(description = "Hash criptográfico da assinatura", example = "abc123def456...")
+    private String hash;
+
     @NotNull
-    @Column(name = "data_hora", nullable = false)
+    @Column(name = "data_assinatura", nullable = false)
     @ToString.Include
     @Schema(description = "Data e hora da assinatura", example = "2024-03-16T14:30:00", requiredMode = Schema.RequiredMode.REQUIRED)
-    private LocalDateTime dataHora;
+    private LocalDateTime dataAssinatura;
 }

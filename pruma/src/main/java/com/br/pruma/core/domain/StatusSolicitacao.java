@@ -14,9 +14,9 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @ToString(onlyExplicitlyIncluded = true)
-public class StatusSolicitacao implements Serializable {
+public class StatusSolicitacao extends AuditableEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -32,10 +32,4 @@ public class StatusSolicitacao implements Serializable {
     @ToString.Include
     private String descricaoSolicitacao;
 
-    /**
-     * Timestamp automático de criação no banco.
-     */
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false, nullable = false)
-    private LocalDate createdAt;
 }

@@ -4,6 +4,7 @@ import com.br.pruma.application.dto.request.OrcamentoRequestDTO;
 import com.br.pruma.application.dto.response.OrcamentoResponseDTO;
 import com.br.pruma.application.dto.update.OrcamentoUpdateDTO;
 import com.br.pruma.application.mapper.OrcamentoMapper;
+import com.br.pruma.application.service.impl.OrcamentoServiceImpl;
 import com.br.pruma.core.domain.Orcamento;
 import com.br.pruma.core.repository.OrcamentoRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -25,9 +26,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class OrcamentoServiceTest {
 
-    @Mock OrcamentoRepository repository;
+    @Mock OrcamentoRepository orcamentoRepository;
     @Mock OrcamentoMapper mapper;
-    @InjectMocks OrcamentoService service;
+    @InjectMocks OrcamentoServiceImpl service;
 
     Orcamento orcamento;
     OrcamentoRequestDTO requestDTO;
@@ -41,79 +42,83 @@ class OrcamentoServiceTest {
     }
 
     @Test
-    @DisplayName("criar: salva e retorna DTO")
-    void criar_sucesso() {
+    @DisplayName("create: salva e retorna DTO")
+    void create_sucesso() {
         when(mapper.toEntity(requestDTO)).thenReturn(orcamento);
-        when(repository.save(orcamento)).thenReturn(orcamento);
+        when(orcamentoRepository.save(orcamento)).thenReturn(orcamento);
         when(mapper.toResponse(orcamento)).thenReturn(responseDTO);
 
-        assertThat(service.criar(requestDTO)).isEqualTo(responseDTO);
+        assertThat(service.create(requestDTO)).isEqualTo(responseDTO);
+        verify(orcamentoRepository).save(orcamento);
     }
 
     @Test
-    @DisplayName("buscarPorId: retorna DTO quando existe")
-    void buscarPorId_encontrado() {
-        when(repository.findById(1L)).thenReturn(Optional.of(orcamento));
+    @DisplayName("getById: retorna DTO quando existe")
+    void getById_encontrado() {
+        when(orcamentoRepository.findById(1)).thenReturn(Optional.of(orcamento));
         when(mapper.toResponse(orcamento)).thenReturn(responseDTO);
 
-        assertThat(service.buscarPorId(1L)).isEqualTo(responseDTO);
+        assertThat(service.getById(1)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("buscarPorId: lanca EntityNotFoundException quando nao existe")
-    void buscarPorId_naoEncontrado() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("getById: lanca EntityNotFoundException quando nao existe")
+    void getById_naoEncontrado() {
+        when(orcamentoRepository.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.buscarPorId(99L))
+        assertThatThrownBy(() -> service.getById(99))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessageContaining("99");
     }
 
     @Test
-    @DisplayName("listarTodos: retorna lista mapeada")
-    void listarTodos() {
-        when(repository.findAll()).thenReturn(List.of(orcamento));
+    @DisplayName("listAll: retorna lista mapeada")
+    void listAll() {
+        when(orcamentoRepository.findAll()).thenReturn(List.of(orcamento));
         when(mapper.toResponse(orcamento)).thenReturn(responseDTO);
 
-        assertThat(service.listarTodos()).containsExactly(responseDTO);
+        assertThat(service.listAll()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("atualizar: atualiza quando existe")
-    void atualizar_sucesso() {
+    @DisplayName("update: atualiza quando existe")
+    void update_sucesso() {
         var updateDTO = mock(OrcamentoUpdateDTO.class);
-        when(repository.findById(1L)).thenReturn(Optional.of(orcamento));
-        when(repository.save(orcamento)).thenReturn(orcamento);
+        when(orcamentoRepository.findById(1)).thenReturn(Optional.of(orcamento));
+        when(orcamentoRepository.save(orcamento)).thenReturn(orcamento);
         when(mapper.toResponse(orcamento)).thenReturn(responseDTO);
 
-        assertThat(service.atualizar(1L, updateDTO)).isEqualTo(responseDTO);
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
         verify(mapper).updateFromDto(updateDTO, orcamento);
     }
 
     @Test
-    @DisplayName("atualizar: lanca EntityNotFoundException quando nao existe")
-    void atualizar_naoEncontrado() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("update: lanca EntityNotFoundException quando nao existe")
+    void update_naoEncontrado() {
+        var updateDTO = mock(OrcamentoUpdateDTO.class);
+        when(orcamentoRepository.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.atualizar(99L, mock(OrcamentoUpdateDTO.class)))
+        assertThatThrownBy(() -> service.update(99, updateDTO))
                 .isInstanceOf(EntityNotFoundException.class);
     }
-
     @Test
-    @DisplayName("deletar: deleta quando existe")
-    void deletar_sucesso() {
-        when(repository.existsById(1L)).thenReturn(true);
-        service.deletar(1L);
-        verify(repository).deleteById(1L);
+    @DisplayName("delete: soft-delete quando existe")
+    void delete_sucesso() {
+        when(orcamentoRepository.findById(1)).thenReturn(Optional.of(orcamento));
+
+        service.delete(1);
+
+        verify(orcamento).setAtivo(false);
+        verify(orcamentoRepository).save(orcamento);
+        verify(orcamentoRepository, never()).deleteById(any());
     }
 
+    // ADICIONAR:
     @Test
-    @DisplayName("deletar: lanca EntityNotFoundException quando nao existe")
-    void deletar_naoEncontrado() {
-        when(repository.existsById(99L)).thenReturn(false);
+    @DisplayName("listAll: retorna lista vazia quando nao ha orcamentos")
+    void listAll_vazia() {
+        when(orcamentoRepository.findAll()).thenReturn(List.of());
 
-        assertThatThrownBy(() -> service.deletar(99L))
-                .isInstanceOf(EntityNotFoundException.class);
-        verify(repository, never()).deleteById(any());
+        assertThat(service.listAll()).isEmpty();
     }
 }

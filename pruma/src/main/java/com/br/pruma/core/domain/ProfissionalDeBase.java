@@ -10,15 +10,17 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(
         name = "profissional_de_base",
         indexes = {
-                @Index(name = "idx_profissional_cpf",          columnList = "profissional_cpf"),
-                @Index(name = "idx_profissional_nome",         columnList = "nome"),
-                @Index(name = "idx_profissional_especialidade", columnList = "especialidade")
+                @Index(name = "idx_profissional_cpf",           columnList = "profissional_cpf"),
+                @Index(name = "idx_profissional_nome",          columnList = "nome"),
+                @Index(name = "idx_profissional_especialidade", columnList = "especialidade"),
+                @Index(name = "idx_profissional_padrinho",      columnList = "padrinho_id")
         }
 )
 @Getter
@@ -61,6 +63,41 @@ public class ProfissionalDeBase implements Serializable {
     @ToString.Exclude
     private String telefone;
 
+    /** Canal principal de entrada MOR — número WhatsApp com DDI (ex: 5511999990000) */
+    @Size(max = 20)
+    @Column(name = "telefone_whatsapp", length = 20)
+    @ToString.Exclude
+    private String telefoneWhatsapp;
+
+    /** Flag que identifica trabalhador informal (pedreiro, pintor, eletricista, etc.) */
+    @Column(name = "trabalhador_informal", nullable = false)
+    @Builder.Default
+    private Boolean trabalhadorInformal = false;
+
+    /**
+     * Snapshot do último score TFE calculado pelo engine externo.
+     * Somente escrito via endpoint protegido ROLE_ENGINE — nunca calculado aqui.
+     */
+    @Column(name = "score_tfe", precision = 5, scale = 4)
+    private BigDecimal scoreTfe;
+
+    /** Timestamp do último login registrado — alimenta componente ψ_op do TFE */
+    @Column(name = "ultimo_login_app")
+    private LocalDateTime ultimoLoginApp;
+
+    /** Contador desnormalizado de obras concluídas — atualizado pelo serviço de obra */
+    @Column(name = "total_obras_concluidas", nullable = false)
+    @Builder.Default
+    private Integer totalObrasConcluidas = 0;
+
+    /**
+     * Padrinho deste profissional no grafo social.
+     * A relação completa (histórico, datas, status) fica em ApadrinhamentoRede.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "padrinho_id")
+    private ProfissionalDeBase padrinho;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
@@ -76,9 +113,12 @@ public class ProfissionalDeBase implements Serializable {
     public void applyPatch(ProfissionalDeBase patch) {
         if (patch == null) return;
         if (patch.getNome() != null && !patch.getNome().isBlank()) this.setNome(patch.getNome());
-        if (patch.getCpf() != null && !patch.getCpf().isBlank()) this.setCpf(patch.getCpf());
-        if (patch.getEspecialidade() != null) this.setEspecialidade(patch.getEspecialidade());
-        if (patch.getTelefone() != null) this.setTelefone(patch.getTelefone());
+        if (patch.getCpf()  != null && !patch.getCpf().isBlank())  this.setCpf(patch.getCpf());
+        if (patch.getEspecialidade()    != null) this.setEspecialidade(patch.getEspecialidade());
+        if (patch.getTelefone()         != null) this.setTelefone(patch.getTelefone());
+        if (patch.getTelefoneWhatsapp() != null) this.setTelefoneWhatsapp(patch.getTelefoneWhatsapp());
+        if (patch.getTrabalhadorInformal() != null) this.setTrabalhadorInformal(patch.getTrabalhadorInformal());
+        if (patch.getPadrinho()         != null) this.setPadrinho(patch.getPadrinho());
     }
 
     public static ProfissionalDeBase ofId(Integer id) {
