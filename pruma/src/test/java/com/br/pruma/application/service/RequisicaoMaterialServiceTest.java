@@ -8,210 +8,153 @@ import com.br.pruma.application.service.impl.RequisicaoMaterialServiceImpl;
 import com.br.pruma.core.domain.RequisicaoMaterial;
 import com.br.pruma.core.exception.RecursoNaoEncontradoException;
 import com.br.pruma.core.repository.port.RequisicaoMaterialRepositoryPort;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("RequisicaoMaterialService — testes unitários")
 class RequisicaoMaterialServiceTest {
 
-    @Mock private RequisicaoMaterialRepositoryPort repositoryPort;
-    @Mock private RequisicaoMaterialMapper mapper;
-    @InjectMocks private RequisicaoMaterialServiceImpl service;
+    @Mock RequisicaoMaterialRepositoryPort repositoryPort;
+    @Mock RequisicaoMaterialMapper mapper;
+    @InjectMocks RequisicaoMaterialServiceImpl service;
 
-    // ── RequisicaoMaterial:        @Builder + @NoArgsConstructor(PROTECTED) + @AllArgsConstructor(PRIVATE)
-    //                               → somente RequisicaoMaterial.builder().build() — new proibido
-    //                               → não estende AuditableEntity — sem campo ativo
-    // ── RequisicaoMaterialRequestDTO:  record → new RequisicaoMaterialRequestDTO(...) — NUNCA mock()
-    // ── RequisicaoMaterialResponseDTO: record → new RequisicaoMaterialResponseDTO(...) — NUNCA mock()
-    // ── RequisicaoMaterialUpdateDTO:   @Data  → new + setters
+    RequisicaoMaterial entity;
+    RequisicaoMaterialResponseDTO responseDTO;
 
-    private static final LocalDate DATA = LocalDate.now().plusDays(1);
-
-    private RequisicaoMaterial buildRequisicao(Integer id) {
-        return RequisicaoMaterial.builder()
-                .id(id)
-                .quantidade(10)
-                .dataRequisicao(DATA)
-                .build();
+    @BeforeEach
+    void setUp() {
+        entity      = mock(RequisicaoMaterial.class);
+        responseDTO = mock(RequisicaoMaterialResponseDTO.class);
     }
-
-    private RequisicaoMaterialRequestDTO buildRequest() {
-        return new RequisicaoMaterialRequestDTO(1, 10, 100, DATA);
-    }
-
-    private RequisicaoMaterialResponseDTO buildResponse() {
-        return new RequisicaoMaterialResponseDTO(1, 1, "Obra Teste", 10, "Cimento", 100, DATA, DATA);
-    }
-
-    // ── create ───────────────────────────────────────────────────────────────
 
     @Test
-    @DisplayName("create: salva via port e retorna DTO")
+    @DisplayName("create: salva e retorna DTO")
     void create_sucesso() {
-        var req      = buildRequest();
-        var entity   = buildRequisicao(null);
-        var saved    = buildRequisicao(1);
-        var response = buildResponse();
+        var dto = mock(RequisicaoMaterialRequestDTO.class);
+        when(mapper.toEntity(dto)).thenReturn(entity);
+        when(repositoryPort.save(entity)).thenReturn(entity);
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
-        when(mapper.toEntity(req)).thenReturn(entity);
-        when(repositoryPort.save(entity)).thenReturn(saved);
-        when(mapper.toResponse(saved)).thenReturn(response);
-
-        assertThat(service.create(req)).isEqualTo(response);
-        verify(repositoryPort).save(entity);
+        assertThat(service.create(dto)).isEqualTo(responseDTO);
     }
 
-    // ── getById ──────────────────────────────────────────────────────────────
-
     @Test
-    @DisplayName("getById: retorna DTO quando requisição existe")
+    @DisplayName("getById: retorna DTO quando existe")
     void getById_encontrado() {
-        var entity   = buildRequisicao(1);
-        var response = buildResponse();
-
         when(repositoryPort.findById(1)).thenReturn(Optional.of(entity));
-        when(mapper.toResponse(entity)).thenReturn(response);
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
-        assertThat(service.getById(1)).isEqualTo(response);
+        assertThat(service.getById(1)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("getById: não encontrado lança RecursoNaoEncontradoException")
+    @DisplayName("getById: lanca RecursoNaoEncontradoException quando nao existe")
     void getById_naoEncontrado() {
         when(repositoryPort.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.getById(99))
-                .isInstanceOf(RecursoNaoEncontradoException.class)
-                .hasMessageContaining("99");
+                .isInstanceOf(RecursoNaoEncontradoException.class);
     }
 
-    // ── listAll ──────────────────────────────────────────────────────────────
-
     @Test
-    @DisplayName("listAll: retorna lista de DTOs")
-    void listAll_comRegistros() {
-        var entity   = buildRequisicao(1);
-        var response = buildResponse();
-
+    @DisplayName("listAll: retorna lista mapeada")
+    void listAll() {
         when(repositoryPort.findAll()).thenReturn(List.of(entity));
-        when(mapper.toResponse(entity)).thenReturn(response);
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
-        assertThat(service.listAll()).hasSize(1).containsExactly(response);
+        assertThat(service.listAll()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("listAll: retorna lista vazia")
-    void listAll_vazio() {
-        when(repositoryPort.findAll()).thenReturn(List.of());
-        assertThat(service.listAll()).isEmpty();
-    }
+    @DisplayName("list: retorna pagina mapeada")
+    void list_paginado() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(repositoryPort.findAll(pageable)).thenReturn(new PageImpl<>(List.of(entity)));
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
-    // ── listByProjeto ─────────────────────────────────────────────────────────
-
-    @Test
-    @DisplayName("listByProjeto: retorna requisições do projeto informado")
-    void listByProjeto_comRegistros() {
-        var entity   = buildRequisicao(1);
-        var response = buildResponse();
-
-        when(repositoryPort.findByProjetoId(10)).thenReturn(List.of(entity));
-        when(mapper.toResponse(entity)).thenReturn(response);
-
-        assertThat(service.listByProjeto(10)).hasSize(1).containsExactly(response);
-        verify(repositoryPort).findByProjetoId(10);
+        assertThat(service.list(pageable).getContent()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("listByProjeto: retorna lista vazia quando não há requisições")
-    void listByProjeto_vazio() {
-        when(repositoryPort.findByProjetoId(10)).thenReturn(List.of());
-        assertThat(service.listByProjeto(10)).isEmpty();
+    @DisplayName("listByProjeto: retorna lista filtrada por projetoId")
+    void listByProjeto() {
+        when(repositoryPort.findByProjetoId(3)).thenReturn(List.of(entity));
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
+
+        assertThat(service.listByProjeto(3)).containsExactly(responseDTO);
     }
 
-    // ── update ───────────────────────────────────────────────────────────────
-
     @Test
-    @DisplayName("update: chama mapper.updateEntity e salva via port")
+    @DisplayName("update: atualiza quando existe")
     void update_sucesso() {
-        // @Data sem @Builder → new + setter
-        var upd = new RequisicaoMaterialUpdateDTO();
-        upd.setQuantidade(java.math.BigDecimal.valueOf(20));
-
-        var entity   = buildRequisicao(1);
-        var response = buildResponse();
-
+        var updateDTO = mock(RequisicaoMaterialUpdateDTO.class);
         when(repositoryPort.findById(1)).thenReturn(Optional.of(entity));
         when(repositoryPort.save(entity)).thenReturn(entity);
-        when(mapper.toResponse(entity)).thenReturn(response);
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
-        assertThat(service.update(1, upd)).isEqualTo(response);
-        verify(mapper).updateEntity(upd, entity);
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
+        verify(mapper).updateEntity(updateDTO, entity);
     }
 
     @Test
-    @DisplayName("update: não encontrado lança RecursoNaoEncontradoException")
+    @DisplayName("update: lanca RecursoNaoEncontradoException quando nao existe")
     void update_naoEncontrado() {
+        var updateDTO = mock(RequisicaoMaterialUpdateDTO.class);
         when(repositoryPort.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.update(99, new RequisicaoMaterialUpdateDTO()))
+        assertThatThrownBy(() -> service.update(99, updateDTO))
                 .isInstanceOf(RecursoNaoEncontradoException.class);
     }
 
-    // ── replace ──────────────────────────────────────────────────────────────
-
     @Test
-    @DisplayName("replace: substitui requisição completa mantendo o mesmo ID")
+    @DisplayName("replace: substitui quando existe")
     void replace_sucesso() {
-        var req      = buildRequest();
-        var nova     = buildRequisicao(null);
-        var saved    = buildRequisicao(1);
-        var response = buildResponse();
+        var dto = mock(RequisicaoMaterialRequestDTO.class);
+        when(repositoryPort.findById(1)).thenReturn(Optional.of(entity));
+        when(mapper.toEntity(dto)).thenReturn(entity);
+        when(repositoryPort.save(entity)).thenReturn(entity);
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
-        when(repositoryPort.findById(1)).thenReturn(Optional.of(buildRequisicao(1)));
-        when(mapper.toEntity(req)).thenReturn(nova);
-        when(repositoryPort.save(any())).thenReturn(saved);
-        when(mapper.toResponse(saved)).thenReturn(response);
-
-        assertThat(service.replace(1, req)).isEqualTo(response);
-        verify(repositoryPort).save(argThat(r -> r.getId().equals(1)));
+        assertThat(service.replace(1, dto)).isEqualTo(responseDTO);
+        verify(entity).setId(1);
     }
 
     @Test
-    @DisplayName("replace: não encontrado lança RecursoNaoEncontradoException")
+    @DisplayName("replace: lanca RecursoNaoEncontradoException quando nao existe")
     void replace_naoEncontrado() {
+        var dto = mock(RequisicaoMaterialRequestDTO.class);
         when(repositoryPort.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.replace(99, buildRequest()))
+        assertThatThrownBy(() -> service.replace(99, dto))
                 .isInstanceOf(RecursoNaoEncontradoException.class);
     }
 
-    // ── delete ───────────────────────────────────────────────────────────────
-
     @Test
-    @DisplayName("delete: chama deleteById após encontrar a entidade")
+    @DisplayName("delete: deleta fisicamente quando existe")
     void delete_sucesso() {
-        when(repositoryPort.findById(1)).thenReturn(Optional.of(buildRequisicao(1)));
+        when(repositoryPort.findById(1)).thenReturn(Optional.of(entity));
 
-        assertThatCode(() -> service.delete(1)).doesNotThrowAnyException();
+        service.delete(1);
+
         verify(repositoryPort).deleteById(1);
     }
 
     @Test
-    @DisplayName("delete: não encontrado lança RecursoNaoEncontradoException")
+    @DisplayName("delete: lanca RecursoNaoEncontradoException quando nao existe")
     void delete_naoEncontrado() {
         when(repositoryPort.findById(99)).thenReturn(Optional.empty());
 

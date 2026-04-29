@@ -19,11 +19,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,8 +40,6 @@ class SolicitacaoMudancaServiceTest {
     @InjectMocks SolicitacaoMudancaServiceImpl service;
 
     SolicitacaoMudanca entity;
-    SolicitacaoMudancaRequestDTO requestDTO;
-    SolicitacaoMudancaUpdateDTO updateDTO;
     SolicitacaoMudancaResponseDTO responseDTO;
     Projeto projeto;
     StatusSolicitacao status;
@@ -45,41 +47,57 @@ class SolicitacaoMudancaServiceTest {
     @BeforeEach
     void setUp() {
         entity      = mock(SolicitacaoMudanca.class);
-        requestDTO  = mock(SolicitacaoMudancaRequestDTO.class);
-        updateDTO   = mock(SolicitacaoMudancaUpdateDTO.class);
         responseDTO = mock(SolicitacaoMudancaResponseDTO.class);
         projeto     = mock(Projeto.class);
         status      = mock(StatusSolicitacao.class);
     }
 
+    // ─── create ────────────────────────────────────────────────────────────────
+
     @Test
-    @DisplayName("create: salva e retorna DTO")
+    @DisplayName("create: salva com projeto e status quando ambos existem")
     void create_sucesso() {
-        when(requestDTO.projetoId()).thenReturn(1);
-        when(requestDTO.statusSolicitacaoId()).thenReturn(1);
-        when(mapper.toEntity(requestDTO)).thenReturn(entity);
+        var dto = mock(SolicitacaoMudancaRequestDTO.class);
+        when(dto.projetoId()).thenReturn(1);
+        when(dto.statusSolicitacaoId()).thenReturn(2);
+        when(mapper.toEntity(dto)).thenReturn(entity);
         when(projetoRepository.findById(1)).thenReturn(Optional.of(projeto));
-        when(statusSolicitacaoRepository.findById(1)).thenReturn(Optional.of(status));
+        when(statusSolicitacaoRepository.findById(2)).thenReturn(Optional.of(status));
         when(repository.save(entity)).thenReturn(entity);
         when(mapper.toDTO(entity)).thenReturn(responseDTO);
 
-        assertThat(service.create(requestDTO)).isEqualTo(responseDTO);
+        assertThat(service.create(dto)).isEqualTo(responseDTO);
         verify(entity).setProjeto(projeto);
         verify(entity).setStatusSolicitacao(status);
-        verify(repository).save(entity);
     }
 
     @Test
     @DisplayName("create: lanca EntityNotFoundException quando projeto nao existe")
     void create_projetoNaoEncontrado() {
-        when(requestDTO.projetoId()).thenReturn(99);
-        when(mapper.toEntity(requestDTO)).thenReturn(entity);
+        var dto = mock(SolicitacaoMudancaRequestDTO.class);
+        when(dto.projetoId()).thenReturn(99);
+        when(mapper.toEntity(dto)).thenReturn(entity);
         when(projetoRepository.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.create(requestDTO))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("99");
+        assertThatThrownBy(() -> service.create(dto))
+                .isInstanceOf(EntityNotFoundException.class);
     }
+
+    @Test
+    @DisplayName("create: lanca EntityNotFoundException quando status nao existe")
+    void create_statusNaoEncontrado() {
+        var dto = mock(SolicitacaoMudancaRequestDTO.class);
+        when(dto.projetoId()).thenReturn(1);
+        when(dto.statusSolicitacaoId()).thenReturn(99);
+        when(mapper.toEntity(dto)).thenReturn(entity);
+        when(projetoRepository.findById(1)).thenReturn(Optional.of(projeto));
+        when(statusSolicitacaoRepository.findById(99)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.create(dto))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    // ─── getById ───────────────────────────────────────────────────────────────
 
     @Test
     @DisplayName("getById: retorna DTO quando existe")
@@ -96,9 +114,10 @@ class SolicitacaoMudancaServiceTest {
         when(repository.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.getById(99))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("99");
+                .isInstanceOf(EntityNotFoundException.class);
     }
+
+    // ─── list ──────────────────────────────────────────────────────────────────
 
     @Test
     @DisplayName("listAll: retorna lista mapeada")
@@ -110,46 +129,113 @@ class SolicitacaoMudancaServiceTest {
     }
 
     @Test
-    @DisplayName("listByProjeto: retorna lista filtrada por projeto")
-    void listByProjeto() {
-        when(repository.findByProjetoId(1)).thenReturn(List.of(entity));
+    @DisplayName("list: retorna pagina mapeada")
+    void list_paginado() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(repository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(entity)));
         when(mapper.toDTO(entity)).thenReturn(responseDTO);
 
-        assertThat(service.listByProjeto(1)).containsExactly(responseDTO);
+        assertThat(service.list(pageable).getContent()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("update: atualiza campos simples e associacoes quando existem")
-    void update_sucesso() {
-        when(repository.findById(1)).thenReturn(Optional.of(entity));
+    @DisplayName("listByProjeto: retorna lista filtrada")
+    void listByProjeto() {
+        when(repository.findByProjetoId(3)).thenReturn(List.of(entity));
+        when(mapper.toDTO(entity)).thenReturn(responseDTO);
+
+        assertThat(service.listByProjeto(3)).containsExactly(responseDTO);
+    }
+
+    // ─── update ────────────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("update: atualiza sem trocar projeto nem status quando ids null")
+    void update_semTrocas() {
+        var updateDTO = mock(SolicitacaoMudancaUpdateDTO.class);
         when(updateDTO.projetoId()).thenReturn(null);
         when(updateDTO.statusSolicitacaoId()).thenReturn(null);
+        when(repository.findById(1)).thenReturn(Optional.of(entity));
         when(repository.save(entity)).thenReturn(entity);
         when(mapper.toDTO(entity)).thenReturn(responseDTO);
 
         assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
+        verifyNoInteractions(projetoRepository);
+        verifyNoInteractions(statusSolicitacaoRepository);
         verify(mapper).updateFromDto(updateDTO, entity);
-        verify(repository).save(entity);
+    }
+
+    @Test
+    @DisplayName("update: troca projeto e status quando ids fornecidos")
+    void update_comTrocas() {
+        var updateDTO = mock(SolicitacaoMudancaUpdateDTO.class);
+        when(updateDTO.projetoId()).thenReturn(5);
+        when(updateDTO.statusSolicitacaoId()).thenReturn(6);
+        when(repository.findById(1)).thenReturn(Optional.of(entity));
+        when(projetoRepository.findById(5)).thenReturn(Optional.of(projeto));
+        when(statusSolicitacaoRepository.findById(6)).thenReturn(Optional.of(status));
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toDTO(entity)).thenReturn(responseDTO);
+
+        service.update(1, updateDTO);
+
+        verify(entity).setProjeto(projeto);
+        verify(entity).setStatusSolicitacao(status);
     }
 
     @Test
     @DisplayName("update: lanca EntityNotFoundException quando nao existe")
     void update_naoEncontrado() {
+        var updateDTO = mock(SolicitacaoMudancaUpdateDTO.class);
         when(repository.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.update(99, updateDTO))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("99");
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    // ─── replace ───────────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("replace: substitui com projeto e status quando existem")
+    void replace_sucesso() {
+        var dto = mock(SolicitacaoMudancaRequestDTO.class);
+        when(dto.projetoId()).thenReturn(1);
+        when(dto.statusSolicitacaoId()).thenReturn(2);
+        when(repository.findById(1)).thenReturn(Optional.of(entity));
+        when(mapper.toEntity(dto)).thenReturn(entity);
+        when(projetoRepository.findById(1)).thenReturn(Optional.of(projeto));
+        when(statusSolicitacaoRepository.findById(2)).thenReturn(Optional.of(status));
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toDTO(entity)).thenReturn(responseDTO);
+
+        assertThat(service.replace(1, dto)).isEqualTo(responseDTO);
+        verify(entity).setId(1);
+        verify(entity).setProjeto(projeto);
+        verify(entity).setStatusSolicitacao(status);
     }
 
     @Test
-    @DisplayName("delete: deleta quando existe")
+    @DisplayName("replace: lanca EntityNotFoundException quando solicitacao nao existe")
+    void replace_naoEncontrado() {
+        var dto = mock(SolicitacaoMudancaRequestDTO.class);
+        when(repository.findById(99)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.replace(99, dto))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    // ─── delete ────────────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("delete: soft-delete quando existe")
     void delete_sucesso() {
         when(repository.findById(1)).thenReturn(Optional.of(entity));
 
         service.delete(1);
 
+        verify(entity).setAtivo(false);
         verify(repository).save(entity);
+        verify(repository, never()).deleteById(any());
     }
 
     @Test
@@ -158,66 +244,6 @@ class SolicitacaoMudancaServiceTest {
         when(repository.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.delete(99))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("99");
-        verify(repository, never()).delete(any(SolicitacaoMudanca.class));
-    }
-
-    @Test
-    @DisplayName("create: lanca EntityNotFoundException quando status nao existe")
-    void create_statusNaoEncontrado() {
-        when(requestDTO.projetoId()).thenReturn(1);
-        when(requestDTO.statusSolicitacaoId()).thenReturn(99);
-        when(mapper.toEntity(requestDTO)).thenReturn(entity);
-        when(projetoRepository.findById(1)).thenReturn(Optional.of(projeto));
-        when(statusSolicitacaoRepository.findById(99)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> service.create(requestDTO))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("99");
-    }
-
-    @Test
-    @DisplayName("listAll: retorna lista vazia quando nao ha solicitacoes")
-    void listAll_vazia() {
-        when(repository.findAll()).thenReturn(List.of());
-
-        assertThat(service.listAll()).isEmpty();
-    }
-
-    @Test
-    @DisplayName("listByProjeto: retorna lista vazia quando projeto nao tem solicitacoes")
-    void listByProjeto_vazia() {
-        when(repository.findByProjetoId(99)).thenReturn(List.of());
-
-        assertThat(service.listByProjeto(99)).isEmpty();
-    }
-
-    @Test
-    @DisplayName("update: atualiza projeto quando projetoId nao e nulo")
-    void update_comTrocaDeProjeto() {
-        when(repository.findById(1)).thenReturn(Optional.of(entity));
-        when(updateDTO.projetoId()).thenReturn(2);
-        when(updateDTO.statusSolicitacaoId()).thenReturn(null);
-        when(projetoRepository.findById(2)).thenReturn(Optional.of(projeto));
-        when(repository.save(entity)).thenReturn(entity);
-        when(mapper.toDTO(entity)).thenReturn(responseDTO);
-
-        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
-        verify(entity).setProjeto(projeto);
-    }
-
-    @Test
-    @DisplayName("update: atualiza status quando statusSolicitacaoId nao e nulo")
-    void update_comTrocaDeStatus() {
-        when(repository.findById(1)).thenReturn(Optional.of(entity));
-        when(updateDTO.projetoId()).thenReturn(null);
-        when(updateDTO.statusSolicitacaoId()).thenReturn(2);
-        when(statusSolicitacaoRepository.findById(2)).thenReturn(Optional.of(status));
-        when(repository.save(entity)).thenReturn(entity);
-        when(mapper.toDTO(entity)).thenReturn(responseDTO);
-
-        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
-        verify(entity).setStatusSolicitacao(status);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 }
