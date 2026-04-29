@@ -16,5 +16,7 @@ public class Constantes {
     public static final String PROJETO_CATEGORIA_NAO_ENCONTRADA = "Projeto Categoria não encontrada: ";
     public static final String PROJETO_NAO_ENCONTRADO = "Projeto não encontrado: ";
     public static final String CLIENTE_NAO_ENCONTRADO="Cliente não encontrado: ";
-    public static final String LOG_ALTERACAO_AUX_NAO_ENCONTRADO="LogAlteracaoAux não encontrado: ";
+    public static final String LOG_ALTERACAO_AUX_NAO_ENCONTRADO="Log de Alteracao Auxiliar não encontrado: ";
+    public static final String APADRINHAMENTO_REDE_NAO_ENCONTRADO = "Apadrinhamento de rede não encontrado: ";
+    public static final String APADRINHAMENTO_REDE_VINCULO_JA_EXISTE = "Já existe um vínculo de apadrinhamento ATIVO entre este padrinho e afilhado.";
 }
