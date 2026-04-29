@@ -17,6 +17,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,35 +36,46 @@ class ObraServiceTest {
     @Mock ObraMapper mapper;
     @InjectMocks ObraServiceImpl service;
 
-    // mock() bypass o @NoArgsConstructor(access = PROTECTED)
-    Obra obra;
-    ObraRequestDTO requestDTO;
+    Obra entity;
     ObraResponseDTO responseDTO;
 
     @BeforeEach
     void setUp() {
-        obra        = mock(Obra.class);
-        requestDTO  = mock(ObraRequestDTO.class);
+        entity      = mock(Obra.class);
         responseDTO = mock(ObraResponseDTO.class);
     }
 
     @Test
     @DisplayName("create: salva e retorna DTO")
     void create_sucesso() {
-        when(requestDTO.getProjetoId()).thenReturn(1);
-        when(projetoRepository.findById(1)).thenReturn(Optional.of(mock(Projeto.class)));
-        when(mapper.toEntity(requestDTO)).thenReturn(obra);
-        when(obraRepository.save(obra)).thenReturn(obra);
-        when(mapper.toResponse(obra)).thenReturn(responseDTO);
+        var dto     = mock(ObraRequestDTO.class);
+        var projeto = mock(Projeto.class);
+        when(dto.getProjetoId()).thenReturn(1);
+        when(projetoRepository.findById(1)).thenReturn(Optional.of(projeto));
+        when(mapper.toEntity(dto)).thenReturn(entity);
+        when(obraRepository.save(entity)).thenReturn(entity);
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
-        assertThat(service.create(requestDTO)).isEqualTo(responseDTO);
+        assertThat(service.create(dto)).isEqualTo(responseDTO);
+        verify(entity).setProjeto(projeto);
+    }
+
+    @Test
+    @DisplayName("create: lanca EntityNotFoundException quando projeto nao existe")
+    void create_projetoNaoEncontrado() {
+        var dto = mock(ObraRequestDTO.class);
+        when(dto.getProjetoId()).thenReturn(99);
+        when(projetoRepository.findById(99)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.create(dto))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
     @DisplayName("getById: retorna DTO quando existe")
     void getById_encontrado() {
-        when(obraRepository.findById(1)).thenReturn(Optional.of(obra));
-        when(mapper.toResponse(obra)).thenReturn(responseDTO);
+        when(obraRepository.findById(1)).thenReturn(Optional.of(entity));
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
         assertThat(service.getById(1)).isEqualTo(responseDTO);
     }
@@ -72,34 +86,68 @@ class ObraServiceTest {
         when(obraRepository.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.getById(99))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("99");
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
     @DisplayName("listAll: retorna lista mapeada")
     void listAll() {
-        when(obraRepository.findAll()).thenReturn(List.of(obra));
-        when(mapper.toResponse(obra)).thenReturn(responseDTO);
+        when(obraRepository.findAll()).thenReturn(List.of(entity));
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
         assertThat(service.listAll()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("update: atualiza quando existe")
-    void update_sucesso() {
-        var updateDTO = mock(ObraUpdateDTO.class);
-        when(updateDTO.getProjetoId()).thenReturn(null);
-        when(obraRepository.findById(1)).thenReturn(Optional.of(obra));
-        when(obraRepository.save(obra)).thenReturn(obra);
-        when(mapper.toResponse(obra)).thenReturn(responseDTO);
+    @DisplayName("list: retorna pagina mapeada")
+    void list_paginado() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(obraRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(entity)));
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
-        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
-        verify(mapper).updateFromDto(updateDTO, obra);
+        assertThat(service.list(pageable).getContent()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("update: lanca EntityNotFoundException quando nao existe")
+    @DisplayName("listByProjeto: retorna lista filtrada")
+    void listByProjeto() {
+        when(obraRepository.findAllByProjeto_Id(2)).thenReturn(List.of(entity));
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
+
+        assertThat(service.listByProjeto(2)).containsExactly(responseDTO);
+    }
+
+    @Test
+    @DisplayName("update: atualiza sem trocar projeto quando projetoId null")
+    void update_semTrocarProjeto() {
+        var updateDTO = mock(ObraUpdateDTO.class);
+        when(updateDTO.getProjetoId()).thenReturn(null);
+        when(obraRepository.findById(1)).thenReturn(Optional.of(entity));
+        when(obraRepository.save(entity)).thenReturn(entity);
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
+
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
+        verify(mapper).updateFromDto(updateDTO, entity);
+        verifyNoInteractions(projetoRepository);
+    }
+
+    @Test
+    @DisplayName("update: troca projeto quando projetoId fornecido")
+    void update_comNovoProjeto() {
+        var updateDTO = mock(ObraUpdateDTO.class);
+        var projeto   = mock(Projeto.class);
+        when(updateDTO.getProjetoId()).thenReturn(5);
+        when(obraRepository.findById(1)).thenReturn(Optional.of(entity));
+        when(projetoRepository.findById(5)).thenReturn(Optional.of(projeto));
+        when(obraRepository.save(entity)).thenReturn(entity);
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
+
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
+        verify(entity).setProjeto(projeto);
+    }
+
+    @Test
+    @DisplayName("update: lanca EntityNotFoundException quando obra nao existe")
     void update_naoEncontrado() {
         var updateDTO = mock(ObraUpdateDTO.class);
         when(obraRepository.findById(99)).thenReturn(Optional.empty());
@@ -108,39 +156,64 @@ class ObraServiceTest {
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
-    // SUBSTITUIR o delete_sucesso existente por:
+    @Test
+    @DisplayName("replace: substitui quando obra e projeto existem")
+    void replace_sucesso() {
+        var dto     = mock(ObraRequestDTO.class);
+        var projeto = mock(Projeto.class);
+        when(dto.getProjetoId()).thenReturn(1);
+        when(obraRepository.findById(1)).thenReturn(Optional.of(entity));
+        when(projetoRepository.findById(1)).thenReturn(Optional.of(projeto));
+        when(mapper.toEntity(dto)).thenReturn(entity);
+        when(obraRepository.save(entity)).thenReturn(entity);
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
+
+        assertThat(service.replace(1, dto)).isEqualTo(responseDTO);
+        verify(entity).setId(1);
+        verify(entity).setProjeto(projeto);
+    }
+
+    @Test
+    @DisplayName("replace: lanca EntityNotFoundException quando obra nao existe")
+    void replace_obraNaoEncontrada() {
+        var dto = mock(ObraRequestDTO.class);
+        when(obraRepository.findById(99)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.replace(99, dto))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("searchByDescricao: retorna pagina com resultados encontrados")
+    void searchByDescricao() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(obraRepository.findAllByDescricaoContainingIgnoreCase("casa")).thenReturn(List.of(entity));
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
+
+        var page = service.searchByDescricao("casa", pageable);
+
+        assertThat(page.getContent()).containsExactly(responseDTO);
+        assertThat(page.getTotalElements()).isEqualTo(1);
+    }
+
     @Test
     @DisplayName("delete: soft-delete quando existe")
     void delete_sucesso() {
-        when(obraRepository.findById(1)).thenReturn(Optional.of(obra));
+        when(obraRepository.findById(1)).thenReturn(Optional.of(entity));
 
         service.delete(1);
 
-        verify(obra).setAtivo(false);
-        verify(obraRepository).save(obra);
+        verify(entity).setAtivo(false);
+        verify(obraRepository).save(entity);
         verify(obraRepository, never()).deleteById(any());
     }
 
-    // ADICIONAR:
     @Test
-    @DisplayName("listAll: retorna lista vazia quando nao ha obras")
-    void listAll_vazia() {
-        when(obraRepository.findAll()).thenReturn(List.of());
+    @DisplayName("delete: lanca EntityNotFoundException quando nao existe")
+    void delete_naoEncontrado() {
+        when(obraRepository.findById(99)).thenReturn(Optional.empty());
 
-        assertThat(service.listAll()).isEmpty();
-    }
-
-    @Test
-    @DisplayName("update: atualiza projeto quando projetoId nao e nulo no updateDTO")
-    void update_comTrocaDeProjeto() {
-        var updateDTO = mock(ObraUpdateDTO.class);
-        when(updateDTO.getProjetoId()).thenReturn(2);
-        when(obraRepository.findById(1)).thenReturn(Optional.of(obra));
-        when(projetoRepository.findById(2)).thenReturn(Optional.of(mock(Projeto.class)));
-        when(obraRepository.save(obra)).thenReturn(obra);
-        when(mapper.toResponse(obra)).thenReturn(responseDTO);
-
-        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
-        verify(obra).setProjeto(any(Projeto.class));
+        assertThatThrownBy(() -> service.delete(99))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 }

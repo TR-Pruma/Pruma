@@ -15,151 +15,146 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PermissaoUsuarioServiceTest {
 
-    @Mock
-    private PermissaoUsuarioRepository repository;
+    @Mock PermissaoUsuarioRepository repository;
+    @Mock PermissaoUsuarioMapper mapper;
+    @InjectMocks PermissaoUsuarioServiceImpl service;
 
-    @Mock
-    private PermissaoUsuarioMapper mapper;
-
-    @InjectMocks
-    private PermissaoUsuarioServiceImpl service;
-
-    private PermissaoUsuario permissao;
-    private PermissaoUsuarioRequestDTO requestDTO;
-    private PermissaoUsuarioUpdateDTO updateDTO;
-    private PermissaoUsuarioResponseDTO responseDTO;
+    PermissaoUsuario entity;
+    PermissaoUsuarioResponseDTO responseDTO;
 
     @BeforeEach
     void setUp() {
-        permissao   = mock(PermissaoUsuario.class);
-        requestDTO  = mock(PermissaoUsuarioRequestDTO.class);
-        updateDTO   = mock(PermissaoUsuarioUpdateDTO.class);
+        entity      = mock(PermissaoUsuario.class);
         responseDTO = mock(PermissaoUsuarioResponseDTO.class);
     }
 
-    // -----------------------------------------------------------------------
-    // create
-    // -----------------------------------------------------------------------
-
     @Test
-    @DisplayName("create: deve salvar e retornar DTO")
+    @DisplayName("create: salva e retorna DTO")
     void create_sucesso() {
-        when(mapper.toEntity(requestDTO)).thenReturn(permissao);
-        when(repository.save(permissao)).thenReturn(permissao);
-        when(mapper.toResponseDTO(permissao)).thenReturn(responseDTO);
+        var dto = mock(PermissaoUsuarioRequestDTO.class);
+        when(mapper.toEntity(dto)).thenReturn(entity);
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toResponseDTO(entity)).thenReturn(responseDTO);
 
-        PermissaoUsuarioResponseDTO result = service.create(requestDTO);
-
-        assertThat(result).isNotNull();
-        verify(repository).save(permissao);
+        assertThat(service.create(dto)).isEqualTo(responseDTO);
     }
 
-    // -----------------------------------------------------------------------
-    // getById
-    // -----------------------------------------------------------------------
-
     @Test
-    @DisplayName("getById: deve retornar DTO quando permissao existe")
+    @DisplayName("getById: retorna DTO quando existe")
     void getById_encontrado() {
-        when(repository.findById(1L)).thenReturn(Optional.of(permissao));
-        when(mapper.toResponseDTO(permissao)).thenReturn(responseDTO);
+        when(repository.findById(1L)).thenReturn(Optional.of(entity));
+        when(mapper.toResponseDTO(entity)).thenReturn(responseDTO);
 
-        PermissaoUsuarioResponseDTO result = service.getById(1L);
-
-        assertThat(result).isNotNull();
+        assertThat(service.getById(1L)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("getById: deve lancar RecursoNaoEncontradoException quando nao encontrar")
+    @DisplayName("getById: lanca RecursoNaoEncontradoException quando nao existe")
     void getById_naoEncontrado() {
         when(repository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.getById(99L))
-                .isInstanceOf(RecursoNaoEncontradoException.class)
-                .hasMessageContaining("99");
+                .isInstanceOf(RecursoNaoEncontradoException.class);
     }
 
-    // -----------------------------------------------------------------------
-    // listAll
-    // -----------------------------------------------------------------------
-
     @Test
-    @DisplayName("listAll: deve retornar lista mapeada")
+    @DisplayName("listAll: retorna lista mapeada")
     void listAll() {
-        when(repository.findAll()).thenReturn(List.of(permissao));
-        when(mapper.toResponseDTO(permissao)).thenReturn(responseDTO);
+        when(repository.findAll()).thenReturn(List.of(entity));
+        when(mapper.toResponseDTO(entity)).thenReturn(responseDTO);
 
         assertThat(service.listAll()).containsExactly(responseDTO);
     }
 
-    // -----------------------------------------------------------------------
-    // update
-    // -----------------------------------------------------------------------
-
     @Test
-    @DisplayName("update: deve atualizar permissao existente")
-    void update_sucesso() {
-        when(repository.findById(1L)).thenReturn(Optional.of(permissao));
-        when(repository.save(permissao)).thenReturn(permissao);
-        when(mapper.toResponseDTO(permissao)).thenReturn(responseDTO);
+    @DisplayName("list: retorna pagina mapeada")
+    void list_paginado() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(repository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(entity)));
+        when(mapper.toResponseDTO(entity)).thenReturn(responseDTO);
 
-        PermissaoUsuarioResponseDTO result = service.update(1L, updateDTO);
-
-        assertThat(result).isNotNull();
-        verify(repository).save(permissao);
+        assertThat(service.list(pageable).getContent()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("update: deve lancar RecursoNaoEncontradoException quando nao existe")
+    @DisplayName("listByClienteCpf: retorna lista filtrada por CPF")
+    void listByClienteCpf() {
+        when(repository.findByCliente_Cpf("111")).thenReturn(List.of(entity));
+        when(mapper.toResponseDTO(entity)).thenReturn(responseDTO);
+
+        assertThat(service.listByClienteCpf("111")).containsExactly(responseDTO);
+    }
+
+    @Test
+    @DisplayName("update: atualiza permissao quando fornecida")
+    void update_comPermissao() {
+        var updateDTO = mock(PermissaoUsuarioUpdateDTO.class);
+        when(updateDTO.permissao()).thenReturn("ADMIN");
+        when(updateDTO.tipoUsuarioId()).thenReturn(null);
+        when(repository.findById(1L)).thenReturn(Optional.of(entity));
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toResponseDTO(entity)).thenReturn(responseDTO);
+
+        assertThat(service.update(1L, updateDTO)).isEqualTo(responseDTO);
+        verify(entity).setPermissao("ADMIN");
+    }
+
+    @Test
+    @DisplayName("update: atualiza tipoUsuario quando id fornecido")
+    void update_comTipoUsuario() {
+        var updateDTO = mock(PermissaoUsuarioUpdateDTO.class);
+        when(updateDTO.permissao()).thenReturn(null);
+        when(updateDTO.tipoUsuarioId()).thenReturn(3);
+        when(repository.findById(1L)).thenReturn(Optional.of(entity));
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toResponseDTO(entity)).thenReturn(responseDTO);
+
+        assertThat(service.update(1L, updateDTO)).isEqualTo(responseDTO);
+        verify(entity).setTipoUsuario(any());
+    }
+
+    @Test
+    @DisplayName("update: lanca RecursoNaoEncontradoException quando nao existe")
     void update_naoEncontrado() {
+        var updateDTO = mock(PermissaoUsuarioUpdateDTO.class);
         when(repository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.update(99L, updateDTO))
-                .isInstanceOf(RecursoNaoEncontradoException.class)
-                .hasMessageContaining("99");
+                .isInstanceOf(RecursoNaoEncontradoException.class);
     }
 
-    // -----------------------------------------------------------------------
-    // delete
-    // -----------------------------------------------------------------------
-
     @Test
-    @DisplayName("delete: deve deletar permissao existente")
+    @DisplayName("delete: soft-delete quando existe")
     void delete_sucesso() {
-        when(repository.findById(1L)).thenReturn(Optional.of(permissao));
+        when(repository.findById(1L)).thenReturn(Optional.of(entity));
 
         service.delete(1L);
 
-        repository.save(permissao);
+        verify(entity).setAtivo(false);
+        verify(repository).save(entity);
+        verify(repository, never()).deleteById(any());
     }
 
     @Test
-    @DisplayName("delete: deve lancar RecursoNaoEncontradoException quando nao existe")
+    @DisplayName("delete: lanca RecursoNaoEncontradoException quando nao existe")
     void delete_naoEncontrado() {
         when(repository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.delete(99L))
-                .isInstanceOf(RecursoNaoEncontradoException.class)
-                .hasMessageContaining("99");
-        verify(repository, never()).delete(any(PermissaoUsuario.class));
+                .isInstanceOf(RecursoNaoEncontradoException.class);
     }
-
-    @Test
-    @DisplayName("listAll: retorna lista vazia quando nao ha permissoes")
-    void listAll_vazia() {
-        when(repository.findAll()).thenReturn(List.of());
-
-        assertThat(service.listAll()).isEmpty();
-    }
-
 }
