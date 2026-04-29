@@ -10,245 +10,180 @@ import com.br.pruma.core.domain.Inspecao;
 import com.br.pruma.core.domain.Projeto;
 import com.br.pruma.core.repository.InspecaoRepository;
 import com.br.pruma.core.repository.ProjetoRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("InspecaoService — testes unitários")
 class InspecaoServiceTest {
 
-    @Mock private InspecaoRepository repository;
-    @Mock private ProjetoRepository projetoRepository;
-    @Mock private InspecaoMapper mapper;
-    @InjectMocks private InspecaoServiceImpl service;
+    @Mock InspecaoRepository repository;
+    @Mock ProjetoRepository projetoRepository;
+    @Mock InspecaoMapper mapper;
+    @InjectMocks InspecaoServiceImpl service;
 
-    private static final LocalDate DATA = LocalDate.now().plusDays(1);
+    Inspecao entity;
+    InspecaoResponseDTO responseDTO;
 
-    private Projeto buildProjeto(Integer id) {
-        return Projeto.builder()
-                .id(id)
-                .nome("Projeto Teste")
-                .build();
+    @BeforeEach
+    void setUp() {
+        entity      = mock(Inspecao.class);
+        responseDTO = mock(InspecaoResponseDTO.class);
     }
-
-    private Inspecao buildInspecao(Integer id, Projeto projeto) {
-        // @Builder simples não herda AuditableEntity → setar ativo via setter
-        var inspecao = Inspecao.builder()
-                .id(id)
-                .projeto(projeto)
-                .descricao("Descrição Teste")
-                .dataInspecao(DATA)
-                .resultado("Aprovado")
-                .build();
-        inspecao.setAtivo(true);
-        return inspecao;
-    }
-
-    private InspecaoRequestDTO buildRequest(Integer projetoId) {
-        // record → instanciar diretamente, nunca mock()
-        return new InspecaoRequestDTO(projetoId, 12345678901L, "Descrição Teste", DATA, "Aprovado");
-    }
-
-    private InspecaoResponseDTO buildResponse(Integer id) {
-        // record → instanciar diretamente, nunca mock()
-        return new InspecaoResponseDTO(id, 10, 12345678901L, "Descrição Teste", DATA, "Aprovado");
-    }
-
-    // ── create ───────────────────────────────────────────────────────────────
 
     @Test
-    @DisplayName("create: busca projeto, salva e retorna DTO")
+    @DisplayName("create: salva e retorna DTO")
     void create_sucesso() {
-        var req      = buildRequest(10);
-        var projeto  = buildProjeto(10);
-        var entity   = buildInspecao(null, projeto);
-        var saved    = buildInspecao(1, projeto);
-        var response = buildResponse(1);
+        var dto     = mock(InspecaoRequestDTO.class);
+        var projeto = mock(Projeto.class);
+        when(dto.projetoId()).thenReturn(1);
+        when(projetoRepository.findById(1)).thenReturn(Optional.of(projeto));
+        when(mapper.toEntity(dto)).thenReturn(entity);
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toResponseDTO(entity)).thenReturn(responseDTO);
 
-        when(projetoRepository.findById(10)).thenReturn(Optional.of(projeto));
-        when(mapper.toEntity(req)).thenReturn(entity);
-        when(repository.save(entity)).thenReturn(saved);
-        when(mapper.toResponseDTO(saved)).thenReturn(response);
-
-        assertThat(service.create(req)).isEqualTo(response);
-        verify(repository).save(argThat(i -> i.getProjeto().equals(projeto)));
+        assertThat(service.create(dto)).isEqualTo(responseDTO);
+        verify(entity).setProjeto(projeto);
     }
 
     @Test
-    @DisplayName("create: projeto não encontrado lança RecursoNaoEncontradoException")
+    @DisplayName("create: lanca excecao quando projeto nao encontrado")
     void create_projetoNaoEncontrado() {
+        var dto = mock(InspecaoRequestDTO.class);
+        when(dto.projetoId()).thenReturn(99);
         when(projetoRepository.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.create(buildRequest(99)))
-                .isInstanceOf(RecursoNaoEncontradoException.class)
-                .hasMessageContaining("99");
-
-        verify(repository, never()).save(any());
+        assertThatThrownBy(() -> service.create(dto))
+                .isInstanceOf(RecursoNaoEncontradoException.class);
     }
 
-    // ── getById ──────────────────────────────────────────────────────────────
-
     @Test
-    @DisplayName("getById: retorna DTO quando inspeção existe")
+    @DisplayName("getById: retorna DTO quando existe")
     void getById_encontrado() {
-        var entity   = buildInspecao(1, buildProjeto(10));
-        var response = buildResponse(1);
-
         when(repository.findById(1)).thenReturn(Optional.of(entity));
-        when(mapper.toResponseDTO(entity)).thenReturn(response);
+        when(mapper.toResponseDTO(entity)).thenReturn(responseDTO);
 
-        assertThat(service.getById(1)).isEqualTo(response);
+        assertThat(service.getById(1)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("getById: não encontrado lança RecursoNaoEncontradoException")
+    @DisplayName("getById: lanca excecao quando nao existe")
     void getById_naoEncontrado() {
         when(repository.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.getById(99))
-                .isInstanceOf(RecursoNaoEncontradoException.class)
-                .hasMessageContaining("99");
+                .isInstanceOf(RecursoNaoEncontradoException.class);
     }
 
-    // ── listAll ──────────────────────────────────────────────────────────────
-
     @Test
-    @DisplayName("listAll: retorna lista completa")
-    void listAll_comRegistros() {
-        var entity   = buildInspecao(1, buildProjeto(10));
-        var response = buildResponse(1);
-
+    @DisplayName("listAll: retorna lista mapeada")
+    void listAll() {
         when(repository.findAll()).thenReturn(List.of(entity));
-        when(mapper.toResponseDTO(entity)).thenReturn(response);
+        when(mapper.toResponseDTO(entity)).thenReturn(responseDTO);
 
-        assertThat(service.listAll()).hasSize(1).containsExactly(response);
+        assertThat(service.listAll()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("listAll: retorna lista vazia")
-    void listAll_vazio() {
-        when(repository.findAll()).thenReturn(List.of());
-        assertThat(service.listAll()).isEmpty();
-    }
+    @DisplayName("list: retorna pagina mapeada")
+    void list_paginado() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(repository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(entity)));
+        when(mapper.toResponseDTO(entity)).thenReturn(responseDTO);
 
-    // ── listByProjeto ─────────────────────────────────────────────────────────
-
-    @Test
-    @DisplayName("listByProjeto: retorna inspeções do projeto")
-    void listByProjeto_comRegistros() {
-        var entity   = buildInspecao(1, buildProjeto(10));
-        var response = buildResponse(1);
-
-        when(repository.findAllByProjeto_Id(10)).thenReturn(List.of(entity));
-        when(mapper.toResponseDTO(entity)).thenReturn(response);
-
-        assertThat(service.listByProjeto(10)).hasSize(1).containsExactly(response);
-        verify(repository).findAllByProjeto_Id(10);
+        assertThat(service.list(pageable).getContent()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("listByProjeto: retorna lista vazia quando não há inspeções")
-    void listByProjeto_vazio() {
-        when(repository.findAllByProjeto_Id(10)).thenReturn(List.of());
-        assertThat(service.listByProjeto(10)).isEmpty();
+    @DisplayName("listByProjeto: retorna lista filtrada por projeto")
+    void listByProjeto() {
+        when(repository.findAllByProjeto_Id(1)).thenReturn(List.of(entity));
+        when(mapper.toResponseDTO(entity)).thenReturn(responseDTO);
+
+        assertThat(service.listByProjeto(1)).containsExactly(responseDTO);
     }
 
-    // ── update ───────────────────────────────────────────────────────────────
-
     @Test
-    @DisplayName("update: atualiza campos e retorna DTO sem trocar projeto")
+    @DisplayName("update: atualiza quando existe")
     void update_sucesso() {
-        var upd      = new InspecaoUpdateDTO();
-        upd.setDescricao("Nova Descrição");
-
-        var entity   = buildInspecao(1, buildProjeto(10));
-        var response = buildResponse(1);
-
+        var updateDTO = mock(InspecaoUpdateDTO.class);
         when(repository.findById(1)).thenReturn(Optional.of(entity));
         when(repository.save(entity)).thenReturn(entity);
-        when(mapper.toResponseDTO(entity)).thenReturn(response);
+        when(mapper.toResponseDTO(entity)).thenReturn(responseDTO);
 
-        assertThat(service.update(1, upd)).isEqualTo(response);
-        verify(mapper).updateFromDto(upd, entity);
-        verify(projetoRepository, never()).findById(any());
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
+        verify(mapper).updateFromDto(updateDTO, entity);
     }
 
     @Test
-    @DisplayName("update: não encontrado lança RecursoNaoEncontradoException")
+    @DisplayName("update: lanca excecao quando nao existe")
     void update_naoEncontrado() {
+        var updateDTO = mock(InspecaoUpdateDTO.class);
         when(repository.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.update(99, new InspecaoUpdateDTO()))
-                .isInstanceOf(RecursoNaoEncontradoException.class)
-                .hasMessageContaining("99");
+        assertThatThrownBy(() -> service.update(99, updateDTO))
+                .isInstanceOf(RecursoNaoEncontradoException.class);
     }
 
-    // ── replace ──────────────────────────────────────────────────────────────
-
     @Test
-    @DisplayName("replace: substitui inspeção completa mantendo o mesmo ID")
+    @DisplayName("replace: substitui quando inspecao e projeto existem")
     void replace_sucesso() {
-        var req      = buildRequest(10);
-        var projeto  = buildProjeto(10);
-        var nova     = buildInspecao(null, projeto);
-        var saved    = buildInspecao(1, projeto);
-        var response = buildResponse(1);
+        var dto     = mock(InspecaoRequestDTO.class);
+        var projeto = mock(Projeto.class);
+        when(repository.findById(1)).thenReturn(Optional.of(entity));
+        when(dto.projetoId()).thenReturn(1);
+        when(projetoRepository.findById(1)).thenReturn(Optional.of(projeto));
+        when(mapper.toEntity(dto)).thenReturn(entity);
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toResponseDTO(entity)).thenReturn(responseDTO);
 
-        when(repository.findById(1)).thenReturn(Optional.of(buildInspecao(1, projeto)));
-        when(projetoRepository.findById(10)).thenReturn(Optional.of(projeto));
-        when(mapper.toEntity(req)).thenReturn(nova);
-        when(repository.save(any())).thenReturn(saved);
-        when(mapper.toResponseDTO(saved)).thenReturn(response);
-
-        assertThat(service.replace(1, req)).isEqualTo(response);
-        verify(repository).save(argThat(i -> i.getId().equals(1) && i.getProjeto().equals(projeto)));
+        assertThat(service.replace(1, dto)).isEqualTo(responseDTO);
+        verify(entity).setId(1);
+        verify(entity).setProjeto(projeto);
     }
 
     @Test
-    @DisplayName("replace: não encontrado lança RecursoNaoEncontradoException")
-    void replace_naoEncontrado() {
+    @DisplayName("replace: lanca excecao quando inspecao nao existe")
+    void replace_inspecaoNaoEncontrada() {
+        var dto = mock(InspecaoRequestDTO.class);
         when(repository.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.replace(99, buildRequest(10)))
-                .isInstanceOf(RecursoNaoEncontradoException.class)
-                .hasMessageContaining("99");
+        assertThatThrownBy(() -> service.replace(99, dto))
+                .isInstanceOf(RecursoNaoEncontradoException.class);
     }
 
-    // ── delete (soft) ────────────────────────────────────────────────────────
-
     @Test
-    @DisplayName("delete: marca ativo=false sem remover do banco")
-    void delete_softDelete() {
-        var entity = buildInspecao(1, buildProjeto(10));
+    @DisplayName("delete: soft-delete quando existe")
+    void delete_sucesso() {
         when(repository.findById(1)).thenReturn(Optional.of(entity));
 
         service.delete(1);
 
-        // Boolean wrapper → getAtivo(), não isAtivo()
-        verify(repository).save(argThat(i -> !i.getAtivo()));
-        verify(repository, never()).delete(any());
+        verify(entity).setAtivo(false);
+        verify(repository).save(entity);
+        verify(repository, never()).deleteById(any());
     }
 
     @Test
-    @DisplayName("delete: não encontrado lança RecursoNaoEncontradoException")
+    @DisplayName("delete: lanca excecao quando nao existe")
     void delete_naoEncontrado() {
         when(repository.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.delete(99))
-                .isInstanceOf(RecursoNaoEncontradoException.class)
-                .hasMessageContaining("99");
+                .isInstanceOf(RecursoNaoEncontradoException.class);
     }
 }

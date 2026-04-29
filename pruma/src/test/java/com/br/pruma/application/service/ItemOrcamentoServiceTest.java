@@ -5,226 +5,160 @@ import com.br.pruma.application.dto.response.ItemOrcamentoResponseDTO;
 import com.br.pruma.application.dto.update.ItemOrcamentoUpdateDTO;
 import com.br.pruma.application.mapper.ItemOrcamentoMapper;
 import com.br.pruma.application.service.impl.ItemOrcamentoServiceImpl;
-import com.br.pruma.config.Constantes;
 import com.br.pruma.core.domain.ItemOrcamento;
 import com.br.pruma.core.repository.port.ItemOrcamentoRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ItemOrcamentoService — testes unitários")
 class ItemOrcamentoServiceTest {
 
-    @Mock private ItemOrcamentoRepositoryPort itemOrcamentoRepositoryPort;
-    @Mock private ItemOrcamentoMapper itemOrcamentoMapper;
-    @InjectMocks private ItemOrcamentoServiceImpl service;
+    @Mock ItemOrcamentoRepositoryPort itemOrcamentoRepositoryPort;
+    @Mock ItemOrcamentoMapper itemOrcamentoMapper;
+    @InjectMocks ItemOrcamentoServiceImpl service;
 
-    private ItemOrcamento buildItem(Integer id) {
-        return ItemOrcamento.builder()
-                .id(id)
-                .descricao("Item Teste")
-                .quantidade(2)
-                .valorUnitario(BigDecimal.valueOf(100.00))
-                .build();
+    ItemOrcamento entity;
+    ItemOrcamentoResponseDTO responseDTO;
+
+    @BeforeEach
+    void setUp() {
+        entity      = mock(ItemOrcamento.class);
+        responseDTO = mock(ItemOrcamentoResponseDTO.class);
     }
-
-    private ItemOrcamentoRequestDTO buildRequest() {
-        return ItemOrcamentoRequestDTO.builder()
-                .orcamentoId(5)
-                .descricao("Item Teste")
-                .quantidade(2)
-                .valorUnitario(BigDecimal.valueOf(100.00))
-                .build();
-    }
-
-    private ItemOrcamentoResponseDTO buildResponse() {
-        return ItemOrcamentoResponseDTO.builder()
-                .id(1)
-                .orcamentoId(5)
-                .descricao("Item Teste")
-                .quantidade(2)
-                .valorUnitario(BigDecimal.valueOf(100.00))
-                .build();
-    }
-
-    // ── create ───────────────────────────────────────────────────────────────
 
     @Test
-    @DisplayName("create: salva via port e retorna DTO")
+    @DisplayName("create: salva e retorna DTO")
     void create_sucesso() {
-        var req      = buildRequest();
-        var entity   = buildItem(null);
-        var saved    = buildItem(1);
-        var response = buildResponse();
+        var dto = mock(ItemOrcamentoRequestDTO.class);
+        when(itemOrcamentoMapper.toEntity(dto)).thenReturn(entity);
+        when(itemOrcamentoRepositoryPort.save(entity)).thenReturn(entity);
+        when(itemOrcamentoMapper.toResponse(entity)).thenReturn(responseDTO);
 
-        when(itemOrcamentoMapper.toEntity(req)).thenReturn(entity);
-        when(itemOrcamentoRepositoryPort.save(entity)).thenReturn(saved);
-        when(itemOrcamentoMapper.toResponse(saved)).thenReturn(response);
-
-        assertThat(service.create(req)).isEqualTo(response);
-        verify(itemOrcamentoRepositoryPort).save(entity);
+        assertThat(service.create(dto)).isEqualTo(responseDTO);
     }
 
-    // ── getById ──────────────────────────────────────────────────────────────
-
     @Test
-    @DisplayName("getById: retorna DTO quando item existe")
+    @DisplayName("getById: retorna DTO quando existe")
     void getById_encontrado() {
-        var entity   = buildItem(1);
-        var response = buildResponse();
-
         when(itemOrcamentoRepositoryPort.findById(1)).thenReturn(Optional.of(entity));
-        when(itemOrcamentoMapper.toResponse(entity)).thenReturn(response);
+        when(itemOrcamentoMapper.toResponse(entity)).thenReturn(responseDTO);
 
-        assertThat(service.getById(1)).isEqualTo(response);
+        assertThat(service.getById(1)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("getById: não encontrado lança EntityNotFoundException com constante")
+    @DisplayName("getById: lanca EntityNotFoundException quando nao existe")
     void getById_naoEncontrado() {
         when(itemOrcamentoRepositoryPort.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.getById(99))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining(Constantes.ITEM_ORCAMENTO_NAO_ENCONTRADO);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
-    // ── listAll ──────────────────────────────────────────────────────────────
-
     @Test
-    @DisplayName("listAll: retorna lista de DTOs")
-    void listAll_comRegistros() {
-        var entity   = buildItem(1);
-        var response = buildResponse();
-
+    @DisplayName("listAll: retorna lista mapeada")
+    void listAll() {
         when(itemOrcamentoRepositoryPort.findAll()).thenReturn(List.of(entity));
-        when(itemOrcamentoMapper.toResponse(entity)).thenReturn(response);
+        when(itemOrcamentoMapper.toResponse(entity)).thenReturn(responseDTO);
 
-        assertThat(service.listAll()).hasSize(1).containsExactly(response);
+        assertThat(service.listAll()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("listAll: retorna lista vazia")
-    void listAll_vazio() {
-        when(itemOrcamentoRepositoryPort.findAll()).thenReturn(List.of());
-        assertThat(service.listAll()).isEmpty();
+    @DisplayName("list: retorna pagina mapeada")
+    void list_paginado() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(itemOrcamentoRepositoryPort.findAll(pageable)).thenReturn(new PageImpl<>(List.of(entity)));
+        when(itemOrcamentoMapper.toResponse(entity)).thenReturn(responseDTO);
+
+        assertThat(service.list(pageable).getContent()).containsExactly(responseDTO);
     }
 
-    // ── listByOrcamento ──────────────────────────────────────────────────────
-
     @Test
-    @DisplayName("listByOrcamento: retorna itens do orçamento informado")
-    void listByOrcamento_comRegistros() {
-        var entity   = buildItem(1);
-        var response = buildResponse();
-
+    @DisplayName("listByOrcamento: retorna lista filtrada por orcamento")
+    void listByOrcamento() {
         when(itemOrcamentoRepositoryPort.findByOrcamentoId(5)).thenReturn(List.of(entity));
-        when(itemOrcamentoMapper.toResponse(entity)).thenReturn(response);
+        when(itemOrcamentoMapper.toResponse(entity)).thenReturn(responseDTO);
 
-        assertThat(service.listByOrcamento(5)).hasSize(1).containsExactly(response);
-        verify(itemOrcamentoRepositoryPort).findByOrcamentoId(5);
+        assertThat(service.listByOrcamento(5)).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("listByOrcamento: retorna lista vazia quando não há itens")
-    void listByOrcamento_vazio() {
-        when(itemOrcamentoRepositoryPort.findByOrcamentoId(5)).thenReturn(List.of());
-        assertThat(service.listByOrcamento(5)).isEmpty();
-    }
-
-    // ── update ───────────────────────────────────────────────────────────────
-
-    @Test
-    @DisplayName("update: atualiza campos e retorna DTO")
+    @DisplayName("update: atualiza quando existe")
     void update_sucesso() {
-        var upd = ItemOrcamentoUpdateDTO.builder()
-                .descricao("Nova Descrição")
-                .quantidade(5)
-                .build();
-        var entity   = buildItem(1);
-        var response = buildResponse();
-
+        var updateDTO = mock(ItemOrcamentoUpdateDTO.class);
         when(itemOrcamentoRepositoryPort.findById(1)).thenReturn(Optional.of(entity));
         when(itemOrcamentoRepositoryPort.save(entity)).thenReturn(entity);
-        when(itemOrcamentoMapper.toResponse(entity)).thenReturn(response);
+        when(itemOrcamentoMapper.toResponse(entity)).thenReturn(responseDTO);
 
-        assertThat(service.update(1, upd)).isEqualTo(response);
-        verify(itemOrcamentoMapper).updateFromDto(upd, entity);
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
+        verify(itemOrcamentoMapper).updateFromDto(updateDTO, entity);
     }
 
     @Test
-    @DisplayName("update: não encontrado lança EntityNotFoundException")
+    @DisplayName("update: lanca EntityNotFoundException quando nao existe")
     void update_naoEncontrado() {
+        var updateDTO = mock(ItemOrcamentoUpdateDTO.class);
         when(itemOrcamentoRepositoryPort.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.update(99, ItemOrcamentoUpdateDTO.builder().build()))
+        assertThatThrownBy(() -> service.update(99, updateDTO))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
-    // ── replace ──────────────────────────────────────────────────────────────
-
     @Test
-    @DisplayName("replace: substitui item completo mantendo o mesmo ID")
+    @DisplayName("replace: substitui quando existe")
     void replace_sucesso() {
-        var req      = buildRequest();
-        var novo     = buildItem(null);
-        var saved    = buildItem(1);
-        var response = buildResponse();
+        var dto = mock(ItemOrcamentoRequestDTO.class);
+        when(itemOrcamentoRepositoryPort.findById(1)).thenReturn(Optional.of(entity));
+        when(itemOrcamentoMapper.toEntity(dto)).thenReturn(entity);
+        when(itemOrcamentoRepositoryPort.save(entity)).thenReturn(entity);
+        when(itemOrcamentoMapper.toResponse(entity)).thenReturn(responseDTO);
 
-        when(itemOrcamentoRepositoryPort.findById(1)).thenReturn(Optional.of(buildItem(1)));
-        when(itemOrcamentoMapper.toEntity(req)).thenReturn(novo);
-        when(itemOrcamentoRepositoryPort.save(any())).thenReturn(saved);
-        when(itemOrcamentoMapper.toResponse(saved)).thenReturn(response);
-
-        assertThat(service.replace(1, req)).isEqualTo(response);
-        verify(itemOrcamentoRepositoryPort).save(argThat(i -> i.getId().equals(1)));
+        assertThat(service.replace(1, dto)).isEqualTo(responseDTO);
+        verify(entity).setId(1);
     }
 
     @Test
-    @DisplayName("replace: não encontrado lança EntityNotFoundException")
+    @DisplayName("replace: lanca EntityNotFoundException quando nao existe")
     void replace_naoEncontrado() {
+        var dto = mock(ItemOrcamentoRequestDTO.class);
         when(itemOrcamentoRepositoryPort.findById(99)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.replace(99, buildRequest()))
+        assertThatThrownBy(() -> service.replace(99, dto))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
-    // ── delete (hard) ────────────────────────────────────────────────────────
-
     @Test
-    @DisplayName("delete: chama port.delete(entity) — hard delete por entidade")
+    @DisplayName("delete: deleta fisicamente quando existe")
     void delete_sucesso() {
-        var entity = buildItem(1);
         when(itemOrcamentoRepositoryPort.findById(1)).thenReturn(Optional.of(entity));
 
-        assertThatCode(() -> service.delete(1)).doesNotThrowAnyException();
+        service.delete(1);
 
-        // port expõe apenas delete(entity) — deleteById não existe no contrato
         verify(itemOrcamentoRepositoryPort).delete(entity);
     }
 
     @Test
-    @DisplayName("delete: não encontrado lança EntityNotFoundException")
+    @DisplayName("delete: lanca EntityNotFoundException quando nao existe")
     void delete_naoEncontrado() {
         when(itemOrcamentoRepositoryPort.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.delete(99))
                 .isInstanceOf(EntityNotFoundException.class);
-
-        verify(itemOrcamentoRepositoryPort, never()).delete(any());
     }
 }

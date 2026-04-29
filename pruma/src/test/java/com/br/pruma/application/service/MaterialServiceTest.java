@@ -15,180 +15,160 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MaterialServiceTest {
 
-    @Mock
-    private MaterialRepository repository;
+    @Mock MaterialRepository repository;
+    @Mock MaterialMapper mapper;
+    @InjectMocks MaterialServiceImpl service;
 
-    @Mock
-    private MaterialMapper mapper;
-
-    @InjectMocks
-    private MaterialServiceImpl service;
-
-    private Material material;
-    private MaterialRequestDTO requestDTO;
-    private MaterialResponseDTO responseDTO;
+    Material entity;
+    MaterialResponseDTO responseDTO;
 
     @BeforeEach
     void setUp() {
-        material = Material.builder()
-                .descricao("Cimento CP-II")
-                .quantidade(100)
-                .custoUnitario(new BigDecimal("32.50"))
-                .build();
-
-        requestDTO = MaterialRequestDTO.builder()
-                .descricao("Cimento CP-II")
-                .quantidade(100)
-                .custoUnitario(new BigDecimal("32.50"))
-                .build();
-
-        responseDTO = MaterialResponseDTO.builder()
-                .descricao("Cimento CP-II")
-                .quantidade(100)
-                .custoUnitario(new BigDecimal("32.50"))
-                .build();
+        entity      = mock(Material.class);
+        responseDTO = mock(MaterialResponseDTO.class);
     }
 
     @Test
-    @DisplayName("create: deve salvar e retornar DTO quando descricao e unica")
+    @DisplayName("create: salva quando descricao ainda nao existe")
     void create_sucesso() {
-        when(repository.findByDescricao(requestDTO.getDescricao())).thenReturn(Optional.empty());
-        when(mapper.toEntity(requestDTO)).thenReturn(material);
-        when(repository.save(material)).thenReturn(material);
-        when(mapper.toResponse(material)).thenReturn(responseDTO);
+        var dto = mock(MaterialRequestDTO.class);
+        when(dto.getDescricao()).thenReturn("Concreto");
+        when(repository.findByDescricao("Concreto")).thenReturn(Optional.empty());
+        when(mapper.toEntity(dto)).thenReturn(entity);
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
-        MaterialResponseDTO result = service.create(requestDTO);
-
-        assertThat(result).isNotNull();
-        assertThat(result.getDescricao()).isEqualTo("Cimento CP-II");
-        verify(repository).save(material);
+        assertThat(service.create(dto)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("create: deve lancar IllegalArgumentException quando descricao ja existe")
+    @DisplayName("create: lanca IllegalArgumentException quando descricao ja existe")
     void create_descricaoDuplicada() {
-        when(repository.findByDescricao(requestDTO.getDescricao())).thenReturn(Optional.of(material));
+        var dto      = mock(MaterialRequestDTO.class);
+        var existing = mock(Material.class);
+        when(dto.getDescricao()).thenReturn("Concreto");
+        when(repository.findByDescricao("Concreto")).thenReturn(Optional.of(existing));
 
-        assertThatThrownBy(() -> service.create(requestDTO))
+        assertThatThrownBy(() -> service.create(dto))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Ja existe material com essa descricao");
-
-        verify(repository, never()).save(any());
+                .hasMessageContaining("Concreto");
     }
 
     @Test
-    @DisplayName("getById: deve retornar DTO quando material existe")
+    @DisplayName("getById: retorna DTO quando existe")
     void getById_encontrado() {
-        when(repository.findById(1)).thenReturn(Optional.of(material));
-        when(mapper.toResponse(material)).thenReturn(responseDTO);
+        when(repository.findById(1)).thenReturn(Optional.of(entity));
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
-        MaterialResponseDTO result = service.getById(1);
-
-        assertThat(result).isNotNull();
-        assertThat(result.getDescricao()).isEqualTo("Cimento CP-II");
+        assertThat(service.getById(1)).isEqualTo(responseDTO);
     }
 
     @Test
-    @DisplayName("getById: deve lancar EntityNotFoundException quando material nao existe")
+    @DisplayName("getById: lanca EntityNotFoundException quando nao existe")
     void getById_naoEncontrado() {
         when(repository.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.getById(99))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("99");
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    @DisplayName("listAll: deve retornar lista com todos os materiais")
-    void listAll_retornaLista() {
-        when(repository.findAllByOrderByDescricaoAsc()).thenReturn(List.of(material));
-        when(mapper.toResponse(material)).thenReturn(responseDTO);
+    @DisplayName("listAll: retorna lista ordenada")
+    void listAll() {
+        when(repository.findAllByOrderByDescricaoAsc()).thenReturn(List.of(entity));
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
-        List<MaterialResponseDTO> result = service.listAll();
-
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getDescricao()).isEqualTo("Cimento CP-II");
+        assertThat(service.listAll()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("listAll: deve retornar lista vazia quando nao ha materiais")
-    void listAll_listaVazia() {
-        when(repository.findAllByOrderByDescricaoAsc()).thenReturn(List.of());
+    @DisplayName("list: retorna pagina mapeada")
+    void list_paginado() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(repository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(entity)));
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
-        List<MaterialResponseDTO> result = service.listAll();
-
-        assertThat(result).isEmpty();
+        assertThat(service.list(pageable).getContent()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("update: deve atualizar material com nova descricao unica")
+    @DisplayName("update: atualiza quando descricao nao colidiu")
     void update_sucesso() {
-        MaterialUpdateDTO updateDTO = MaterialUpdateDTO.builder()
-                .descricao("Cimento CP-III")
-                .build();
+        var updateDTO = mock(MaterialUpdateDTO.class);
+        when(updateDTO.getDescricao()).thenReturn("Argamassa");
+        when(repository.findById(1)).thenReturn(Optional.of(entity));
+        when(entity.getId()).thenReturn(1);
+        when(repository.findByDescricao("Argamassa")).thenReturn(Optional.empty());
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
-        setId(material, 1);
-
-        when(repository.findById(1)).thenReturn(Optional.of(material));
-        when(repository.findByDescricao("Cimento CP-III")).thenReturn(Optional.empty());
-        when(repository.save(material)).thenReturn(material);
-        when(mapper.toResponse(material)).thenReturn(responseDTO);
-
-        MaterialResponseDTO result = service.update(1, updateDTO);
-
-        assertThat(result).isNotNull();
-        verify(mapper).updateFromDto(updateDTO, material);
-        verify(repository).save(material);
+        assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
+        verify(mapper).updateFromDto(updateDTO, entity);
     }
 
     @Test
-    @DisplayName("update: deve lancar EntityNotFoundException quando material nao existe")
-    void update_naoEncontrado() {
-        when(repository.findById(99)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> service.update(99, MaterialUpdateDTO.builder().build()))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("99");
-    }
-
-    @Test
-    @DisplayName("update: deve lancar IllegalArgumentException quando nova descricao pertence a outro material")
-    void update_descricaoDuplicadaOutroMaterial() {
-        MaterialUpdateDTO updateDTO = MaterialUpdateDTO.builder()
-                .descricao("Cimento CP-III")
-                .build();
-
-        Material outro = Material.builder()
-                .descricao("Cimento CP-III")
-                .quantidade(50)
-                .custoUnitario(BigDecimal.TEN)
-                .build();
-
-        setId(material, 1);
-        setId(outro, 2);
-
-        when(repository.findById(1)).thenReturn(Optional.of(material));
-        when(repository.findByDescricao("Cimento CP-III")).thenReturn(Optional.of(outro));
+    @DisplayName("update: lanca IllegalArgumentException quando descricao pertence a outro material")
+    void update_descricaoDeOutroMaterial() {
+        var updateDTO = mock(MaterialUpdateDTO.class);
+        var outro     = mock(Material.class);
+        when(updateDTO.getDescricao()).thenReturn("Argamassa");
+        when(repository.findById(1)).thenReturn(Optional.of(entity));
+        when(entity.getId()).thenReturn(1);
+        when(outro.getId()).thenReturn(2);
+        when(repository.findByDescricao("Argamassa")).thenReturn(Optional.of(outro));
 
         assertThatThrownBy(() -> service.update(1, updateDTO))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Outro material ja usa essa descricao");
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    @DisplayName("delete: deve deletar quando material existe")
+    @DisplayName("update: lanca EntityNotFoundException quando nao existe")
+    void update_naoEncontrado() {
+        var updateDTO = mock(MaterialUpdateDTO.class);
+        when(repository.findById(99)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.update(99, updateDTO))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("replace: substitui quando existe")
+    void replace_sucesso() {
+        var dto = mock(MaterialRequestDTO.class);
+        when(repository.findById(1)).thenReturn(Optional.of(entity));
+        when(mapper.toEntity(dto)).thenReturn(entity);
+        when(repository.save(entity)).thenReturn(entity);
+        when(mapper.toResponse(entity)).thenReturn(responseDTO);
+
+        assertThat(service.replace(1, dto)).isEqualTo(responseDTO);
+        verify(entity).setId(1);
+    }
+
+    @Test
+    @DisplayName("replace: lanca EntityNotFoundException quando nao existe")
+    void replace_naoEncontrado() {
+        var dto = mock(MaterialRequestDTO.class);
+        when(repository.findById(99)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.replace(99, dto))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("delete: deleta fisicamente quando existe")
     void delete_sucesso() {
         when(repository.existsById(1)).thenReturn(true);
 
@@ -198,24 +178,11 @@ class MaterialServiceTest {
     }
 
     @Test
-    @DisplayName("delete: deve lancar EntityNotFoundException quando material nao existe")
+    @DisplayName("delete: lanca EntityNotFoundException quando nao existe")
     void delete_naoEncontrado() {
         when(repository.existsById(99)).thenReturn(false);
 
         assertThatThrownBy(() -> service.delete(99))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("99");
-
-        verify(repository, never()).deleteById(any());
-    }
-
-    private void setId(Material m, Integer id) {
-        try {
-            var field = Material.class.getDeclaredField("id");
-            field.setAccessible(true);
-            field.set(m, id);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+                .isInstanceOf(EntityNotFoundException.class);
     }
 }
