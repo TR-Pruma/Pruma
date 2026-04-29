@@ -1,12 +1,12 @@
 package com.br.pruma.application.service;
 
-import com.br.pruma.application.dto.request.ProjetoRequestDTO;
-import com.br.pruma.application.dto.response.ProjetoResponseDTO;
-import com.br.pruma.application.dto.update.ProjetoUpdateDTO;
-import com.br.pruma.application.mapper.ProjetoMapper;
-import com.br.pruma.application.service.impl.ProjetoServiceImpl;
-import com.br.pruma.core.domain.Projeto;
-import com.br.pruma.core.repository.ProjetoRepository;
+import com.br.pruma.application.dto.request.ProjetoCategoriaRequestDTO;
+import com.br.pruma.application.dto.response.ProjetoCategoriaResponseDTO;
+import com.br.pruma.application.dto.update.ProjetoCategoriaUpdateDTO;
+import com.br.pruma.application.mapper.ProjetoCategoriaMapper;
+import com.br.pruma.application.service.impl.ProjetoCategoriaServiceImpl;
+import com.br.pruma.core.domain.ProjetoCategoria;
+import com.br.pruma.core.repository.ProjetoCategoriaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,28 +27,28 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ProjetoServiceTest {
+class ProjetoCategoriaServiceTest {
 
-    @Mock ProjetoRepository repository;
-    @Mock ProjetoMapper mapper;
-    @InjectMocks ProjetoServiceImpl service;
+    @Mock ProjetoCategoriaRepository repository;
+    @Mock ProjetoCategoriaMapper mapper;
+    @InjectMocks ProjetoCategoriaServiceImpl service;
 
-    Projeto entity;
-    ProjetoResponseDTO responseDTO;
+    ProjetoCategoria entity;
+    ProjetoCategoriaResponseDTO responseDTO;
 
     @BeforeEach
     void setUp() {
-        entity      = mock(Projeto.class);
-        responseDTO = mock(ProjetoResponseDTO.class);
+        entity      = mock(ProjetoCategoria.class);
+        responseDTO = mock(ProjetoCategoriaResponseDTO.class);
     }
 
     @Test
     @DisplayName("create: salva e retorna DTO")
     void create_sucesso() {
-        var dto = mock(ProjetoRequestDTO.class);
+        var dto = mock(ProjetoCategoriaRequestDTO.class);
         when(mapper.toEntity(dto)).thenReturn(entity);
         when(repository.save(entity)).thenReturn(entity);
-        when(mapper.toResponse(entity)).thenReturn(responseDTO);
+        when(mapper.toDTO(entity)).thenReturn(responseDTO);
 
         assertThat(service.create(dto)).isEqualTo(responseDTO);
     }
@@ -57,7 +57,7 @@ class ProjetoServiceTest {
     @DisplayName("getById: retorna DTO quando existe")
     void getById_encontrado() {
         when(repository.findById(1)).thenReturn(Optional.of(entity));
-        when(mapper.toResponse(entity)).thenReturn(responseDTO);
+        when(mapper.toDTO(entity)).thenReturn(responseDTO);
 
         assertThat(service.getById(1)).isEqualTo(responseDTO);
     }
@@ -72,10 +72,10 @@ class ProjetoServiceTest {
     }
 
     @Test
-    @DisplayName("listAll: retorna lista mapeada")
+    @DisplayName("listAll: retorna lista mapeada via toDTOList")
     void listAll() {
         when(repository.findAll()).thenReturn(List.of(entity));
-        when(mapper.toResponse(entity)).thenReturn(responseDTO);
+        when(mapper.toDTOList(List.of(entity))).thenReturn(List.of(responseDTO));
 
         assertThat(service.listAll()).containsExactly(responseDTO);
     }
@@ -85,27 +85,24 @@ class ProjetoServiceTest {
     void list_paginado() {
         Pageable pageable = PageRequest.of(0, 10);
         when(repository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(entity)));
-        when(mapper.toResponse(entity)).thenReturn(responseDTO);
+        when(mapper.toDTO(entity)).thenReturn(responseDTO);
 
         assertThat(service.list(pageable).getContent()).containsExactly(responseDTO);
     }
 
     @Test
-    @DisplayName("listByNome: retorna lista filtrada por nome")
-    void listByNome() {
-        when(repository.findAllByNomeContainingIgnoreCase("Reforma")).thenReturn(List.of(entity));
-        when(mapper.toResponse(entity)).thenReturn(responseDTO);
-
-        assertThat(service.listByNome("Reforma")).containsExactly(responseDTO);
+    @DisplayName("listByProjeto: retorna lista vazia (nao implementado)")
+    void listByProjeto_vazia() {
+        assertThat(service.listByProjeto(1)).isEmpty();
     }
 
     @Test
     @DisplayName("update: atualiza quando existe")
     void update_sucesso() {
-        var updateDTO = mock(ProjetoUpdateDTO.class);
+        var updateDTO = mock(ProjetoCategoriaUpdateDTO.class);
         when(repository.findById(1)).thenReturn(Optional.of(entity));
         when(repository.save(entity)).thenReturn(entity);
-        when(mapper.toResponse(entity)).thenReturn(responseDTO);
+        when(mapper.toDTO(entity)).thenReturn(responseDTO);
 
         assertThat(service.update(1, updateDTO)).isEqualTo(responseDTO);
         verify(mapper).updateFromDto(updateDTO, entity);
@@ -114,33 +111,10 @@ class ProjetoServiceTest {
     @Test
     @DisplayName("update: lanca EntityNotFoundException quando nao existe")
     void update_naoEncontrado() {
-        var updateDTO = mock(ProjetoUpdateDTO.class);
+        var updateDTO = mock(ProjetoCategoriaUpdateDTO.class);
         when(repository.findById(99)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.update(99, updateDTO))
-                .isInstanceOf(EntityNotFoundException.class);
-    }
-
-    @Test
-    @DisplayName("replace: substitui quando existe")
-    void replace_sucesso() {
-        var dto = mock(ProjetoRequestDTO.class);
-        when(repository.findById(1)).thenReturn(Optional.of(entity));
-        when(mapper.toEntity(dto)).thenReturn(entity);
-        when(repository.save(entity)).thenReturn(entity);
-        when(mapper.toResponse(entity)).thenReturn(responseDTO);
-
-        assertThat(service.replace(1, dto)).isEqualTo(responseDTO);
-        verify(entity).setId(1);
-    }
-
-    @Test
-    @DisplayName("replace: lanca EntityNotFoundException quando nao existe")
-    void replace_naoEncontrado() {
-        var dto = mock(ProjetoRequestDTO.class);
-        when(repository.findById(99)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> service.replace(99, dto))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
