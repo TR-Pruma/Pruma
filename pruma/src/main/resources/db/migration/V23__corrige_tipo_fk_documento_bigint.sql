@@ -1,24 +1,34 @@
--- V23: Converte colunas documento_id de INT para BIGINT
--- A entidade Documento tem @Id Long, mas V1 criou as FKs como INT.
--- Hibernate validate falha com:
---   wrong column type [documento_id] in table [assinatura_digital]:
---   found [int], expecting [bigint]
---
--- FK_CHECKS off para permitir ALTER sem violar constraints temporariamente.
+-- V23: Converte documento_id de INT para BIGINT
+-- Entidade Documento tem @Id Long, mas V1 criou o PK como INT.
+-- MySQL exige que FK e PK referenciado sejam do mesmo tipo (erro 3780).
+-- Ordem: 1) muda PK documento  2) muda FK columns  3) recria constraints
 
 SET FOREIGN_KEY_CHECKS = 0;
 
--- assinatura_digital: remove FK, altera tipo, recria FK
+-- 1. Muda o PK de documento para BIGINT
+--    (entidade Documento usa @Id Long)
+ALTER TABLE documento
+    MODIFY COLUMN documento_id BIGINT NOT NULL AUTO_INCREMENT;
+
+-- 2. assinatura_digital: drop FK, muda coluna para BIGINT, recria FK
 ALTER TABLE assinatura_digital
-    DROP FOREIGN KEY fk_assin_documento,
-    MODIFY COLUMN documento_id BIGINT NULL,
+    DROP FOREIGN KEY fk_assin_documento;
+
+ALTER TABLE assinatura_digital
+    MODIFY COLUMN documento_id BIGINT NULL;
+
+ALTER TABLE assinatura_digital
     ADD CONSTRAINT fk_assin_documento
         FOREIGN KEY (documento_id) REFERENCES documento (documento_id);
 
--- anexo: remove FK, altera tipo, recria FK
+-- 3. anexo: drop FK, muda coluna para BIGINT, recria FK
 ALTER TABLE anexo
-    DROP FOREIGN KEY fk_anexo_documento,
-    MODIFY COLUMN documento_id BIGINT NULL,
+    DROP FOREIGN KEY fk_anexo_documento;
+
+ALTER TABLE anexo
+    MODIFY COLUMN documento_id BIGINT NULL;
+
+ALTER TABLE anexo
     ADD CONSTRAINT fk_anexo_documento
         FOREIGN KEY (documento_id) REFERENCES documento (documento_id);
 
