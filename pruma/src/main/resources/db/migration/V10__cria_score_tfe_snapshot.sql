@@ -18,8 +18,8 @@ CREATE TABLE score_tfe (
     ativo                TINYINT(1)      NOT NULL DEFAULT 1,
     version              BIGINT          NOT NULL DEFAULT 0,
     PRIMARY KEY (score_tfe_id),
-    CONSTRAINT uq_score_tfe_profissional UNIQUE (profissional_id),
-    CONSTRAINT fk_score_tfe_profissional FOREIGN KEY (profissional_id)
+    CONSTRAINT uq_score_tfe_profissional  UNIQUE (profissional_id),
+    CONSTRAINT fk_score_tfe_snap_profissional FOREIGN KEY (profissional_id)
         REFERENCES profissional_de_base (profissional_id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
     INDEX idx_score_tfe_profissional (profissional_id),
