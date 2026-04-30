@@ -105,13 +105,12 @@ class MaterialServiceTest {
     }
 
     @Test
-    @DisplayName("update: atualiza quando descricao nao colidiu")
+    @DisplayName("update: atualiza quando existe")
     void update_sucesso() {
         var updateDTO = mock(MaterialUpdateDTO.class);
         when(updateDTO.getDescricao()).thenReturn("Argamassa");
         when(repository.findById(1)).thenReturn(Optional.of(entity));
         when(entity.getId()).thenReturn(1);
-        when(repository.findByDescricao("Argamassa")).thenReturn(Optional.empty());
         when(repository.save(entity)).thenReturn(entity);
         when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
