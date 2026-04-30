@@ -14,20 +14,13 @@ import java.util.List;
 public interface TarefaMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "atividade", source = "atividadeId", qualifiedByName = "atividadeIdToAtividade")
     @Mapping(target = "status", source = "status", qualifiedByName = "stringToStatus")
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "version", ignore = true)
+
     Tarefa toEntity(TarefaRequestDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "atividade", source = "atividadeId", qualifiedByName = "atividadeIdToAtividade")
     @Mapping(target = "status", source = "status", qualifiedByName = "stringToStatus")
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "version", ignore = true)
     void updateFromDto(TarefaUpdateDTO dto, @MappingTarget Tarefa entity);
 
     @Mapping(target = "id", source = "id")
@@ -43,7 +36,7 @@ public interface TarefaMapper {
     @Named("atividadeIdToAtividade")
     default Atividade atividadeIdToAtividade(Integer atividadeId) {
         if (atividadeId == null) return null;
-        return Atividade.ofId(atividadeId);
+        return Atividade.builder().id(atividadeId).build();
     }
 
     @Named("stringToStatus")
