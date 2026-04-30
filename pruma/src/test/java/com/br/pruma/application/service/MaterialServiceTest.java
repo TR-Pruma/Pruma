@@ -110,7 +110,6 @@ class MaterialServiceTest {
         var updateDTO = mock(MaterialUpdateDTO.class);
         when(updateDTO.getDescricao()).thenReturn("Argamassa");
         when(repository.findById(1)).thenReturn(Optional.of(entity));
-        when(entity.getId()).thenReturn(1);
         when(repository.save(entity)).thenReturn(entity);
         when(mapper.toResponse(entity)).thenReturn(responseDTO);
 
