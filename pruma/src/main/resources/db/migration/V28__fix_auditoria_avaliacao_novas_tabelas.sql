@@ -26,9 +26,6 @@ SET @s = IF(@n > 0,
     'SELECT 1');
 PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
 
--- Remove version da avaliacao caso exista (sera gerenciado pela AuditableEntity)
--- (mantemos pois AuditableEntity o adiciona via @Version)
-
 -- Adiciona avaliador_id
 SET @n = (SELECT COUNT(*) FROM information_schema.columns
           WHERE table_schema = DATABASE() AND table_name = 'avaliacao' AND column_name = 'avaliador_id');
@@ -63,13 +60,15 @@ SET @s = IF(@n = 0,
     'SELECT 1');
 PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
 
--- Indexes
+-- Index avaliador
 SET @n = (SELECT COUNT(*) FROM information_schema.statistics
           WHERE table_schema = DATABASE() AND table_name = 'avaliacao' AND index_name = 'idx_avaliacao_avaliador');
 SET @s = IF(@n = 0,
     'ALTER TABLE avaliacao ADD INDEX idx_avaliacao_avaliador (avaliador_id)',
     'SELECT 1');
 PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
+
+-- Index avaliado
 SET @n = (SELECT COUNT(*) FROM information_schema.statistics
           WHERE table_schema = DATABASE() AND table_name = 'avaliacao' AND index_name = 'idx_avaliacao_avaliado');
 SET @s = IF(@n = 0,
@@ -78,12 +77,33 @@ SET @s = IF(@n = 0,
 PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
 
 -- ===== AUDITORIA =====
--- Muda PK de UUID/CHAR para INT AUTO_INCREMENT
-SET @pk_type_au = (SELECT DATA_TYPE FROM information_schema.columns
+-- Converte auditoria_id de BINARY(16) para INT AUTO_INCREMENT
+-- MySQL nao permite MODIFY diretamente em PK binaria -> precisa: drop PK, modify, re-add PK
+SET @pk_type_au = (SELECT COLUMN_TYPE FROM information_schema.columns
                    WHERE table_schema = DATABASE() AND table_name = 'auditoria'
                      AND column_name = 'auditoria_id');
-SET @s = IF(@pk_type_au IN ('char','varchar'),
+
+-- Passo 1: Drop PK (apenas se ainda for BINARY)
+SET @s = IF(@pk_type_au = 'binary(16)',
+    'ALTER TABLE auditoria DROP PRIMARY KEY',
+    'SELECT 1');
+PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
+
+-- Passo 2: Modify para INT AUTO_INCREMENT
+SET @pk_type_au = (SELECT COLUMN_TYPE FROM information_schema.columns
+                   WHERE table_schema = DATABASE() AND table_name = 'auditoria'
+                     AND column_name = 'auditoria_id');
+SET @s = IF(@pk_type_au != 'int',
     'ALTER TABLE auditoria MODIFY COLUMN auditoria_id INT NOT NULL AUTO_INCREMENT',
+    'SELECT 1');
+PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
+
+-- Passo 3: Re-add PK
+SET @pk_exists = (SELECT COUNT(*) FROM information_schema.table_constraints
+                  WHERE table_schema = DATABASE() AND table_name = 'auditoria'
+                    AND constraint_type = 'PRIMARY KEY');
+SET @s = IF(@pk_exists = 0,
+    'ALTER TABLE auditoria ADD PRIMARY KEY (auditoria_id)',
     'SELECT 1');
 PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
 
@@ -115,6 +135,14 @@ SET @n = (SELECT COUNT(*) FROM information_schema.columns
           WHERE table_schema = DATABASE() AND table_name = 'auditoria' AND column_name = 'tipo_usuario_id');
 SET @s = IF(@n > 0,
     'ALTER TABLE auditoria DROP COLUMN tipo_usuario_id',
+    'SELECT 1');
+PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
+
+-- Remove tipo_usuario (coluna texto, adicionada no V25)
+SET @n = (SELECT COUNT(*) FROM information_schema.columns
+          WHERE table_schema = DATABASE() AND table_name = 'auditoria' AND column_name = 'tipo_usuario');
+SET @s = IF(@n > 0,
+    'ALTER TABLE auditoria DROP COLUMN tipo_usuario',
     'SELECT 1');
 PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
 
@@ -168,7 +196,13 @@ SET @s = IF(@n = 0,
     'SELECT 1');
 PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
 
-ALTER TABLE auditoria ADD INDEX IF NOT EXISTS idx_auditoria_usuario (usuario_id);
+-- Index idx_auditoria_usuario
+SET @n = (SELECT COUNT(*) FROM information_schema.statistics
+          WHERE table_schema = DATABASE() AND table_name = 'auditoria' AND index_name = 'idx_auditoria_usuario');
+SET @s = IF(@n = 0,
+    'ALTER TABLE auditoria ADD INDEX idx_auditoria_usuario (usuario_id)',
+    'SELECT 1');
+PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
 
 -- ===== NOVAS TABELAS =====
 
