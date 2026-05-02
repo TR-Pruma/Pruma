@@ -68,4 +68,13 @@ public class Usuario extends AuditableEntity implements UserDetails, Serializabl
     @Override public boolean isAccountNonLocked()      { return getAtivo(); }
     @Override public boolean isCredentialsNonExpired() { return true;       }
     @Override public boolean isEnabled()               { return getAtivo(); }
+
+    /**
+     * Factory method para criar uma referencia lazy por ID.
+     * Utilizado em mappers (ex: AuditoriaMapper) para evitar queries desnecessarias.
+     */
+    public static Usuario ofId(Integer id) {
+        if (id == null) return null;
+        return Usuario.builder().id(id).build();
+    }
 }
