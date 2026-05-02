@@ -2,17 +2,17 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ===== AVALIACAO =====
--- Reverte nota de DECIMAL(3,1) para INT (V27 havia convertido; DER V4 define INT)
+-- Reverte nota de DECIMAL(3,1) para INT
 SET @col_type_av = (SELECT DATA_TYPE FROM information_schema.columns
                     WHERE table_schema = DATABASE()
                       AND table_name   = 'avaliacao'
                       AND column_name  = 'nota');
 SET @s = IF(@col_type_av IN ('decimal','numeric'),
     'ALTER TABLE avaliacao MODIFY COLUMN nota INT NULL',
-    'SELECT 1 -- nota ja e INT');
+    'SELECT 1');
 PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
 
--- Remove cliente_cpf (DER nao tem esta coluna)
+-- Remove cliente_cpf
 SET @n = (SELECT COUNT(*) FROM information_schema.columns
           WHERE table_schema = DATABASE() AND table_name = 'avaliacao' AND column_name = 'cliente_cpf');
 SET @s = IF(@n > 0,
@@ -76,38 +76,18 @@ SET @s = IF(@n = 0,
     'SELECT 1');
 PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
 
--- ===== AUDITORIA =====
--- Converte auditoria_id de BINARY(16) para INT AUTO_INCREMENT
--- MySQL nao permite MODIFY diretamente em PK binaria -> precisa: drop PK, modify, re-add PK
+-- ===== AUDITORIA - conversao BINARY(16) -> INT AUTO_INCREMENT =====
+-- OBRIGATORIO: DROP PRIMARY KEY + MODIFY + ADD PRIMARY KEY em um unico ALTER TABLE
+-- MySQL nao permite AUTO_INCREMENT em coluna sem indice; o split em passos separados causa erro 1075.
 SET @pk_type_au = (SELECT COLUMN_TYPE FROM information_schema.columns
                    WHERE table_schema = DATABASE() AND table_name = 'auditoria'
                      AND column_name = 'auditoria_id');
-
--- Passo 1: Drop PK (apenas se ainda for BINARY)
 SET @s = IF(@pk_type_au = 'binary(16)',
-    'ALTER TABLE auditoria DROP PRIMARY KEY',
+    'ALTER TABLE auditoria DROP PRIMARY KEY, MODIFY COLUMN auditoria_id INT NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (auditoria_id)',
     'SELECT 1');
 PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
 
--- Passo 2: Modify para INT AUTO_INCREMENT
-SET @pk_type_au = (SELECT COLUMN_TYPE FROM information_schema.columns
-                   WHERE table_schema = DATABASE() AND table_name = 'auditoria'
-                     AND column_name = 'auditoria_id');
-SET @s = IF(@pk_type_au != 'int',
-    'ALTER TABLE auditoria MODIFY COLUMN auditoria_id INT NOT NULL AUTO_INCREMENT',
-    'SELECT 1');
-PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
-
--- Passo 3: Re-add PK
-SET @pk_exists = (SELECT COUNT(*) FROM information_schema.table_constraints
-                  WHERE table_schema = DATABASE() AND table_name = 'auditoria'
-                    AND constraint_type = 'PRIMARY KEY');
-SET @s = IF(@pk_exists = 0,
-    'ALTER TABLE auditoria ADD PRIMARY KEY (auditoria_id)',
-    'SELECT 1');
-PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
-
--- Remove data_hora (nao existe no DER)
+-- Remove data_hora
 SET @n = (SELECT COUNT(*) FROM information_schema.columns
           WHERE table_schema = DATABASE() AND table_name = 'auditoria' AND column_name = 'data_hora');
 SET @s = IF(@n > 0,
@@ -138,7 +118,7 @@ SET @s = IF(@n > 0,
     'SELECT 1');
 PREPARE st FROM @s; EXECUTE st; DEALLOCATE PREPARE st;
 
--- Remove tipo_usuario (coluna texto, adicionada no V25)
+-- Remove tipo_usuario (coluna texto adicionada no V25)
 SET @n = (SELECT COUNT(*) FROM information_schema.columns
           WHERE table_schema = DATABASE() AND table_name = 'auditoria' AND column_name = 'tipo_usuario');
 SET @s = IF(@n > 0,
