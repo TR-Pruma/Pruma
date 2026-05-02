@@ -1,17 +1,17 @@
--- V30: corrige tabela cliente — coluna cliente_cpf ausente no V1
--- O Hibernate valida @Column(name="cliente_cpf") e @Index(name="idx_cliente_cpf")
+-- V30: corrige tabela cliente -- coluna cliente_cpf ausente no V1
+-- Banco limpo (drop total) -- sem risco de coluna duplicada
 
 ALTER TABLE cliente
-    ADD COLUMN IF NOT EXISTS cliente_cpf VARCHAR(11) NOT NULL DEFAULT '' AFTER cliente_id;
+    ADD COLUMN cliente_cpf VARCHAR(11) NOT NULL DEFAULT '' AFTER cliente_id;
 
--- Remove o DEFAULT vazio (coluna já existe, apenas estrutural)
+-- Remove o DEFAULT vazio estrutural
 ALTER TABLE cliente
     MODIFY COLUMN cliente_cpf VARCHAR(11) NOT NULL;
 
--- Garante unicidade exigida pela entidade
+-- Unicidade exigida por @Column(unique = true)
 ALTER TABLE cliente
     ADD CONSTRAINT uq_cliente_cpf UNIQUE (cliente_cpf);
 
--- Índice nomeado exigido pelo @Index na entidade
-CREATE INDEX IF NOT EXISTS idx_cliente_cpf  ON cliente (cliente_cpf);
-CREATE INDEX IF NOT EXISTS idx_cliente_email ON cliente (email);
+-- Indices nomeados exigidos pelo @Table(indexes = {...}) da entidade
+CREATE INDEX idx_cliente_cpf   ON cliente (cliente_cpf);
+CREATE INDEX idx_cliente_email ON cliente (email);
