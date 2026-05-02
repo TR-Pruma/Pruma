@@ -2,81 +2,70 @@ package com.br.pruma.core.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serial;
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
-/**
- * Representa uma avaliação feita por um cliente sobre um projeto.
- */
 @Entity
-@Table(name = "avaliacao",
+@Table(
+        name = "avaliacao",
         indexes = {
-                @Index(name = "idx_avaliacao_projeto", columnList = "projeto_id"),
-                @Index(name = "idx_avaliacao_cliente", columnList = "cliente_cpf")
-        })
+                @Index(name = "idx_avaliacao_projeto",   columnList = "projeto_id"),
+                @Index(name = "idx_avaliacao_avaliador", columnList = "avaliador_id"),
+                @Index(name = "idx_avaliacao_avaliado",  columnList = "avaliado_id")
+        }
+)
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = {"projeto", "cliente"})
-@Schema(description = "Representa uma avaliação de um cliente sobre um projeto")
-public class Avaliacao implements Serializable {
+@SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+@ToString(onlyExplicitlyIncluded = true)
+@Schema(description = "Avaliacao de um usuario sobre outro dentro de um projeto")
+public class Avaliacao extends AuditableEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "avaliacao_id", nullable = false, updatable = false)
+    @Column(name = "avaliacao_id", updatable = false, nullable = false)
     @EqualsAndHashCode.Include
-    @Schema(description = "Identificador único da avaliação", example = "1")
+    @ToString.Include
+    @Schema(description = "Identificador unico da avaliacao", example = "1")
     private Integer id;
 
+    @NotNull(message = "Projeto e obrigatorio")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "projeto_id", nullable = false)
-    @Schema(description = "Projeto avaliado")
+    @Schema(description = "Projeto relacionado")
     private Projeto projeto;
 
+    @NotNull(message = "Avaliador e obrigatorio")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "cliente_cpf", nullable = false)
-    @Schema(description = "Cliente que fez a avaliação")
-    private Cliente cliente;
+    @JoinColumn(name = "avaliador_id", nullable = false)
+    @Schema(description = "Usuario que realizou a avaliacao")
+    private Usuario avaliador;
 
-    @Column(name = "nota", precision = 3, scale = 1, nullable = false)
-    @Schema(description = "Nota dada pelo cliente ao projeto (0.0 a 10.0)", example = "8.5")
-    private BigDecimal nota;
+    @NotNull(message = "Avaliado e obrigatorio")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "avaliado_id", nullable = false)
+    @Schema(description = "Usuario que foi avaliado")
+    private Usuario avaliado;
+
+    @NotNull(message = "Nota e obrigatoria")
+    @Min(value = 0, message = "Nota minima e 0")
+    @Max(value = 10, message = "Nota maxima e 10")
+    @Column(name = "nota", nullable = false)
+    @Schema(description = "Nota de 0 a 10", example = "8")
+    private Integer nota;
 
     @Column(name = "comentario", columnDefinition = "TEXT")
-    @Schema(description = "Comentário opcional sobre a avaliação", example = "Ótima experiência, recomendo!")
+    @Schema(description = "Comentario opcional", example = "Otimo profissional!")
     private String comentario;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    @Schema(description = "Data de criação da avaliação")
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    @Schema(description = "Data da última atualização da avaliação")
-    private LocalDateTime updatedAt;
-
-    @Version
-    @Column(name = "version", nullable = false)
-    @Schema(description = "Controle de versão para concorrência otimista", example = "1")
-    private Long version;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = this.createdAt;
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }
