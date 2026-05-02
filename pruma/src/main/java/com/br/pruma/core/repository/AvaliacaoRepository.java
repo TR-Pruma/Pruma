@@ -8,6 +8,12 @@ import java.util.List;
 
 @Repository
 public interface AvaliacaoRepository extends JpaRepository<Avaliacao, Integer> {
+
     List<Avaliacao> findByProjetoId(Integer projetoId);
-    List<Avaliacao> findByClienteCpf(String clienteCpf);
+
+    /** Avaliacoes realizadas por um usuario (avaliador) */
+    List<Avaliacao> findByAvaliadorId(Integer avaliadorId);
+
+    /** Avaliacoes recebidas por um usuario (avaliado) */
+    List<Avaliacao> findByAvaliadoId(Integer avaliadoId);
 }
