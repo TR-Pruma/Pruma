@@ -522,17 +522,21 @@ CREATE TABLE IF NOT EXISTS tarefa (
 
 -- -----------------------------------------------------------------------------
 -- checklist
+-- ATENCAO: projeto_id (FK para projeto), data_criacao, data_atualizacao
+-- alinhado com entidade Checklist.java
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS checklist (
-    checklist_id INT           NOT NULL AUTO_INCREMENT,
-    obra_id      INT,
-    nome         VARCHAR(255),
-    created_at   DATETIME(6)   NOT NULL,
-    updated_at   DATETIME(6),
-    ativo        TINYINT(1)    NOT NULL DEFAULT 1,
-    version      BIGINT,
+    checklist_id    INT           NOT NULL AUTO_INCREMENT,
+    projeto_id      INT           NOT NULL,
+    nome            VARCHAR(50)   NOT NULL,
+    ativo           TINYINT(1)    NOT NULL DEFAULT 1,
+    data_criacao    DATETIME(6)   NOT NULL,
+    data_atualizacao DATETIME(6)  NOT NULL,
+    version         BIGINT        NOT NULL DEFAULT 0,
     PRIMARY KEY (checklist_id),
-    CONSTRAINT fk_checklist_obra FOREIGN KEY (obra_id) REFERENCES obra (obra_id)
+    INDEX idx_checklist_projeto (projeto_id),
+    INDEX idx_checklist_nome (nome),
+    CONSTRAINT fk_checklist_projeto FOREIGN KEY (projeto_id) REFERENCES projeto (projeto_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- -----------------------------------------------------------------------------
