@@ -43,44 +43,43 @@ public class Auditoria extends AuditableEntity {
     @Column(name = "auditoria_id", updatable = false, nullable = false)
     @EqualsAndHashCode.Include
     @Schema(
-            description = "Identificador único da auditoria",
+            description = "Identificador unico da auditoria",
             example     = "123e4567-e89b-12d3-a456-426614174000",
             required    = true
     )
     private UUID id;
 
-    @NotBlank(message = "CPF do cliente é obrigatório")
+    @NotBlank(message = "CPF do cliente e obrigatorio")
     @Pattern(
             regexp  = "^\\d{11}$",
-            message = "CPF deve conter 11 dígitos numéricos"
+            message = "CPF deve conter 11 digitos numericos"
     )
     @Column(name = "cliente_cpf", length = 11, nullable = false)
     @Schema(
-            description = "CPF do cliente associado à auditoria",
+            description = "CPF do cliente associado a auditoria",
             example     = "12345678900",
             required    = true
     )
     private String clienteCpf;
 
-    @NotNull(message = "Tipo de usuário é obrigatório")
+    @NotNull(message = "Tipo de usuario e obrigatorio")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
-            name               = "tipo_usuario",
-            referencedColumnName = "tipo_usuario",
-            nullable           = false
+            name     = "tipo_usuario_id",
+            nullable = false
     )
     @Schema(
-            description = "Tipo de usuário que realizou a ação",
+            description = "Tipo de usuario que realizou a acao",
             example     = "ADMINISTRADOR",
             required    = true
     )
     private TipoUsuario tipoUsuario;
 
-    @NotBlank(message = "Descrição da ação é obrigatória")
+    @NotBlank(message = "Descricao da acao e obrigatoria")
     @Column(name = "acao", columnDefinition = "TEXT", nullable = false)
     @Schema(
-            description = "Descrição da ação realizada",
-            example     = "Usuário alterou os dados do perfil",
+            description = "Descricao da acao realizada",
+            example     = "Usuario alterou os dados do perfil",
             required    = true
     )
     private String acao;
@@ -88,7 +87,7 @@ public class Auditoria extends AuditableEntity {
     @CreatedDate
     @Column(name = "data_hora", nullable = false, updatable = false)
     @Schema(
-            description = "Data e hora em que a ação foi registrada",
+            description = "Data e hora em que a acao foi registrada",
             example     = "2024-03-16T14:30:00",
             required    = true
     )
