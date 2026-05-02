@@ -22,8 +22,9 @@ public interface AuditoriaMapper {
     @Mapping(target = "detalhe",    source = "detalhe")
     Auditoria toEntity(AuditoriaRequestDTO dto);
 
+    // Usuario nao possui campo 'nome'; expoe cpf como identificador legivel
     @Mapping(target = "usuarioId",   source = "usuario.id")
-    @Mapping(target = "usuarioNome", source = "usuario.nome")
+    @Mapping(target = "usuarioNome", source = "usuario.cpf")
     @Mapping(target = "createdAt",   source = "createdAt")
     AuditoriaResponseDTO toResponse(Auditoria auditoria);
 
