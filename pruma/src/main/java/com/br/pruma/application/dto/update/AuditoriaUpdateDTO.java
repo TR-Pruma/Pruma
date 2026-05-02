@@ -1,17 +1,24 @@
 package com.br.pruma.application.dto.update;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Data
+@Schema(description = "DTO para atualizacao parcial de auditoria")
 public class AuditoriaUpdateDTO {
 
-    private String entidade;
-
+    @Size(max = 100)
+    @Schema(description = "Acao realizada", example = "DELETE")
     private String acao;
 
-    private String usuario;
+    @Size(max = 100)
+    @Schema(description = "Nome da entidade afetada", example = "Obra")
+    private String entidade;
 
-    private LocalDateTime dataHora;
+    @Schema(description = "ID do registro afetado", example = "10")
+    private Integer entidadeId;
+
+    @Schema(description = "Detalhe da alteracao")
+    private String detalhe;
 }

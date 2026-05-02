@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -15,45 +14,31 @@ import java.util.UUID;
 @Schema(description = "DTO para respostas de auditoria")
 public class AuditoriaResponseDTO {
 
-    @Schema(
-            description = "Identificador único da auditoria",
-            example     = "123e4567-e89b-12d3-a456-426614174000",
-            required    = true
-    )
-    private UUID id;
+    @Schema(description = "Identificador unico da auditoria", example = "1")
+    private Integer id;
 
-    @Schema(
-            description = "CPF do cliente",
-            example     = "12345678900",
-            required    = true
-    )
-    private String clienteCpf;
+    @Schema(description = "ID do usuario que realizou a acao", example = "7")
+    private Integer usuarioId;
 
-    @Schema(
-            description = "Tipo de usuário que realizou a ação",
-            example     = "ADMINISTRADOR",
-            required    = true
-    )
-    private String tipoUsuario;
+    @Schema(description = "Nome do usuario que realizou a acao", example = "Joao Silva")
+    private String usuarioNome;
 
-    @Schema(
-            description = "Descrição da ação realizada",
-            example     = "Atualização dos dados cadastrais",
-            required    = true
-    )
+    @Schema(description = "Acao realizada", example = "UPDATE")
     private String acao;
 
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    @Schema(
-            description = "Data e hora da ação",
-            example     = "01-08-2025 14:30:00",
-            required    = true
-    )
-    private LocalDateTime dataHora;
+    @Schema(description = "Entidade afetada", example = "Projeto")
+    private String entidade;
 
-    @Schema(
-            description = "Versão do registro para controle de concorrência",
-            example     = "1"
-    )
+    @Schema(description = "ID do registro afetado", example = "42")
+    private Integer entidadeId;
+
+    @Schema(description = "Detalhe da alteracao")
+    private String detalhe;
+
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+    @Schema(description = "Data e hora de criacao do registro", example = "01-08-2025 14:30:00")
+    private LocalDateTime createdAt;
+
+    @Schema(description = "Versao do registro para controle de concorrencia", example = "1")
     private Long version;
 }
