@@ -2,6 +2,7 @@
 -- V36: CORRECOES RESIDUAIS POS-V35
 -- Compativel com MySQL 5.7+ (sem ADD COLUMN IF NOT EXISTS).
 -- Usa procedures para idempotencia segura.
+-- Mapeamento validado contra as entidades Java do branch feature/novos_services.
 -- =============================================================================
 
 -- ---------------------------------------------------------------------------
@@ -68,6 +69,11 @@ END;
 
 -- ===========================================================================
 -- comunicacao: colunas obrigatorias
+-- Entidade: Comunicacao.java
+--   projeto_id   -> @ManyToOne @JoinColumn(nullable=false)
+--   cliente_id   -> @ManyToOne @JoinColumn(nullable=false)
+--   mensagem     -> @Column(columnDefinition="TEXT", nullable=false)
+--   tipo_remetente -> @Column(length=15, nullable=false)
 -- ===========================================================================
 CALL pruma_add_col('comunicacao','cliente_id',
   'cliente_id INT NOT NULL DEFAULT 0');
@@ -84,6 +90,7 @@ CALL pruma_add_idx('comunicacao','idx_com_remetente','tipo_remetente');
 
 -- ===========================================================================
 -- comunicacao_aux
+-- Entidade: ComunicacaoAux.java - @MapsId sobre comunicacao
 -- ===========================================================================
 CREATE TABLE IF NOT EXISTS comunicacao_aux (
   comunicacao_id INT         NOT NULL,
@@ -98,14 +105,36 @@ CREATE TABLE IF NOT EXISTS comunicacao_aux (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ===========================================================================
--- anexo: colunas novas
+-- anexo: alinhado com Anexo.java
+--   projeto_id  -> @ManyToOne @JoinColumn(nullable=false)
+--   tipo_anexo  -> @Column(length=15, nullable=false)
+--   caminho     -> @Column(length=1024, nullable=false)  [nome da coluna: caminho]
+--   nome        -> @Column(length=255)
+--   tipo_mime   -> @Column(length=100)
+--   tamanho     -> @Column(name="tamanho") Long
 -- ===========================================================================
-CALL pruma_add_col('anexo','tipo_anexo',  'tipo_anexo  VARCHAR(50)  NULL');
-CALL pruma_add_col('anexo','descricao',   'descricao   VARCHAR(500) NULL');
-CALL pruma_add_col('anexo','url_externa', 'url_externa VARCHAR(500) NULL');
+CALL pruma_add_col('anexo','projeto_id',
+  'projeto_id INT NOT NULL DEFAULT 0');
+CALL pruma_add_col('anexo','tipo_anexo',
+  "tipo_anexo VARCHAR(15) NOT NULL DEFAULT 'OUTRO'");
+CALL pruma_add_col('anexo','caminho',
+  'caminho VARCHAR(1024) NOT NULL DEFAULT ""');
+CALL pruma_add_col('anexo','nome',
+  'nome VARCHAR(255) NULL');
+CALL pruma_add_col('anexo','tipo_mime',
+  'tipo_mime VARCHAR(100) NULL');
+CALL pruma_add_col('anexo','tamanho',
+  'tamanho BIGINT NULL');
+
+CALL pruma_add_fk('anexo','fk_anexo_projeto',
+  'FOREIGN KEY (projeto_id) REFERENCES projeto (projeto_id)');
+
+CALL pruma_add_idx('anexo','idx_anexo_projeto','projeto_id');
+CALL pruma_add_idx('anexo','idx_anexo_tipo',   'tipo_anexo');
 
 -- ===========================================================================
 -- cronograma: coluna nome + constraints
+-- Entidade: Cronograma.java
 -- ===========================================================================
 CALL pruma_add_col('cronograma','nome',
   "nome VARCHAR(255) NOT NULL DEFAULT 'sem-nome'");
