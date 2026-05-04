@@ -70,9 +70,9 @@ END;
 -- ===========================================================================
 -- comunicacao: colunas obrigatorias
 -- Entidade: Comunicacao.java
---   projeto_id   -> @ManyToOne @JoinColumn(nullable=false)
---   cliente_id   -> @ManyToOne @JoinColumn(nullable=false)
---   mensagem     -> @Column(columnDefinition="TEXT", nullable=false)
+--   projeto_id     -> @ManyToOne @JoinColumn(nullable=false)
+--   cliente_id     -> @ManyToOne @JoinColumn(nullable=false)
+--   mensagem       -> @Column(columnDefinition="TEXT", nullable=false)
 --   tipo_remetente -> @Column(length=15, nullable=false)
 -- ===========================================================================
 CALL pruma_add_col('comunicacao','cliente_id',
@@ -106,12 +106,12 @@ CREATE TABLE IF NOT EXISTS comunicacao_aux (
 
 -- ===========================================================================
 -- anexo: alinhado com Anexo.java
---   projeto_id  -> @ManyToOne @JoinColumn(nullable=false)
---   tipo_anexo  -> @Column(length=15, nullable=false)
---   caminho     -> @Column(length=1024, nullable=false)  [nome da coluna: caminho]
---   nome        -> @Column(length=255)
---   tipo_mime   -> @Column(length=100)
---   tamanho     -> @Column(name="tamanho") Long
+--   projeto_id -> @ManyToOne @JoinColumn(nullable=false)
+--   tipo_anexo -> @Column(length=15, nullable=false)
+--   caminho    -> @Column(length=1024, nullable=false)
+--   nome       -> @Column(length=255)
+--   tipo_mime  -> @Column(length=100)
+--   tamanho    -> @Column BIGINT
 -- ===========================================================================
 CALL pruma_add_col('anexo','projeto_id',
   'projeto_id INT NOT NULL DEFAULT 0');
@@ -131,6 +131,61 @@ CALL pruma_add_fk('anexo','fk_anexo_projeto',
 
 CALL pruma_add_idx('anexo','idx_anexo_projeto','projeto_id');
 CALL pruma_add_idx('anexo','idx_anexo_tipo',   'tipo_anexo');
+
+-- ===========================================================================
+-- apadrinhamento_rede: criacao/complemento da tabela
+-- Entidade: ApadrinhamentoRede.java
+--   apadrinhamento_id -> @Id @GeneratedValue BIGINT
+--   padrinho_id       -> @ManyToOne ProfissionalDeBase (nullable=false)
+--   afilhado_id       -> @ManyToOne ProfissionalDeBase (nullable=false)
+--   data_inicio       -> DATE NOT NULL
+--   data_fim          -> DATE NULL
+--   status            -> VARCHAR(20) NOT NULL DEFAULT 'ATIVO'
+--   created_at        -> DATETIME(6) NOT NULL
+--   updated_at        -> DATETIME(6) NOT NULL
+-- ===========================================================================
+CREATE TABLE IF NOT EXISTS apadrinhamento_rede (
+  apadrinhamento_id BIGINT      NOT NULL AUTO_INCREMENT,
+  padrinho_id       INT         NOT NULL,
+  afilhado_id       INT         NOT NULL,
+  data_inicio       DATE        NOT NULL,
+  data_fim          DATE        NULL,
+  status            VARCHAR(20) NOT NULL DEFAULT 'ATIVO',
+  created_at        DATETIME(6) NOT NULL,
+  updated_at        DATETIME(6) NOT NULL,
+  PRIMARY KEY (apadrinhamento_id),
+  CONSTRAINT fk_apadr_padrinho FOREIGN KEY (padrinho_id)
+    REFERENCES profissional_de_base (profissional_id),
+  CONSTRAINT fk_apadr_afilhado FOREIGN KEY (afilhado_id)
+    REFERENCES profissional_de_base (profissional_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Colunas caso a tabela ja exista sem elas (rerun safety)
+CALL pruma_add_col('apadrinhamento_rede','apadrinhamento_id',
+  'apadrinhamento_id BIGINT NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (apadrinhamento_id)');
+CALL pruma_add_col('apadrinhamento_rede','padrinho_id',
+  'padrinho_id INT NOT NULL DEFAULT 0');
+CALL pruma_add_col('apadrinhamento_rede','afilhado_id',
+  'afilhado_id INT NOT NULL DEFAULT 0');
+CALL pruma_add_col('apadrinhamento_rede','data_inicio',
+  'data_inicio DATE NOT NULL DEFAULT (CURRENT_DATE)');
+CALL pruma_add_col('apadrinhamento_rede','data_fim',
+  'data_fim DATE NULL');
+CALL pruma_add_col('apadrinhamento_rede','status',
+  "status VARCHAR(20) NOT NULL DEFAULT 'ATIVO'");
+CALL pruma_add_col('apadrinhamento_rede','created_at',
+  'created_at DATETIME(6) NOT NULL DEFAULT NOW(6)');
+CALL pruma_add_col('apadrinhamento_rede','updated_at',
+  'updated_at DATETIME(6) NOT NULL DEFAULT NOW(6)');
+
+CALL pruma_add_fk('apadrinhamento_rede','fk_apadr_padrinho',
+  'FOREIGN KEY (padrinho_id) REFERENCES profissional_de_base (profissional_id)');
+CALL pruma_add_fk('apadrinhamento_rede','fk_apadr_afilhado',
+  'FOREIGN KEY (afilhado_id) REFERENCES profissional_de_base (profissional_id)');
+
+CALL pruma_add_idx('apadrinhamento_rede','idx_apadrinhamento_padrinho','padrinho_id');
+CALL pruma_add_idx('apadrinhamento_rede','idx_apadrinhamento_afilhado','afilhado_id');
+CALL pruma_add_idx('apadrinhamento_rede','idx_apadrinhamento_status',  'status');
 
 -- ===========================================================================
 -- cronograma: coluna nome + constraints
