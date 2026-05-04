@@ -1,3 +1,4 @@
--- V32: substituido pelo reset total V35__reset_schema_completo.sql
--- Este arquivo e um no-op intencional.
+-- V32 OBSOLETO: substituido pelo V35 (reset completo) + V36 (correcoes pos-V35).
+-- Este arquivo existe apenas para manter a sequencia do Flyway intacta.
+-- Nenhuma operacao DDL e executada aqui.
 SELECT 1;
