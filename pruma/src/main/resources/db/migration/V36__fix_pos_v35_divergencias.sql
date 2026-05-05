@@ -68,6 +68,42 @@ BEGIN
 END;
 
 -- ===========================================================================
+-- apadrinhamento_rede
+-- O V35 criou a tabela com schema errado:
+--   PK:  apadrinhamento_rede_id  (deve ser apadrinhamento_id)
+--   FK:  apadrinhado_id          (deve ser afilhado_id)
+--   Faltavam: status, data_fim
+-- Solucao: DROP + CREATE com schema correto alinhado a ApadrinhamentoRede.java
+-- Ambiente de dev sem dados: seguro fazer DROP.
+-- ===========================================================================
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS apadrinhamento_rede;
+
+CREATE TABLE apadrinhamento_rede (
+  apadrinhamento_id BIGINT      NOT NULL AUTO_INCREMENT,
+  padrinho_id       INT         NOT NULL,
+  afilhado_id       INT         NOT NULL,
+  data_inicio       DATE        NOT NULL,
+  data_fim          DATE        NULL,
+  status            VARCHAR(20) NOT NULL DEFAULT 'ATIVO',
+  created_at        DATETIME(6) NOT NULL,
+  updated_at        DATETIME(6) NOT NULL,
+  ativo             TINYINT(1)  NOT NULL DEFAULT 1,
+  version           BIGINT,
+  PRIMARY KEY (apadrinhamento_id),
+  INDEX idx_apadrinhamento_padrinho (padrinho_id),
+  INDEX idx_apadrinhamento_afilhado (afilhado_id),
+  INDEX idx_apadrinhamento_status   (status),
+  CONSTRAINT fk_apadr_padrinho FOREIGN KEY (padrinho_id)
+    REFERENCES profissional_de_base (profissional_id),
+  CONSTRAINT fk_apadr_afilhado FOREIGN KEY (afilhado_id)
+    REFERENCES profissional_de_base (profissional_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- ===========================================================================
 -- comunicacao: colunas obrigatorias
 -- Entidade: Comunicacao.java
 --   projeto_id     -> @ManyToOne @JoinColumn(nullable=false)
@@ -131,65 +167,6 @@ CALL pruma_add_fk('anexo','fk_anexo_projeto',
 
 CALL pruma_add_idx('anexo','idx_anexo_projeto','projeto_id');
 CALL pruma_add_idx('anexo','idx_anexo_tipo',   'tipo_anexo');
-
--- ===========================================================================
--- apadrinhamento_rede
--- Entidade: ApadrinhamentoRede.java
---   apadrinhamento_id -> @Id @GeneratedValue BIGINT AUTO_INCREMENT
---   padrinho_id       -> @ManyToOne ProfissionalDeBase (nullable=false)
---   afilhado_id       -> @ManyToOne ProfissionalDeBase (nullable=false)
---   data_inicio       -> DATE NOT NULL
---   data_fim          -> DATE NULL
---   status            -> VARCHAR(20) NOT NULL DEFAULT 'ATIVO'
---   created_at        -> DATETIME(6) NOT NULL (@CreationTimestamp)
---   updated_at        -> DATETIME(6) NOT NULL (@UpdateTimestamp)
---
--- NOTA: CREATE TABLE IF NOT EXISTS e a unica abordagem valida aqui.
--- NAO usar pruma_add_col para colunas AUTO_INCREMENT/PK - MySQL erro 1075.
--- Se a tabela ja existia sem as colunas corretas, ela deve ser recriada
--- manualmente antes de rodar este migration.
--- ===========================================================================
-CREATE TABLE IF NOT EXISTS apadrinhamento_rede (
-  apadrinhamento_id BIGINT      NOT NULL AUTO_INCREMENT,
-  padrinho_id       INT         NOT NULL,
-  afilhado_id       INT         NOT NULL,
-  data_inicio       DATE        NOT NULL,
-  data_fim          DATE        NULL,
-  status            VARCHAR(20) NOT NULL DEFAULT 'ATIVO',
-  created_at        DATETIME(6) NOT NULL,
-  updated_at        DATETIME(6) NOT NULL,
-  PRIMARY KEY (apadrinhamento_id),
-  CONSTRAINT fk_apadr_padrinho FOREIGN KEY (padrinho_id)
-    REFERENCES profissional_de_base (profissional_id),
-  CONSTRAINT fk_apadr_afilhado FOREIGN KEY (afilhado_id)
-    REFERENCES profissional_de_base (profissional_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Colunas complementares caso a tabela ja exista porem incompleta
--- (apenas colunas simples - sem AUTO_INCREMENT/PK que causam erro 1075)
-CALL pruma_add_col('apadrinhamento_rede','padrinho_id',
-  'padrinho_id INT NOT NULL DEFAULT 0');
-CALL pruma_add_col('apadrinhamento_rede','afilhado_id',
-  'afilhado_id INT NOT NULL DEFAULT 0');
-CALL pruma_add_col('apadrinhamento_rede','data_inicio',
-  'data_inicio DATE NOT NULL DEFAULT (CURRENT_DATE)');
-CALL pruma_add_col('apadrinhamento_rede','data_fim',
-  'data_fim DATE NULL');
-CALL pruma_add_col('apadrinhamento_rede','status',
-  "status VARCHAR(20) NOT NULL DEFAULT 'ATIVO'");
-CALL pruma_add_col('apadrinhamento_rede','created_at',
-  'created_at DATETIME(6) NOT NULL DEFAULT NOW(6)');
-CALL pruma_add_col('apadrinhamento_rede','updated_at',
-  'updated_at DATETIME(6) NOT NULL DEFAULT NOW(6)');
-
-CALL pruma_add_fk('apadrinhamento_rede','fk_apadr_padrinho',
-  'FOREIGN KEY (padrinho_id) REFERENCES profissional_de_base (profissional_id)');
-CALL pruma_add_fk('apadrinhamento_rede','fk_apadr_afilhado',
-  'FOREIGN KEY (afilhado_id) REFERENCES profissional_de_base (profissional_id)');
-
-CALL pruma_add_idx('apadrinhamento_rede','idx_apadrinhamento_padrinho','padrinho_id');
-CALL pruma_add_idx('apadrinhamento_rede','idx_apadrinhamento_afilhado','afilhado_id');
-CALL pruma_add_idx('apadrinhamento_rede','idx_apadrinhamento_status',  'status');
 
 -- ===========================================================================
 -- cronograma: coluna nome + constraints
