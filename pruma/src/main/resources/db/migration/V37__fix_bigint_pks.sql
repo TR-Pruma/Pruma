@@ -1,39 +1,45 @@
 -- =============================================================================
 -- V37: CORRECAO DE TIPOS INT -> BIGINT
--- Entidades Java que declaram a PK como Long exigem BIGINT no banco.
--- O V35 criou todas as PKs como INT, causando falha na validacao do Hibernate.
+-- documento_id precisa ser BIGINT (Documento.java usa Long como PK).
 --
--- Entidades afetadas (PK = Long):
---   Documento           -> documento_id
---   ApadrinhamentoRede  -> apadrinhamento_id  (ja BIGINT no V36, incluido por seguranca)
---
--- Colunas de referencia (FK) que tambem precisam ser BIGINT:
---   assinatura_digital.documento_id  (FK -> documento.documento_id)
+-- MySQL nao permite MODIFY COLUMN em uma coluna que e alvo ou origem de FK
+-- enquanto a coluna referenciada tem tipo diferente. A solucao correta e:
+--   1. Dropar todas as FKs que referenciam documento_id
+--   2. Fazer o MODIFY COLUMN nas duas pontas (PK e FKs)
+--   3. Recriar as FKs
 -- =============================================================================
 
-SET FOREIGN_KEY_CHECKS = 0;
+-- 1) Dropar FKs que envolvem documento_id
+ALTER TABLE assinatura_digital DROP FOREIGN KEY IF EXISTS fk_assinatura_documento;
+ALTER TABLE anexo               DROP FOREIGN KEY IF EXISTS fk_anexo_documento;
 
--- ---------------------------------------------------------------------------
--- documento: PK Long -> BIGINT
--- Entidade: Documento.java  private Long id;
--- ---------------------------------------------------------------------------
+-- Se o nome exato da FK for diferente, os comandos abaixo cobrem aliases comuns
+ALTER TABLE assinatura_digital DROP FOREIGN KEY IF EXISTS fk_assinatura_digital_documento;
+ALTER TABLE assinatura_digital DROP FOREIGN KEY IF EXISTS assinatura_digital_ibfk_1;
+ALTER TABLE assinatura_digital DROP FOREIGN KEY IF EXISTS assinatura_digital_ibfk_2;
+ALTER TABLE anexo               DROP FOREIGN KEY IF EXISTS anexo_ibfk_1;
+ALTER TABLE anexo               DROP FOREIGN KEY IF EXISTS anexo_ibfk_2;
+
+-- 2) Alterar a PK em documento
 ALTER TABLE documento
   MODIFY COLUMN documento_id BIGINT NOT NULL AUTO_INCREMENT;
 
--- ---------------------------------------------------------------------------
--- assinatura_digital: FK documento_id deve acompanhar a PK de documento
--- Entidade: AssinaturaDigital.java  @JoinColumn(name="documento_id")
--- Hibernate reclama: found [int], expecting [bigint]
--- ---------------------------------------------------------------------------
+-- 3) Alterar FKs nas tabelas filhas para BIGINT
 ALTER TABLE assinatura_digital
   MODIFY COLUMN documento_id BIGINT NOT NULL;
 
--- ---------------------------------------------------------------------------
--- apadrinhamento_rede: PK ja foi criada como BIGINT no V36,
--- mas garantimos aqui caso alguem rode o V37 isolado.
--- Entidade: ApadrinhamentoRede.java  private Long apadrinhamentoId;
--- ---------------------------------------------------------------------------
+ALTER TABLE anexo
+  MODIFY COLUMN documento_id BIGINT;
+
+-- 4) Recriar as FKs
+ALTER TABLE assinatura_digital
+  ADD CONSTRAINT fk_assinatura_documento
+    FOREIGN KEY (documento_id) REFERENCES documento(documento_id);
+
+ALTER TABLE anexo
+  ADD CONSTRAINT fk_anexo_documento
+    FOREIGN KEY (documento_id) REFERENCES documento(documento_id);
+
+-- 5) apadrinhamento_rede: garante BIGINT (sem FK externa, ALTER simples)
 ALTER TABLE apadrinhamento_rede
   MODIFY COLUMN apadrinhamento_id BIGINT NOT NULL AUTO_INCREMENT;
-
-SET FOREIGN_KEY_CHECKS = 1;
