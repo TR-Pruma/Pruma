@@ -133,16 +133,21 @@ CALL pruma_add_idx('anexo','idx_anexo_projeto','projeto_id');
 CALL pruma_add_idx('anexo','idx_anexo_tipo',   'tipo_anexo');
 
 -- ===========================================================================
--- apadrinhamento_rede: criacao/complemento da tabela
+-- apadrinhamento_rede
 -- Entidade: ApadrinhamentoRede.java
---   apadrinhamento_id -> @Id @GeneratedValue BIGINT
+--   apadrinhamento_id -> @Id @GeneratedValue BIGINT AUTO_INCREMENT
 --   padrinho_id       -> @ManyToOne ProfissionalDeBase (nullable=false)
 --   afilhado_id       -> @ManyToOne ProfissionalDeBase (nullable=false)
 --   data_inicio       -> DATE NOT NULL
 --   data_fim          -> DATE NULL
 --   status            -> VARCHAR(20) NOT NULL DEFAULT 'ATIVO'
---   created_at        -> DATETIME(6) NOT NULL
---   updated_at        -> DATETIME(6) NOT NULL
+--   created_at        -> DATETIME(6) NOT NULL (@CreationTimestamp)
+--   updated_at        -> DATETIME(6) NOT NULL (@UpdateTimestamp)
+--
+-- NOTA: CREATE TABLE IF NOT EXISTS e a unica abordagem valida aqui.
+-- NAO usar pruma_add_col para colunas AUTO_INCREMENT/PK - MySQL erro 1075.
+-- Se a tabela ja existia sem as colunas corretas, ela deve ser recriada
+-- manualmente antes de rodar este migration.
 -- ===========================================================================
 CREATE TABLE IF NOT EXISTS apadrinhamento_rede (
   apadrinhamento_id BIGINT      NOT NULL AUTO_INCREMENT,
@@ -160,9 +165,8 @@ CREATE TABLE IF NOT EXISTS apadrinhamento_rede (
     REFERENCES profissional_de_base (profissional_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Colunas caso a tabela ja exista sem elas (rerun safety)
-CALL pruma_add_col('apadrinhamento_rede','apadrinhamento_id',
-  'apadrinhamento_id BIGINT NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (apadrinhamento_id)');
+-- Colunas complementares caso a tabela ja exista porem incompleta
+-- (apenas colunas simples - sem AUTO_INCREMENT/PK que causam erro 1075)
 CALL pruma_add_col('apadrinhamento_rede','padrinho_id',
   'padrinho_id INT NOT NULL DEFAULT 0');
 CALL pruma_add_col('apadrinhamento_rede','afilhado_id',
